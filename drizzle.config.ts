@@ -21,7 +21,10 @@ url.hostname = requireEnv("PGHOST");
 url.pathname = `/${requireEnv("PGDATABASE")}`;
 
 url.searchParams.set("sslmode", process.env.PGSSLMODE ?? "require");
-url.searchParams.set("channel_binding", process.env.PGCHANNELBINDING ?? "require");
+url.searchParams.set(
+  "channel_binding",
+  process.env.PGCHANNELBINDING ?? "require",
+);
 
 const connectionString = url.toString();
 

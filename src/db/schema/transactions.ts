@@ -3,7 +3,9 @@ import { users } from "./users";
 
 export const transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").notNull().references(() => users.id),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
   description: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),

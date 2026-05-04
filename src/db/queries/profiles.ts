@@ -57,6 +57,6 @@ export async function updateProfileName(
     .set({ firstName, lastName })
     .where(eq(profiles.id, userId))
     .returning();
-    
+
   return result[0];
 }
