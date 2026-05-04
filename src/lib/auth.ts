@@ -4,6 +4,8 @@ import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
 import { createUser, getUserByEmail } from "@/db/queries/users";
 import argon2 from "argon2";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { db } from "@/db";
 
 export async function hashPassword(password: string) {
   return await argon2.hash(password);
@@ -40,6 +42,7 @@ async function loginWithCredentials(
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  adapter: DrizzleAdapter(db),
   providers: [
     Credentials({
       name: "Cashly",

@@ -27,21 +27,9 @@ export async function createProfile(
     .insert(profiles)
     .values({
       id: userId,
-      username,
-      picture,
       firstName,
       lastName,
     })
-    .returning();
-
-  return result[0];
-}
-
-export async function updateProfilePicture(userId: string, picture: string) {
-  const result = await db
-    .update(profiles)
-    .set({ picture })
-    .where(eq(profiles.id, userId))
     .returning();
 
   return result[0];

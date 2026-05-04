@@ -1,3 +1,3 @@
 export * from "./users";
-export * from "./profiles";
 export * from "./transactions";
+export * from "./auth";
