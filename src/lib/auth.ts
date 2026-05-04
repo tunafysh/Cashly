@@ -6,6 +6,7 @@ import { createUser, getUserByEmail } from "@/db/queries/users";
 import argon2 from "argon2";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
+import { users, accounts, authenticators } from "@/db/schema";
 
 export async function hashPassword(password: string) {
   return await argon2.hash(password);
@@ -42,7 +43,11 @@ async function loginWithCredentials(
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: DrizzleAdapter(db),
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    authenticatorsTable: authenticators,
+  }),
   session: {
     strategy: "jwt",
   },
