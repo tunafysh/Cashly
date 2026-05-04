@@ -3,7 +3,7 @@ import "dotenv/config";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  username: text("username").notNull().unique(),
+  username: text("username").notNull(),
   email: text("email").notNull(),
   passwordHash: text("password_hash").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

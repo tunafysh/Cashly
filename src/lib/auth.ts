@@ -5,6 +5,10 @@ import GitHub from "next-auth/providers/github";
 import { createUser, getUserByEmail } from "@/db/queries/users";
 import argon2 from "argon2";
 
+export async function hashPassword(password: string) {
+  return await argon2.hash(password);
+}
+
 async function loginWithCredentials(
   credentials: Partial<Record<"email" | "password", string>>,
 ) {
@@ -13,21 +17,18 @@ async function loginWithCredentials(
   let user = await getUserByEmail(credentials.email);
 
   if (!user) {
-    const hashed = await argon2.hash(credentials.password);
+    const hashed = await hashPassword(credentials.password);
 
     user = await createUser(
       credentials.email.split("@")[0],
       credentials.email,
-      hashed
+      hashed,
     );
   }
 
   if (!user?.passwordHash) return null;
 
-  const valid = await argon2.verify(
-    user.passwordHash,
-    credentials.password
-  );
+  const valid = await argon2.verify(user.passwordHash, credentials.password);
 
   if (!valid) return null;
 
@@ -37,7 +38,6 @@ async function loginWithCredentials(
     name: user.username,
   };
 }
-
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
