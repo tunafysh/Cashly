@@ -43,6 +43,9 @@ async function loginWithCredentials(
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: DrizzleAdapter(db),
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     Credentials({
       name: "Cashly",
