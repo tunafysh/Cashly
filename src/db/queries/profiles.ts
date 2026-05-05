@@ -19,7 +19,6 @@ export async function getProfileByUserId(userId: string) {
 export async function createProfile(
   userId: string,
   username: string,
-  picture: string | null,
   firstName: string,
   lastName: string,
 ) {
@@ -27,6 +26,7 @@ export async function createProfile(
     .insert(profiles)
     .values({
       id: userId,
+      username,
       firstName,
       lastName,
     })
