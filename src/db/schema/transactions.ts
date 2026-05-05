@@ -3,7 +3,7 @@ import { users } from "./users";
 
 export const transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id")
+  userId: uuid("user_id") // snake case cuz im not a pick me.
     .notNull()
     .references(() => users.id),
   amount: numeric("amount", { precision: 10, scale: 2 }).notNull(),
