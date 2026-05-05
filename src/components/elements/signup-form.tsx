@@ -39,12 +39,13 @@ export function SignupForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
+          <div>
           <form
             className="p-6 md:p-8"
             action={async (formData) => {
               "use server";
 
-              let username = formData.get("username")?.toString();
+              let name = formData.get("name")?.toString();
               let email = formData.get("email")?.toString();
               let password = formData.get("password")?.toString();
               let confirmPassword = formData
@@ -53,9 +54,9 @@ export function SignupForm({
 
               if (password !== confirmPassword) return;
 
-              if (!username || !email || !password) return;
+              if (!name || !email || !password) return;
 
-              await createUser(username, email, password);
+              await createUser(name, email, password);
 
               const data = new FormData();
               data.set("email", email);
@@ -72,12 +73,12 @@ export function SignupForm({
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Username</FieldLabel>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
                 <Input
-                  name="username"
-                  id="username"
+                  name="name"
+                  id="name"
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder="Enter your name. e.g John Doe"
                   required
                 />
               </Field>
@@ -111,9 +112,13 @@ export function SignupForm({
               <Field>
                 <Button type="submit">Sign up</Button>
               </Field>
+              </FieldGroup>
+              </form>
+              <FieldGroup>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
               </FieldSeparator>
+              <div className="px-6 pb-6 md:px-8 md:pb-8">
               <Field className="grid grid-rows-2 gap-4">
                 <form
                   action={async () => {
@@ -124,7 +129,7 @@ export function SignupForm({
                   <Button
                     variant="outline"
                     type="submit"
-                    className="group/btn relative gap-4 "
+                    className="group/btn relative gap-4 w-full"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                       <path
@@ -145,7 +150,7 @@ export function SignupForm({
                   <Button
                     variant="outline"
                     type="submit"
-                    className="group/btn relative gap-4"
+                    className="group/btn relative gap-4 w-full"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                       <path
@@ -158,11 +163,13 @@ export function SignupForm({
                   </Button>
                 </form>
               </Field>
+              <br />
               <FieldDescription className="text-center">
                 Have an account? <a href="/login">Log in</a>
               </FieldDescription>
-            </FieldGroup>
-          </form>
+              </div>
+              </FieldGroup>
+            </div>
           <div className="relative hidden bg-muted md:block">
             <img
               src="https://images.unsplash.com/photo-1774050952646-a850ad28ad6f?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxmZWF0dXJlZC1waG90b3MtZmVlZHw1fHx8ZW58MHx8fHx8"
