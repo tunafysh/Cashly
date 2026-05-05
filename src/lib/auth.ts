@@ -38,7 +38,7 @@ async function loginWithCredentials(
   return {
     id: user.id,
     email: user.email,
-    name: user.username,
+    name: user.name,
   };
 }
 

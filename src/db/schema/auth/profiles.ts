@@ -7,6 +7,7 @@ export const profiles = pgTable("profiles", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" })
     .primaryKey(),
+  username: text("username").notNull(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
 });

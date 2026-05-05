@@ -24,7 +24,7 @@ export async function getUserByEmailQuery(email: string) {
 }
 
 export async function createUser(
-  username: string,
+  name: string,
   email: string,
   password: string,
 ) {
@@ -33,7 +33,7 @@ export async function createUser(
   const result = await db
     .insert(users)
     .values({
-      username,
+      name,
       email,
       passwordHash,
     })
@@ -62,10 +62,10 @@ export async function updateUserPassword(id: string, passwordHash: string) {
   return result[0];
 }
 
-export async function updateUsername(id: string, username: string) {
+export async function updateName(id: string, name: string) {
   const result = await db
     .update(users)
-    .set({ username })
+    .set({ name })
     .where(eq(users.id, id))
     .returning();
 
