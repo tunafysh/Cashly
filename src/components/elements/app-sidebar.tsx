@@ -31,6 +31,8 @@ import {
   FileIcon,
   CommandIcon,
 } from "lucide-react";
+import { Suspense } from "react";
+import { Skeleton } from "../ui/skeleton";
 
 const data = {
   user: {

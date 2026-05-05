@@ -1,4 +1,3 @@
-"use server"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,7 +14,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { auth } from "@/lib/auth";
 import {
   EllipsisVerticalIcon,
   CircleUserRoundIcon,
@@ -23,19 +21,25 @@ import {
   BellIcon,
   LogOutIcon,
 } from "lucide-react";
-import { User } from "next-auth";
 import { signOut, useSession } from "next-auth/react";
-import { useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+
+function getInitials(name: string) {
+  const words = name.split(" ")
+  let initials = "";
+  words.forEach((word, index) => {
+    initials += word[0].toUpperCase()
+  })
+  return initials;
+}
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const [user, setUser] = useState<User | null>(null);
+  const { data, status } = useSession();
 
-  auth().then((session) => {
-    if (session?.user) {
-      setUser(session.user);
-    }
-  });
+  const user = data?.user;
+
+  if (status === "loading") return <Skeleton className="w-full h-full" />;
 
   return (
     <SidebarMenu>
@@ -48,7 +52,7 @@ export function NavUser() {
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? undefined} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{getInitials(user?.name ?? "")}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user?.name ?? undefined}</span>

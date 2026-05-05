@@ -7,9 +7,12 @@ import { SiteHeader } from "@/components/elements/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 import data from "./data.json";
+import { SessionProvider } from "next-auth/react";
 
 export default function Page() {
   return (
+    <SessionProvider>
+
     <SidebarProvider
       style={
         {
@@ -34,5 +37,6 @@ export default function Page() {
         </div>
       </SidebarInset>
     </SidebarProvider>
+    </SessionProvider>
   );
 }
