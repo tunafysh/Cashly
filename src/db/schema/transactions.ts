@@ -25,6 +25,8 @@ export const transactions = pgTable("transactions", {
   categoryId: uuid("category_id").references(() => categories.id),
   description: text("description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => {
+  return [
+    index("user_id_idx").on(table.userId),
+  ]
 });
-
-index("user_id_idx").on(transactions.userId);
