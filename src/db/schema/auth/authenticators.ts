@@ -1,4 +1,11 @@
-import { integer, pgTable, boolean, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import {
+  integer,
+  pgTable,
+  boolean,
+  primaryKey,
+  text,
+  uuid,
+} from "drizzle-orm/pg-core";
 import { users } from "../users";
 
 export const authenticators = pgTable(
@@ -21,5 +28,5 @@ export const authenticators = pgTable(
         columns: [authenticator.userId, authenticator.credentialID],
       }),
     },
-  ]
-)
+  ],
+);

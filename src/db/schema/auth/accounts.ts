@@ -1,8 +1,19 @@
-import { pgTable, uuid, text, timestamp, primaryKey, integer } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  primaryKey,
+  integer,
+} from "drizzle-orm/pg-core";
 import { users } from "../users";
 
-export const accounts = pgTable("accounts", {
-    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+export const accounts = pgTable(
+  "accounts",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     provider: text("provider").notNull(),
     providerAccountId: text("provider_account_id").notNull(),
@@ -20,5 +31,5 @@ export const accounts = pgTable("accounts", {
         columns: [account.provider, account.providerAccountId],
       }),
     },
-  ]
+  ],
 );
