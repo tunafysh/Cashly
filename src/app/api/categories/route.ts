@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createCategory, deleteCategory, getUserCategories, updateCategory } from "@/db/queries/categories";
+import {
+  createCategory,
+  deleteCategory,
+  getUserCategories,
+  updateCategory,
+} from "@/db/queries/categories";
 import { auth } from "@/lib/auth";
 
 export async function GET() {
@@ -17,7 +22,7 @@ export async function GET() {
     console.error("Error fetching categories:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -35,15 +40,15 @@ export async function POST(req: NextRequest) {
     const category = await createCategory({
       userId: session.user.id,
       name,
-      color
-  });
+      color,
+    });
 
     return NextResponse.json({ category });
   } catch (error) {
     console.error("Error creating category:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -58,19 +63,14 @@ export async function PATCH(req: NextRequest) {
   try {
     const { id, name, color } = await req.json();
 
-    const category = await updateCategory(
-      session.user.id,
-      id,
-      name,
-      color
-    );
+    const category = await updateCategory(session.user.id, id, name, color);
 
     return NextResponse.json({ category });
   } catch (error) {
     console.error("Error updating category:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -94,7 +94,7 @@ export async function DELETE(req: NextRequest) {
     console.error("Error deleting category:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

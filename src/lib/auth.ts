@@ -20,13 +20,7 @@ async function loginWithCredentials(
   let user = await getUserByEmail(credentials.email);
 
   if (!user) {
-    const hashed = await hashPassword(credentials.password);
-
-    user = await createUser(
-      credentials.email.split("@")[0],
-      credentials.email,
-      hashed,
-    );
+    throw new Error("User not found");
   }
 
   if (!user?.passwordHash) return null;
@@ -50,6 +44,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   }),
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
   providers: [
     Credentials({
