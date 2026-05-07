@@ -82,7 +82,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
       },
     }),
-    Google,
-    GitHub,
+    Google({
+    async profile(profile) {
+      return { ...profile }
+    },
+    }),
+    GitHub({
+    async profile(profile) {
+      return { 
+        id: String(profile.id),
+        name: profile.name,
+        email: profile.email,
+        image: profile.avatar_url,
+       }
+    },
+    }),
   ],
 });
