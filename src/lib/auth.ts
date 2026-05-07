@@ -50,6 +50,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id;
       }
+
+      console.log("JWT TOKEN:", token);
+
       return token;
     },
 
