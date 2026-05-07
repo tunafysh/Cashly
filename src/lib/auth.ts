@@ -52,6 +52,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return token;
     },
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
   providers: [
     Credentials({
@@ -82,20 +89,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         });
       },
     }),
-    Google({
-    async profile(profile) {
-      return { ...profile }
-    },
-    }),
-    GitHub({
-    async profile(profile) {
-      return { 
-        id: String(profile.id),
-        name: profile.name,
-        email: profile.email,
-        image: profile.avatar_url,
-       }
-    },
-    }),
+    Google,
+    GitHub,
   ],
 });
