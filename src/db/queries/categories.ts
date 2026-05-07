@@ -9,10 +9,16 @@ type CreateCategoryInput = {
 };
 
 export async function getUserCategories(userId: string) {
+  // Check if the user has any categories
+  if( !(await db.select().from(categories).where(eq(categories.userId, userId)).limit(1)).length) {
+    // If not, return an empty array instead of null to avoid issues in the frontend    
+    return [];
+  }
+
   return await db
     .select()
     .from(categories)
-    .where(eq(categories.userId, userId));
+    .where(eq(categories.userId, userId))
 }
 
 export async function createCategory({
