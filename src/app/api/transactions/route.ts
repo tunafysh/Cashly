@@ -67,8 +67,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     try {
-        const { transactionId } = await req.json();
-        await deleteTransaction(session.user.id, transactionId);
+        const { id } = await req.json();
+        await deleteTransaction(session.user.id, id);
         return NextResponse.json({ message: "Transaction deleted successfully" });
     } catch (error) {
         console.error("Error deleting transaction:", error);
