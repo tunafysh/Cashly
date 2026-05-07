@@ -1,7 +1,6 @@
 "use client";
 import { AppSidebar } from "@/components/elements/app-sidebar";
 import { ChartAreaInteractive } from "@/components/elements/chart-area-interactive";
-import { DataTable } from "@/components/elements/data-table";
 import { SectionCards } from "@/components/elements/section-cards";
 import { SiteHeader } from "@/components/elements/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -30,7 +29,7 @@ export default function Page() {
                 <div className="px-4 lg:px-6">
                   <ChartAreaInteractive />
                 </div>
-                <DataTable data={data} />
+                
               </div>
             </div>
           </div>

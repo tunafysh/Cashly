@@ -10,6 +10,8 @@ import { auth } from "@/lib/auth";
 export async function GET() {
   const session = await auth();
 
+  console.log("Session in GET /api/categories:", session);
+
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -29,6 +31,8 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const session = await auth();
+
+  console.log("Session in POST /api/categories:", session);
 
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -56,6 +60,8 @@ export async function POST(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const session = await auth();
 
+  console.log("Session in PATCH /api/categories:", session);
+
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -77,6 +83,8 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   const session = await auth();
+
+  console.log("Session in DELETE /api/categories:", session);
 
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
