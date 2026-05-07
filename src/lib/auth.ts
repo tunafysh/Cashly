@@ -47,11 +47,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   callbacks: {
     async jwt({ token, user }) {
+      // first login (user exists)
       if (user) {
         token.id = user.id;
       }
 
-      console.log("JWT TOKEN:", token);
+      // IMPORTANT: OAuth case fallback
+      if (!token.id && token.sub) {
+        token.id = token.sub;
+      }
 
       return token;
     },
