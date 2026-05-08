@@ -26,7 +26,7 @@ export const transactions = pgTable(
     type: transactionTypeEnum("type").notNull(),
     categoryId: uuid("category_id").references(() => categories.id),
     description: text("description"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => {
     return [index("user_id_idx").on(table.userId)];
