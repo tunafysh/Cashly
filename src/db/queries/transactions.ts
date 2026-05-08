@@ -1,4 +1,4 @@
-import { eq, and, gte, ne, or, isNull, desc } from "drizzle-orm";
+import { eq, and, gte, ne, or, isNull, desc, lte } from "drizzle-orm";
 import { db } from "..";
 import { categories, transactions } from "../schema";
 
@@ -53,6 +53,12 @@ export async function getUserTransactions(
     );
   }
 
+  if (filters?.toDate) {
+    conditions.push(
+      lte(transactions.createdAt, filters.toDate)
+    );
+  }
+
   if (filters?.categoryId) {
     conditions.push(
       eq(transactions.categoryId, filters.categoryId)
@@ -69,10 +75,6 @@ export async function getUserTransactions(
     conditions.push(
       or(ne(transactions.description, ""), isNull(transactions.description))!
     );
-  }
-  
-  if (!(await baseTransactionQuery().where(and(...conditions)).limit(1)).length) {
-    return [];
   }
 
   return await baseTransactionQuery().where(and(...conditions)).orderBy(desc(transactions.createdAt));
