@@ -20,8 +20,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  let body = await req.json();
+
+  console.log("body: ", body);
+
   try {
-    const filters = parseTransactionFilters(await req.json());
+    const filters = parseTransactionFilters(body);
 
     console.log("Parsed filters:", filters);
 
