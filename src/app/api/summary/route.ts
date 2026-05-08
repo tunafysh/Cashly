@@ -1,11 +1,14 @@
 import { getUserTransactions, Filters } from "@/db/queries/transactions";
 import { auth } from "@/lib/auth";
+import { parseDate } from "@/lib/date";
 import { NextRequest, NextResponse } from "next/server";
 
 function parseFilters(body: any): Filters {
+  const fromDate = parseDate(body.fromDate);
+  const toDate = parseDate(body.toDate);
   return {
-    fromDate: body.fromDate ? new Date(body.fromDate) : undefined,
-    toDate: body.toDate ? new Date(body.toDate) : undefined,
+    fromDate: body.fromDate ? fromDate : undefined,
+    toDate: body.toDate ? toDate : undefined,
     categoryId: body.categoryId,
     type: body.type,
     withDescription: body.withDescription,
