@@ -108,8 +108,10 @@ export function NavUser() {
             <LogoutButton>
             <DropdownMenuItem variant="destructive">
               <LogoutButton>
-                <LogOutIcon />
-                Log out
+                <>
+                  <LogOutIcon />
+                  Log out
+                </>
               </LogoutButton>
             </DropdownMenuItem>
             </LogoutButton>
