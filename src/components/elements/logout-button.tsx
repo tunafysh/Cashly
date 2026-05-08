@@ -26,7 +26,7 @@ export default function LogoutButton({ children }: { children: React.ReactNode }
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => signOut({ redirectTo: "/" })}>
+          <AlertDialogAction variant={"destructive"} onClick={() => signOut({ redirectTo: "/" })}>
             Logout
           </AlertDialogAction>
         </AlertDialogFooter>
