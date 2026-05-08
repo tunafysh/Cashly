@@ -13,12 +13,12 @@ export function parseTransactionFilters(body: any): Filters | undefined {
   const filters: Filters = {};
 
   if (body.fromDate && body.fromDate !== "") {
-    const parsed = parseDate(body.fromDate);
+    const parsed = parseDate(body.fromDate, false);
     if (parsed) filters.fromDate = parsed;
   }
 
   if (body.toDate && body.toDate !== "") {
-    const parsed = parseDate(body.toDate);
+    const parsed = parseDate(body.toDate, true);
     if (parsed) filters.toDate = parsed;
   }
 
