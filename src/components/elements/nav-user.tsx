@@ -106,7 +106,7 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <LogoutButton>
-            <DropdownMenuItem variant="destructive" onClick={() => signOut({ redirectTo: "/" })}>
+            <DropdownMenuItem variant="destructive">
               <LogOutIcon />
               Log out
             </DropdownMenuItem>
