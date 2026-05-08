@@ -30,12 +30,12 @@ export function parseDate(input: string): Date {
     return new Date(year, month - 1, day, 0, 0, 0, 0);
   }
 
-  if (monthOnly.test(input)&& Number(input)>=1 && Number(input)<=12) {
+  if (monthOnly.test(input) && Number(input) >= 1 && Number(input) <= 12) {
     const month = Number(input);
     return new Date(0, month - 1, 1, 0, 0, 0, 0);
   }
 
-  if (dayOnly.test(input)&& Number(input)>=1 && Number(input)<=31) {
+  if (dayOnly.test(input) && Number(input) >= 1 && Number(input) <= 31) {
     const day = Number(input);
     return new Date(0, 0, day, 0, 0, 0, 0);
   }

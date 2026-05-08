@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   try {
     const session = await auth();
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -20,11 +20,11 @@ export async function GET(req: NextRequest) {
     const transactions = await getUserTransactions(userId, filters);
 
     const income = transactions
-      .filter(t => t.type === "income")
+      .filter((t) => t.type === "income")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const expenses = transactions
-      .filter(t => t.type === "expense")
+      .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const balance = income + expenses;
@@ -36,9 +36,6 @@ export async function GET(req: NextRequest) {
       expenses: Math.abs(expenses),
     });
   } catch (err) {
-    return NextResponse.json(
-      { error: "Invalid request" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }

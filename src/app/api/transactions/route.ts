@@ -1,6 +1,10 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserTransactions, createTransaction, deleteTransaction } from "@/db/queries/transactions";
+import {
+  getUserTransactions,
+  createTransaction,
+  deleteTransaction,
+} from "@/db/queries/transactions";
 import { parseTransactionFilters } from "@/lib/utils";
 
 type CreateTransactionInput = {
@@ -21,23 +25,22 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
-    const query = Object.fromEntries(searchParams.entries());
+    const hasParams = searchParams.toString().length > 0;
 
-    const filters = parseTransactionFilters(query);
+    const filters = hasParams
+      ? parseTransactionFilters(Object.fromEntries(searchParams.entries()))
+      : undefined;
 
     console.log("Parsed filters:", filters);
 
-    const transactions = await getUserTransactions(
-      session.user.id,
-      filters
-    );
+    const transactions = await getUserTransactions(session.user.id, filters);
 
     return NextResponse.json({ transactions });
   } catch (error) {
     console.error("Error fetching transactions:", error);
     return NextResponse.json(
       { message: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -49,45 +52,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-    try {
-        const { amount, type, categoryId, description } = await req.json();
+  try {
+    const { amount, type, categoryId, description } = await req.json();
 
-        const transaction = await createTransaction({
-            userId: session.user.id,
-            amount,
-            type,
-            categoryId,
-            description,
-        });
+    const transaction = await createTransaction({
+      userId: session.user.id,
+      amount,
+      type,
+      categoryId,
+      description,
+    });
 
-        return NextResponse.json({ transaction });
-    } catch (error) {
-        console.error("Error creating transaction:", error);
-        return NextResponse.json(
-          { message: "Internal Server Error" },
-          { status: 500 },
-        );
-    }
+    return NextResponse.json({ transaction });
+  } catch (error) {
+    console.error("Error creating transaction:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
 }
 
 // No UPDATE function since transactions are immutable.
 
 export async function DELETE(req: NextRequest) {
-    const session = await auth();
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    try {
-        const { id } = await req.json();
-        await deleteTransaction(session.user.id, id);
-        return NextResponse.json({ message: "Transaction deleted successfully" });
-    } catch (error) {
-        console.error("Error deleting transaction:", error);
-        return NextResponse.json(
-          { message: "Internal Server Error" },
-          { status: 500 },
-        );
-    }
+  try {
+    const { id } = await req.json();
+    await deleteTransaction(session.user.id, id);
+    return NextResponse.json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
 }

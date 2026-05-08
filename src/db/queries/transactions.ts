@@ -39,52 +39,40 @@ export type Filters = {
   type?: "income" | "expense";
 };
 
-export async function getUserTransactions(
-  userId: string,
-  filters?: Filters
-) {
-  const conditions = [
-    eq(transactions.userId, userId),
-  ];
+export async function getUserTransactions(userId: string, filters?: Filters) {
+  const conditions = [eq(transactions.userId, userId)];
 
   if (filters?.fromDate) {
-    conditions.push(
-      gte(transactions.createdAt, filters.fromDate)
-    );
+    conditions.push(gte(transactions.createdAt, filters.fromDate));
   }
 
   if (filters?.toDate) {
-    conditions.push(
-      lte(transactions.createdAt, filters.toDate)
-    );
+    conditions.push(lte(transactions.createdAt, filters.toDate));
   }
 
   if (filters?.categoryId) {
-    conditions.push(
-      eq(transactions.categoryId, filters.categoryId)
-    );
+    conditions.push(eq(transactions.categoryId, filters.categoryId));
   }
 
   if (filters?.type) {
-    conditions.push(
-      eq(transactions.type, filters.type)
-    );
+    conditions.push(eq(transactions.type, filters.type));
   }
 
   if (filters?.withDescription) {
     conditions.push(
-      or(ne(transactions.description, ""), isNull(transactions.description))!
+      or(ne(transactions.description, ""), isNull(transactions.description))!,
     );
   }
 
   if (filters?.withDescription === false) {
     conditions.push(
-      or(eq(transactions.description, ""), isNull(transactions.description))!
+      or(eq(transactions.description, ""), isNull(transactions.description))!,
     );
   }
 
-  return await baseTransactionQuery().where(and(...conditions)).orderBy(desc(transactions.createdAt));
-  
+  return await baseTransactionQuery()
+    .where(and(...conditions))
+    .orderBy(desc(transactions.createdAt));
 }
 
 export async function createTransaction({
