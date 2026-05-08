@@ -2,8 +2,8 @@ export function parseDate(input: string, max: boolean): Date | undefined {
   const yearOnly = /^\d{4}$/;
   const monthOnly = /^\d{2}$/;
   const dayOnly = /^\d{2}$/; // can't believe i am repeating this but whatever
-  const yearMonth = /^\d{4}-\d{2}$/;
-  const yearMonthDay = /^\d{4}-\d{2}-\d{2}$/;
+  const yearMonth = /^\d{2}-\d{4}$/;
+  const yearMonthDay = /^\d{2}-\d{2}-\d{4}$/;
 
   // YYYY
   if (yearOnly.test(input)) {
@@ -15,7 +15,7 @@ export function parseDate(input: string, max: boolean): Date | undefined {
 
   // YYYY-MM
   if (yearMonth.test(input)) {
-    const [yearStr, monthStr] = input.split("-");
+    const [monthStr, yearStr] = input.split("-");
     const year = Number(yearStr);
     const month = Number(monthStr);
 
@@ -26,7 +26,7 @@ export function parseDate(input: string, max: boolean): Date | undefined {
 
   // YYYY-MM-DD
   if (yearMonthDay.test(input)) {
-    const [yearStr, monthStr, dayStr] = input.split("-");
+    const [dayStr, monthStr, yearStr] = input.split("-");
     const year = Number(yearStr);
     const month = Number(monthStr);
     const day = Number(dayStr);
@@ -56,5 +56,5 @@ export function parseDate(input: string, max: boolean): Date | undefined {
     return undefined;
   }
 
-  throw new Error("Invalid date format. Use YYYY, YYYY-MM, or YYYY-MM-DD");
+  throw new Error("Invalid date format. Use YYYY, MM-YYYY, or DD-MM-YYYY");
 }
