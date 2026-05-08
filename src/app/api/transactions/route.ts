@@ -10,23 +10,49 @@ type CreateTransactionInput = {
   description?: string;
 };
 
-export async function GET() {
-    const session = await auth();
+export async function GET(req: Request) {
+  const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+  if (!session?.user?.id) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
-    try {
-        const transactions = await getUserTransactions(session.user.id);
-        return NextResponse.json({ transactions });
-    } catch (error) {
-        console.error("Error fetching transactions:", error);
-        return NextResponse.json(
-          { message: "Internal Server Error" },
-          { status: 500 },
-        );
-    }
+  try {
+    const { searchParams } = new URL(req.url);
+
+    const filters = {
+      fromDate: searchParams.get("fromDate")
+        ? new Date(searchParams.get("fromDate")!)
+        : undefined,
+
+      toDate: searchParams.get("toDate")
+        ? new Date(searchParams.get("toDate")!)
+        : undefined,
+
+      categoryId: searchParams.get("categoryId") ?? undefined,
+
+      type: searchParams.get("type") as
+        | "income"
+        | "expense"
+        | undefined,
+
+      withDescription:
+        searchParams.get("withDescription") === "true",
+    };
+
+    const transactions = await getUserTransactions(
+      session.user.id,
+      filters
+    );
+
+    return NextResponse.json({ transactions });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
