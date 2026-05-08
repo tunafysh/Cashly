@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function parseTransactionFilters(body: any): Filters | undefined {
   if (!body) return undefined;
-  
+
   const filters: Filters = {};
 
   if (body.fromDate && body.fromDate !== "") {

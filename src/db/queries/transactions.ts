@@ -1,4 +1,4 @@
-import { eq, and, gte, ne, or, isNull, desc, lt } from "drizzle-orm";
+import { eq, and, gte, ne, or, isNotNull, desc, lt, isNull } from "drizzle-orm";
 import { db } from "..";
 import { categories, transactions } from "../schema";
 
@@ -42,6 +42,10 @@ export type Filters = {
 export async function getUserTransactions(userId: string, filters?: Filters) {
   const conditions = [eq(transactions.userId, userId)];
 
+  console.log(filters);
+  console.log(filters?.fromDate instanceof Date);
+  console.log(filters?.toDate instanceof Date);
+
   if (filters?.fromDate) {
     conditions.push(gte(transactions.createdAt, filters.fromDate));
   }
@@ -61,9 +65,12 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     conditions.push(eq(transactions.type, filters.type));
   }
 
-  if (filters?.withDescription) {
+  if (filters?.withDescription === true) {
     conditions.push(
-      or(ne(transactions.description, ""), isNull(transactions.description))!,
+      and(
+        ne(transactions.description, ""),
+        isNotNull(transactions.description),
+      )!,
     );
   }
 

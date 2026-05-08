@@ -18,7 +18,13 @@ type SummaryData = {
   expenses: number;
 };
 
-export function SectionCards({ fromDate, toDate }: { fromDate?: Date; toDate?: Date }) {
+export function SectionCards({
+  fromDate,
+  toDate,
+}: {
+  fromDate?: Date;
+  toDate?: Date;
+}) {
   const [data, setData] = useState<SummaryData>({
     balance: 0,
     income: 0,
@@ -110,8 +116,7 @@ export function SectionCards({ fromDate, toDate }: { fromDate?: Date; toDate?: D
             <Badge variant="outline">
               {data.balance >= 0 ? (
                 <>
-                  <TrendingUpIcon />
-                  +{data.balance.toFixed(2)}
+                  <TrendingUpIcon />+{data.balance.toFixed(2)}
                 </>
               ) : (
                 <>
@@ -124,7 +129,8 @@ export function SectionCards({ fromDate, toDate }: { fromDate?: Date; toDate?: D
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Net balance {data.balance >= 0 ? "positive" : "negative"} <TrendingUpIcon className="size-4" />
+            Net balance {data.balance >= 0 ? "positive" : "negative"}{" "}
+            <TrendingUpIcon className="size-4" />
           </div>
           <div className="text-muted-foreground">
             {fromDate || toDate ? "Filtered period" : "All time"}

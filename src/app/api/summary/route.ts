@@ -12,7 +12,9 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const filters = parseTransactionFilters(Object.fromEntries(searchParams.entries()));
+    const filters = parseTransactionFilters(
+      Object.fromEntries(searchParams.entries()),
+    );
 
     const transactions = await getUserTransactions(session.user.id, filters);
 

@@ -137,7 +137,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartAreaInteractive({ onDateRangeChange }: { onDateRangeChange?: (fromDate?: Date, toDate?: Date) => void }) {
+export function ChartAreaInteractive({
+  onDateRangeChange,
+}: {
+  onDateRangeChange?: (fromDate?: Date, toDate?: Date) => void;
+}) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("90d");
 
