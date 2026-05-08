@@ -43,7 +43,7 @@ export function LoginForm({
               className="p-6 md:p-8"
               action={async (formData) => {
                 "use server";
-                await signIn("credentials", formData);
+                await signIn("credentials", formData, { redirectTo: "/app" });
               }}
             >
               <FieldGroup>
@@ -97,7 +97,7 @@ export function LoginForm({
                     className="group/btn relative gap-4 "
                     onClick={async () => {
                       "use server";
-                      await signIn("google");
+                      await signIn("google", { redirectTo: "/app" });
                     }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -114,7 +114,7 @@ export function LoginForm({
                     className="group/btn relative gap-4"
                     onClick={async () => {
                       "use server";
-                      await signIn("github");
+                      await signIn("github", { redirectTo: "/app" });
                     }}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

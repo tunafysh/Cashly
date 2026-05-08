@@ -62,7 +62,7 @@ export function SignupForm({
                 data.set("email", email);
                 data.set("password", password);
 
-                await signIn("credentials", data);
+                await signIn("credentials", data, { redirectTo: "/app" });
               }}
             >
               <FieldGroup>
@@ -128,7 +128,7 @@ export function SignupForm({
                   <form
                     action={async () => {
                       "use server";
-                      await signIn("google");
+                      await signIn("google", { redirectTo: "/app" });
                     }}
                   >
                     <Button
@@ -152,7 +152,7 @@ export function SignupForm({
                   <form
                     action={async () => {
                       "use server";
-                      await signIn("github");
+                      await signIn("github", { redirectTo: "/app" });
                     }}
                   >
                     <Button
