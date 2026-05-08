@@ -1,19 +1,7 @@
 import { getUserTransactions, Filters } from "@/db/queries/transactions";
 import { auth } from "@/lib/auth";
-import { parseDate } from "@/lib/date";
+import { parseTransactionFilters } from "@/lib/utils";
 import { NextRequest, NextResponse } from "next/server";
-
-function parseFilters(body: any): Filters {
-  const fromDate = parseDate(body.fromDate);
-  const toDate = parseDate(body.toDate);
-  return {
-    fromDate: body.fromDate ? fromDate : undefined,
-    toDate: body.toDate ? toDate : undefined,
-    categoryId: body.categoryId,
-    type: body.type,
-    withDescription: body.withDescription,
-  };
-}
 
 export async function GET(req: NextRequest) {
   try {
@@ -27,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     const body = await req.json();
 
-    const filters = parseFilters(body);
+    const filters = parseTransactionFilters(body);
 
     const transactions = await getUserTransactions(userId, filters);
 

@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { getUserTransactions, createTransaction, deleteTransaction } from "@/db/queries/transactions";
+import { parseTransactionFilters } from "@/lib/utils";
 
 type CreateTransactionInput = {
   userId: string;
@@ -20,25 +21,7 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
-    const filters = {
-      fromDate: searchParams.get("fromDate")
-        ? new Date(searchParams.get("fromDate")!)
-        : undefined,
-
-      toDate: searchParams.get("toDate")
-        ? new Date(searchParams.get("toDate")!)
-        : undefined,
-
-      categoryId: searchParams.get("categoryId") ?? undefined,
-
-      type: searchParams.get("type") as
-        | "income"
-        | "expense"
-        | undefined,
-
-      withDescription:
-        searchParams.get("withDescription") === "true",
-    };
+    const filters = parseTransactionFilters(await req.json());
 
     console.log("Parsed filters:", filters);
 
