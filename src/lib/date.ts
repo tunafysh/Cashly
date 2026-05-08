@@ -1,4 +1,4 @@
-export function parseDate(input: string): Date {
+export function parseDate(input: string): Date | undefined {
   const yearOnly = /^\d{4}$/;
   const monthOnly = /^\d{2}$/;
   const dayOnly = /^\d{2}$/; // can't believe i am repeating this but whatever
@@ -38,6 +38,10 @@ export function parseDate(input: string): Date {
   if (dayOnly.test(input) && Number(input) >= 1 && Number(input) <= 31) {
     const day = Number(input);
     return new Date(0, 0, day, 0, 0, 0, 0);
+  }
+
+  if (input === "" || input === null || input === undefined) {
+    return undefined;
   }
 
   throw new Error("Invalid date format. Use YYYY, YYYY-MM, or YYYY-MM-DD");
