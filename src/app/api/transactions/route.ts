@@ -25,7 +25,8 @@ export async function GET(req: Request) {
   console.log("body: ", body);
 
   try {
-    const filters = parseTransactionFilters(body);
+
+    const filters = (body && Object.keys(body).length > 0) ? parseTransactionFilters(body) : undefined;
 
     console.log("Parsed filters:", filters);
 
