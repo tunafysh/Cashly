@@ -40,6 +40,8 @@ export async function GET(req: Request) {
         searchParams.get("withDescription") === "true",
     };
 
+    console.log("Parsed filters:", filters);
+
     const transactions = await getUserTransactions(
       session.user.id,
       filters
