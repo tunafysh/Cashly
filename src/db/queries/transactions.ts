@@ -54,7 +54,7 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     const endOfDay = new Date(filters.toDate);
     endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
     endOfDay.setUTCHours(0, 0, 0, 0);
-    conditions.push(lt(transactions.createdAt, endOfDay));
+    conditions.push(lte(transactions.createdAt, endOfDay));
   }
 
   if (filters?.categoryId) {
