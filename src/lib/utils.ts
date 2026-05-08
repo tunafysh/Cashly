@@ -8,6 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function parseTransactionFilters(body: any): Filters | undefined {
+  console.log("body: ", body);
   if (!body) return undefined;
   const fromDate = parseDate(body.fromDate);
   const toDate = parseDate(body.toDate);
