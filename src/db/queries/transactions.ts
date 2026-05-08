@@ -77,6 +77,12 @@ export async function getUserTransactions(
     );
   }
 
+  if (filters?.withDescription === false) {
+    conditions.push(
+      or(eq(transactions.description, ""), isNull(transactions.description))!
+    );
+  }
+
   return await baseTransactionQuery().where(and(...conditions)).orderBy(desc(transactions.createdAt));
   
 }
