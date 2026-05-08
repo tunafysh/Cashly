@@ -20,9 +20,11 @@ import {
   CreditCardIcon,
   BellIcon,
   LogOutIcon,
+  Settings2Icon,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { Skeleton } from "../ui/skeleton";
+import LogoutButton from "./logout-button";
 
 function getInitials(name: string) {
   const words = name.split(" ");
@@ -83,7 +85,7 @@ export function NavUser() {
                     src={user?.image ?? undefined}
                     alt={user?.name ?? undefined}
                   />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{getInitials(user?.name ?? "")}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
@@ -98,23 +100,17 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <CircleUserRoundIcon />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
+                <Settings2Icon />
+                Settings
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => signOut({ redirectTo: "/" })}>
+            <LogoutButton>
+            <DropdownMenuItem variant="destructive" onClick={() => signOut({ redirectTo: "/" })}>
               <LogOutIcon />
               Log out
             </DropdownMenuItem>
+            </LogoutButton>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

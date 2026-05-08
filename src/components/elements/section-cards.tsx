@@ -18,29 +18,34 @@ type SummaryData = {
   expenses: number;
 };
 
-function sectionCard(data: SummaryData, loading: boolean, fromDate?: Date, toDate?: Date) {
+function sectionCard(
+  data: SummaryData,
+  loading: boolean,
+  fromDate?: Date,
+  toDate?: Date,
+) {
   <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Income</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ${data.income.toFixed(2)}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon />
-              +12.5%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Income {loading ? "loading..." : "loaded"}
-          </div>
-          <div className="text-muted-foreground">
-            {fromDate || toDate ? "Filtered period" : "All time"}
-          </div>
-        </CardFooter>
-      </Card>
+    <CardHeader>
+      <CardDescription>Total Income</CardDescription>
+      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+        ${data.income.toFixed(2)}
+      </CardTitle>
+      <CardAction>
+        <Badge variant="outline">
+          <TrendingUpIcon />
+          +12.5%
+        </Badge>
+      </CardAction>
+    </CardHeader>
+    <CardFooter className="flex-col items-start gap-1.5 text-sm">
+      <div className="line-clamp-1 flex gap-2 font-medium">
+        Income {loading ? "loading..." : "loaded"}
+      </div>
+      <div className="text-muted-foreground">
+        {fromDate || toDate ? "Filtered period" : "All time"}
+      </div>
+    </CardFooter>
+  </Card>;
 }
 
 export function SectionCards({
