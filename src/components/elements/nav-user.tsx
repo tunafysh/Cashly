@@ -106,14 +106,10 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <LogoutButton>
-            <DropdownMenuItem variant="destructive">
-              <LogoutButton>
-                <>
-                  <LogOutIcon />
-                  Log out
-                </>
-              </LogoutButton>
-            </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+                <LogOutIcon />
+                Log out
+              </DropdownMenuItem>
             </LogoutButton>
           </DropdownMenuContent>
         </DropdownMenu>
