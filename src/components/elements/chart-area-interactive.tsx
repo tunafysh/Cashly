@@ -137,7 +137,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function ChartAreaInteractive() {
+export function ChartAreaInteractive({ onDateRangeChange }: { onDateRangeChange?: (fromDate?: Date, toDate?: Date) => void }) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("90d");
 
@@ -146,6 +146,23 @@ export function ChartAreaInteractive() {
       setTimeRange("7d");
     }
   }, [isMobile]);
+
+  React.useEffect(() => {
+    const referenceDate = new Date("2024-06-30");
+    let daysToSubtract = 90;
+    if (timeRange === "30d") {
+      daysToSubtract = 30;
+    } else if (timeRange === "7d") {
+      daysToSubtract = 7;
+    }
+    const fromDate = new Date(referenceDate);
+    fromDate.setUTCDate(fromDate.getUTCDate() - daysToSubtract);
+    fromDate.setUTCHours(0, 0, 0, 0);
+    const toDate = new Date(referenceDate);
+    toDate.setUTCHours(0, 0, 0, 0);
+
+    onDateRangeChange?.(fromDate, toDate);
+  }, [timeRange, onDateRangeChange]);
 
   const filteredData = chartData.filter((item) => {
     const date = new Date(item.date);

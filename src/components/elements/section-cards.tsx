@@ -10,15 +10,57 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export function SectionCards() {
+type SummaryData = {
+  balance: number;
+  income: number;
+  expenses: number;
+};
+
+export function SectionCards({ fromDate, toDate }: { fromDate?: Date; toDate?: Date }) {
+  const [data, setData] = useState<SummaryData>({
+    balance: 0,
+    income: 0,
+    expenses: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        if (fromDate) {
+          params.append("fromDate", fromDate.toISOString().split("T")[0]);
+        }
+        if (toDate) {
+          params.append("toDate", toDate.toISOString().split("T")[0]);
+        }
+
+        const response = await fetch(`/api/summary?${params.toString()}`);
+
+        if (response.ok) {
+          const result = await response.json();
+          setData(result);
+        }
+      } catch (error) {
+        console.error("Error fetching summary:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, [fromDate, toDate]);
+
   return (
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Total Revenue</CardDescription>
+          <CardDescription>Total Income</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            $1,250.00
+            ${data.income.toFixed(2)}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -29,18 +71,18 @@ export function SectionCards() {
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Trending up this month <TrendingUpIcon className="size-4" />
+            Income {loading ? "loading..." : "loaded"}
           </div>
           <div className="text-muted-foreground">
-            Visitors for the last 6 months
+            {fromDate || toDate ? "Filtered period" : "All time"}
           </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>New Customers</CardDescription>
+          <CardDescription>Total Expenses</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            1,234
+            ${data.expenses.toFixed(2)}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -51,51 +93,64 @@ export function SectionCards() {
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Down 20% this period <TrendingDownIcon className="size-4" />
+            Expenses tracked <TrendingDownIcon className="size-4" />
           </div>
           <div className="text-muted-foreground">
-            Acquisition needs attention
+            {fromDate || toDate ? "Filtered period" : "All time"}
           </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Active Accounts</CardDescription>
+          <CardDescription>Balance</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            45,678
+            ${data.balance.toFixed(2)}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
-              <TrendingUpIcon />
-              +12.5%
+              {data.balance >= 0 ? (
+                <>
+                  <TrendingUpIcon />
+                  +{data.balance.toFixed(2)}
+                </>
+              ) : (
+                <>
+                  <TrendingDownIcon />
+                  {data.balance.toFixed(2)}
+                </>
+              )}
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Strong user retention <TrendingUpIcon className="size-4" />
+            Net balance {data.balance >= 0 ? "positive" : "negative"} <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Engagement exceed targets</div>
+          <div className="text-muted-foreground">
+            {fromDate || toDate ? "Filtered period" : "All time"}
+          </div>
         </CardFooter>
       </Card>
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Growth Rate</CardDescription>
+          <CardDescription>Transaction Count</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            4.5%
+            -
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
               <TrendingUpIcon />
-              +4.5%
+              active
             </Badge>
           </CardAction>
         </CardHeader>
         <CardFooter className="flex-col items-start gap-1.5 text-sm">
           <div className="line-clamp-1 flex gap-2 font-medium">
-            Steady performance increase <TrendingUpIcon className="size-4" />
+            Filter active transactions <TrendingUpIcon className="size-4" />
           </div>
-          <div className="text-muted-foreground">Meets growth projections</div>
+          <div className="text-muted-foreground">
+            {fromDate || toDate ? "Filtered period" : "All time"}
+          </div>
         </CardFooter>
       </Card>
     </div>

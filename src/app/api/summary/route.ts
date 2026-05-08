@@ -11,13 +11,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const { searchParams } = new URL(req.url);
+    const filters = parseTransactionFilters(Object.fromEntries(searchParams.entries()));
 
-    const body = await req.json();
-
-    const filters = parseTransactionFilters(body);
-
-    const transactions = await getUserTransactions(userId, filters);
+    const transactions = await getUserTransactions(session.user.id, filters);
 
     const income = transactions
       .filter((t) => t.type === "income")
@@ -30,12 +27,46 @@ export async function GET(req: NextRequest) {
     const balance = income + expenses;
 
     return NextResponse.json({
-      filters,
       balance,
       income,
       expenses: Math.abs(expenses),
     });
   } catch (err) {
+    console.error("Error in summary:", err);
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const filters = parseTransactionFilters(body);
+
+    const transactions = await getUserTransactions(session.user.id, filters);
+
+    const income = transactions
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    const expenses = transactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    const balance = income + expenses;
+
+    return NextResponse.json({
+      balance,
+      income,
+      expenses: Math.abs(expenses),
+    });
+  } catch (err) {
+    console.error("Error in summary:", err);
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }

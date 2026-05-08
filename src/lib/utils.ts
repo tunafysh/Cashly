@@ -9,13 +9,30 @@ export function cn(...inputs: ClassValue[]) {
 
 export function parseTransactionFilters(body: any): Filters | undefined {
   if (!body) return undefined;
-  const fromDate = parseDate(body.fromDate);
-  const toDate = parseDate(body.toDate);
-  return {
-    fromDate: body.fromDate ? fromDate : undefined,
-    toDate: body.toDate ? toDate : undefined,
-    categoryId: body.categoryId,
-    type: body.type,
-    withDescription: body.withDescription,
-  };
+  
+  const filters: Filters = {};
+
+  if (body.fromDate && body.fromDate !== "") {
+    const parsed = parseDate(body.fromDate);
+    if (parsed) filters.fromDate = parsed;
+  }
+
+  if (body.toDate && body.toDate !== "") {
+    const parsed = parseDate(body.toDate);
+    if (parsed) filters.toDate = parsed;
+  }
+
+  if (body.categoryId) {
+    filters.categoryId = body.categoryId;
+  }
+
+  if (body.type) {
+    filters.type = body.type;
+  }
+
+  if (body.withDescription !== undefined) {
+    filters.withDescription = body.withDescription;
+  }
+
+  return Object.keys(filters).length > 0 ? filters : undefined;
 }
