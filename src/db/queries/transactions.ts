@@ -1,4 +1,4 @@
-import { eq, and, gte, ne, or, isNull, desc, lte } from "drizzle-orm";
+import { eq, and, gte, ne, or, isNull, desc, lt } from "drizzle-orm";
 import { db } from "..";
 import { categories, transactions } from "../schema";
 
@@ -47,7 +47,10 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
   }
 
   if (filters?.toDate) {
-    conditions.push(lte(transactions.createdAt, filters.toDate));
+    const endOfDay = new Date(filters.toDate);
+    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+    endOfDay.setUTCHours(0, 0, 0, 0);
+    conditions.push(lt(transactions.createdAt, endOfDay));
   }
 
   if (filters?.categoryId) {

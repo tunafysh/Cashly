@@ -8,7 +8,7 @@ export function parseDate(input: string): Date | undefined {
   // YYYY
   if (yearOnly.test(input)) {
     const year = Number(input);
-    return new Date(year, 0, 1, 0, 0, 0, 0);
+    return new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0));
   }
 
   // YYYY-MM
@@ -17,7 +17,7 @@ export function parseDate(input: string): Date | undefined {
     const year = Number(yearStr);
     const month = Number(monthStr);
 
-    return new Date(year, month - 1, 1, 0, 0, 0, 0);
+    return new Date(Date.UTC(year, month - 1, 1, 0, 0, 0, 0));
   }
 
   // YYYY-MM-DD
@@ -27,17 +27,17 @@ export function parseDate(input: string): Date | undefined {
     const month = Number(monthStr);
     const day = Number(dayStr);
 
-    return new Date(year, month - 1, day, 0, 0, 0, 0);
+    return new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
   }
 
   if (monthOnly.test(input) && Number(input) >= 1 && Number(input) <= 12) {
     const month = Number(input);
-    return new Date(0, month - 1, 1, 0, 0, 0, 0);
+    return new Date(Date.UTC(0, month - 1, 1, 0, 0, 0, 0));
   }
 
   if (dayOnly.test(input) && Number(input) >= 1 && Number(input) <= 31) {
     const day = Number(input);
-    return new Date(0, 0, day, 0, 0, 0, 0);
+    return new Date(Date.UTC(0, 0, day, 0, 0, 0, 0));
   }
 
   if (input === "" || input === null || input === undefined) {
