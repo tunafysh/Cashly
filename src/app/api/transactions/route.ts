@@ -14,13 +14,13 @@ type CreateTransactionInput = {
 export async function GET(req: Request) {
   const session = await auth();
 
+  console.log("Session started.");
+
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const { searchParams } = new URL(req.url);
-
     const filters = parseTransactionFilters(await req.json());
 
     console.log("Parsed filters:", filters);
