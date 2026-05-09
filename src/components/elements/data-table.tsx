@@ -110,7 +110,7 @@ export default function DataTable() {
   if (error) return <div className="text-red-600">Error: {error}</div>;
 
   return (
-    <Table className="border-border rounded-md">
+    <Table className="border-border rounded-md mx-4 lg:mx-6">
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id} className="bg-muted">
