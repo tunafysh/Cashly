@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm";
 import { db } from "..";
 import { categories, transactions } from "../schema";
+import { z } from "zod";
 
 type CreateTransactionInput = {
   userId: string;
@@ -19,6 +20,15 @@ type CreateTransactionInput = {
   categoryId: string;
   description?: string;
 };
+
+
+const transactionSchema = z.object({
+  userId: z.string(),
+  amount: z.number().positive(),
+  type: z.enum(["income", "expense"]),
+  categoryId: z.string(),
+  description: z.string().optional(),
+});
 
 const transactionSelect = {
   id: transactions.id,
@@ -95,22 +105,25 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     .orderBy(desc(transactions.createdAt));
 }
 
-export async function createTransaction({
-  userId,
-  amount,
-  type,
-  categoryId,
-  description,
-}: CreateTransactionInput) {
+export async function createTransaction(input: CreateTransactionInput | CreateTransactionInput[]) {
+  const transactionsToInsert = Array.isArray(input) ? input : [input];
+  for (const tx of transactionsToInsert) {
+    const parsed = transactionSchema.safeParse(tx);
+    if (!parsed.success) {
+      throw new Error(`Invalid transaction data: ${JSON.stringify(parsed.error.issues)}`);
+    }
+  }
   return await db
     .insert(transactions)
-    .values({
-      userId,
-      amount: amount.toFixed(2), // Ensure amount is stored with 2 decimal places
-      type,
-      categoryId,
-      description,
-    })
+    .values(
+      transactionsToInsert.map((tx) => ({
+        userId: tx.userId,
+        amount: tx.amount.toFixed(2), // Ensure amount is stored with 2 decimal places
+        type: tx.type,
+        categoryId: tx.categoryId,
+        description: tx.description,
+      }))
+    )
     .returning();
 }
 
