@@ -24,7 +24,7 @@ type CreateTransactionInput = {
 
 const transactionSchema = z.object({
   userId: z.string(),
-  amount: z.number(),
+  amount: z.number().positive(),
   type: z.enum(["income", "expense"]),
   categoryId: z.string(),
   description: z.string().optional(),
