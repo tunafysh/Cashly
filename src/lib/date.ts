@@ -49,5 +49,11 @@ export function parseDate(input: string, max: boolean): Date | undefined {
       : new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
   }
 
+  // Full ISO string fallback
+  const isoDate = new Date(input);
+  if (!isNaN(isoDate.getTime())) {
+    return isoDate;
+  }
+
   throw new Error(`Invalid date format: ${input}, expected YYYY, YYYY-MM, YYYY-MM-DD or YYYY-MM-DDTHH:mm`);
 }
