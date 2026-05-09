@@ -45,6 +45,7 @@ export type Transaction = {
 
 type ChartData = {
   date: string;
+  dateTime: string;
   income: number;
   expenses: number;
   balance: number;
@@ -56,18 +57,27 @@ export function aggregateTransactions(
   const analyticsMap = new Map<string, ChartData>();
 
   for (const transaction of transactions) {
-    const date = new Date(transaction.createdAt).toISOString().split("T")[0];
+    const date = new Date(transaction.createdAt);
+    // Group by hour
+    date.setUTCMinutes(0, 0, 0);
+    const hourKey = date.toISOString();
 
-    if (!analyticsMap.has(date)) {
-      analyticsMap.set(date, {
-        date,
+    if (!analyticsMap.has(hourKey)) {
+      analyticsMap.set(hourKey, {
+        date: hourKey,
+        dateTime: new Date(hourKey).toLocaleString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         income: 0,
         expenses: 0,
         balance: 0,
       });
     }
 
-    const entry = analyticsMap.get(date)!;
+    const entry = analyticsMap.get(hourKey)!;
 
     const amount = Number(transaction.amount);
 
@@ -237,17 +247,13 @@ export function ChartAreaInteractive({
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="date"
+              dataKey="dateTime"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
+                return value;
               }}
             />
             <ChartTooltip
