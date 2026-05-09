@@ -18,34 +18,49 @@ type SummaryData = {
   expenses: number;
 };
 
-function sectionCard(
-  data: SummaryData,
-  loading: boolean,
-  fromDate?: Date,
-  toDate?: Date,
-) {
-  <Card className="@container/card">
-    <CardHeader>
-      <CardDescription>Total Income</CardDescription>
-      <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-        ${data.income.toFixed(2)}
-      </CardTitle>
-      <CardAction>
-        <Badge variant="outline">
-          <TrendingUpIcon />
-          +12.5%
-        </Badge>
-      </CardAction>
-    </CardHeader>
-    <CardFooter className="flex-col items-start gap-1.5 text-sm">
-      <div className="line-clamp-1 flex gap-2 font-medium">
-        Income {loading ? "loading..." : "loaded"}
-      </div>
-      <div className="text-muted-foreground">
-        {fromDate || toDate ? "Filtered period" : "All time"}
-      </div>
-    </CardFooter>
-  </Card>;
+function SectionCard({
+  title,
+  value,
+  label,
+  loading,
+  trend,
+  trendIcon,
+  fromDate,
+  toDate
+}: {
+  title: string;
+  value: number;
+  label: string;
+  loading: boolean;
+  trend: string;
+  trendIcon: React.ReactNode;
+  fromDate?: Date;
+  toDate?: Date;
+}) {
+  return (
+    <Card className="@container/card">
+      <CardHeader>
+        <CardDescription>{title}</CardDescription>
+        <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+          ${value.toFixed(2)}
+        </CardTitle>
+        <CardAction>
+          <Badge variant="outline">
+            {trendIcon}
+            {trend}
+          </Badge>
+        </CardAction>
+      </CardHeader>
+      <CardFooter className="flex-col items-start gap-1.5 text-sm">
+        <div className="line-clamp-1 flex gap-2 font-medium">
+          {label} {loading ? "loading..." : "loaded"}
+        </div>
+        <div className="text-muted-foreground">
+          {fromDate || toDate ? "Filtered period" : "All time"}
+        </div>
+      </CardFooter>
+    </Card>
+  );
 }
 
 export function SectionCards({
@@ -92,81 +107,46 @@ export function SectionCards({
 
   return (
     <div className="grid grid-cols-1 gap-4 px-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4 dark:*:data-[slot=card]:bg-card">
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Total Expenses</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ${data.expenses.toFixed(2)}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <TrendingDownIcon />
-              -20%
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Expenses tracked <TrendingDownIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            {fromDate || toDate ? "Filtered period" : "All time"}
-          </div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Balance</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            ${data.balance.toFixed(2)}
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              {data.balance >= 0 ? (
-                <>
-                  <TrendingUpIcon />+{data.balance.toFixed(2)}
-                </>
-              ) : (
-                <>
-                  <TrendingDownIcon />
-                  {data.balance.toFixed(2)}
-                </>
-              )}
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Net balance {data.balance >= 0 ? "positive" : "negative"}{" "}
-            <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            {fromDate || toDate ? "Filtered period" : "All time"}
-          </div>
-        </CardFooter>
-      </Card>
-      <Card className="@container/card">
-        <CardHeader>
-          <CardDescription>Transaction Count</CardDescription>
-          <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            -
-          </CardTitle>
-          <CardAction>
-            <Badge variant="outline">
-              <TrendingUpIcon />
-              active
-            </Badge>
-          </CardAction>
-        </CardHeader>
-        <CardFooter className="flex-col items-start gap-1.5 text-sm">
-          <div className="line-clamp-1 flex gap-2 font-medium">
-            Filter active transactions <TrendingUpIcon className="size-4" />
-          </div>
-          <div className="text-muted-foreground">
-            {fromDate || toDate ? "Filtered period" : "All time"}
-          </div>
-        </CardFooter>
-      </Card>
+      <SectionCard
+        title="Balance"
+        value={data.balance}
+        label={`Net balance ${data.balance >= 0 ? "positive" : "negative"}`}
+        loading={loading}
+        trend={data.balance >= 0 ? `+${data.balance.toFixed(2)}` : `${data.balance.toFixed(2)}`}
+        trendIcon={data.balance >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
+      <SectionCard 
+        title="Total Expenses"
+        value={data.expenses}
+        label="Expenses tracked"
+        loading={loading}
+        trend="-20%"
+        trendIcon={<TrendingDownIcon />}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
+      <SectionCard
+        title="Total Income"
+        value={data.income}
+        label="Income tracked"
+        loading={loading}
+        trend="+12.5%"
+        trendIcon={<TrendingUpIcon />}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
+      <SectionCard
+        title="Transaction Count"
+        value={0}
+        label="Filter active transactions"
+        loading={loading}
+        trend="active"
+        trendIcon={<TrendingUpIcon />}
+        fromDate={fromDate}
+        toDate={toDate}
+      />
     </div>
   );
 }
