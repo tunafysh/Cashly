@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "../ui/table";
 import { Transaction } from "./chart-area-interactive";
 import { Badge } from "../ui/badge";
+import { Cell } from "recharts";
 
 const columns: ColumnDef<Transaction>[] = [
   {
@@ -98,10 +99,10 @@ export default function DataTable() {
   if (error) return <div className="text-red-600">Error: {error}</div>;
 
   return (
-    <Table>
+    <Table className="border-border rounded-md">
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
-          <TableRow key={headerGroup.id}>
+          <TableRow key={headerGroup.id} className="bg-muted">
             {headerGroup.headers.map((header) => (
               <TableHead key={header.id}>
                 {header.isPlaceholder
@@ -114,7 +115,7 @@ export default function DataTable() {
       </TableHeader>
       <TableBody>
         {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
+          <TableRow key={row.id} className={`hover:bg-[${row.original.category.color}]/10 border border-[${row.original.category.color}]`}>
             {row.getVisibleCells().map((cell) => (
               <TableCell key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

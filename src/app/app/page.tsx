@@ -33,7 +33,9 @@ export default function Page() {
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
             </div>
-            <DataTable />
+            <div className="px-4 lg:px-6">
+              <DataTable />
+            </div>
           </div>
         </div>
       </div>
