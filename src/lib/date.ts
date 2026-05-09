@@ -55,5 +55,7 @@ export function parseDate(input: string, max: boolean): Date | undefined {
     return isoDate;
   }
 
-  throw new Error(`Invalid date format: ${input}, expected YYYY, YYYY-MM, YYYY-MM-DD or YYYY-MM-DDTHH:mm`);
+  throw new Error(
+    `Invalid date format: ${input}, expected YYYY, YYYY-MM, YYYY-MM-DD or YYYY-MM-DDTHH:mm`,
+  );
 }

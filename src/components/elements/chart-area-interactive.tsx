@@ -56,9 +56,7 @@ export function aggregateTransactions(
   const analyticsMap = new Map<string, ChartData>();
 
   for (const transaction of transactions) {
-    const date = new Date(transaction.createdAt)
-      .toISOString()
-      .split("T")[0];
+    const date = new Date(transaction.createdAt).toISOString().split("T")[0];
 
     if (!analyticsMap.has(date)) {
       analyticsMap.set(date, {
@@ -85,8 +83,7 @@ export function aggregateTransactions(
   }
 
   return Array.from(analyticsMap.values()).sort(
-    (a, b) =>
-      new Date(a.date).getTime() - new Date(b.date).getTime(),
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
   );
 }
 
@@ -120,62 +117,41 @@ export function ChartAreaInteractive({
   }, [isMobile]);
 
   React.useEffect(() => {
-  async function fetchChartData() {
-    const referenceDate = new Date();
+    async function fetchChartData() {
+      const referenceDate = new Date();
 
-    let daysToSubtract = 90;
+      let daysToSubtract = 90;
 
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
+      if (timeRange === "30d") {
+        daysToSubtract = 30;
+      }
+
+      if (timeRange === "7d") {
+        daysToSubtract = 7;
+      }
+
+      const fromDate = new Date(referenceDate);
+
+      fromDate.setUTCDate(fromDate.getUTCDate() - daysToSubtract);
+      fromDate.setUTCHours(0, 0, 0, 0);
+
+      const params = new URLSearchParams({
+        fromDate: fromDate.toISOString(),
+        toDate: referenceDate.toISOString(),
+      });
+
+      const response = await fetch(`/api/transactions?${params}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+
+      const data = await response.json();
+
+      setChartData(aggregateTransactions(data.transactions));
     }
 
-    if (timeRange === "7d") {
-      daysToSubtract = 7;
-    }
-
-    const fromDate = new Date(referenceDate);
-
-    fromDate.setUTCDate(fromDate.getUTCDate() - daysToSubtract);
-    fromDate.setUTCHours(0, 0, 0, 0);
-
-    const params = new URLSearchParams({
-      fromDate: fromDate.toISOString(),
-      toDate: referenceDate.toISOString(),
-    });
-
-    const response = await fetch(`/api/transactions?${params}`);
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch transactions");
-    }
-
-    const data = await response.json();
-
-    setChartData(
-      aggregateTransactions(data.transactions),
-    );
-  }
-
-  fetchChartData();
-}, [timeRange]);
-
-  React.useEffect(() => {
-    const referenceDate = new Date("2024-06-30");
-    let daysToSubtract = 90;
-    if (timeRange === "30d") {
-      daysToSubtract = 30;
-    } else if (timeRange === "7d") {
-      daysToSubtract = 7;
-    }
-    const fromDate = new Date(referenceDate);
-    fromDate.setUTCDate(fromDate.getUTCDate() - daysToSubtract);
-    fromDate.setUTCHours(0, 0, 0, 0);
-    const toDate = new Date(referenceDate);
-    toDate.setUTCHours(0, 0, 0, 0);
-
-    fetch(`/api/transactions?fromDate=${fromDate.toISOString()}&toDate=${toDate.toISOString()}`)
-      .then((response) => response.json())
-      .then((data) => setChartData(data));
+    fetchChartData();
   }, [timeRange]);
 
   return (

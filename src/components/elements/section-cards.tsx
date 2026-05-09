@@ -26,7 +26,7 @@ function SectionCard({
   trend,
   trendIcon,
   fromDate,
-  toDate
+  toDate,
 }: {
   title: string;
   value: number;
@@ -112,12 +112,18 @@ export function SectionCards({
         value={data.balance}
         label={`Net balance ${data.balance >= 0 ? "positive" : "negative"}`}
         loading={loading}
-        trend={data.balance >= 0 ? `+${data.balance.toFixed(2)}` : `${data.balance.toFixed(2)}`}
-        trendIcon={data.balance >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
+        trend={
+          data.balance >= 0
+            ? `+${data.balance.toFixed(2)}`
+            : `${data.balance.toFixed(2)}`
+        }
+        trendIcon={
+          data.balance >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />
+        }
         fromDate={fromDate}
         toDate={toDate}
       />
-      <SectionCard 
+      <SectionCard
         title="Total Expenses"
         value={data.expenses}
         label="Expenses tracked"

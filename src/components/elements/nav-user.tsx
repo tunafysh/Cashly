@@ -85,7 +85,9 @@ export function NavUser() {
                     src={user?.image ?? undefined}
                     alt={user?.name ?? undefined}
                   />
-                  <AvatarFallback className="rounded-lg">{getInitials(user?.name ?? "")}</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {getInitials(user?.name ?? "")}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">
@@ -106,7 +108,10 @@ export function NavUser() {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <LogoutButton>
-              <DropdownMenuItem variant="destructive" onSelect={(e) => e.preventDefault()}>
+              <DropdownMenuItem
+                variant="destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
                 <LogOutIcon />
                 Log out
               </DropdownMenuItem>
