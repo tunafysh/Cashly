@@ -44,6 +44,24 @@ export async function createCategory({
     .returning();
 }
 
+export async function createCategoryWithoutColor({
+  userId,
+  name,
+}: Omit<CreateCategoryInput, "color">) {
+  // Generate a random color in hex format
+  const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+  return await db
+    .insert(categories)
+    .values({
+      userId,
+      name,
+      color: randomColor,
+    })
+    .returning();
+}
+
+
 export async function deleteCategory(userId: string, categoryId: string) {
   return await db
     .delete(categories)

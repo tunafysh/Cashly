@@ -7,15 +7,16 @@ import {
   transactionSchema,
 } from "@/db/queries/transactions";
 import { auth } from "@/lib/auth";
+import { createCategoryWithoutColor } from "@/db/queries/categories";
 
-const parseCsv = (file: File): Promise<TransactionInput[]> => {
+const parseCsv = (file: File): Promise<PrimitiveTransaction[]> => {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
 
       complete: (results) => {
-        resolve(results.data as TransactionInput[]);
+        resolve(results.data as PrimitiveTransaction[]);
       },
 
       error: (error) => {
@@ -23,6 +24,14 @@ const parseCsv = (file: File): Promise<TransactionInput[]> => {
       },
     });
   });
+};
+
+// Define the expected structure of the transaction data to further normalize it
+type PrimitiveTransaction = {
+  amount: number;
+  type: "income" | "expense";
+  category: string;
+  description?: string;
 };
 
 type FileTypes = "json" | "csv" | "xlsx";
@@ -47,19 +56,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let data: unknown[] = [];
+    let data: PrimitiveTransaction[] = [];
 
+    
     if (type === "csv") {
       data = await parseCsv(file);
     } else if (type === "xlsx") {
       const arrayBuffer = await file.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: "array" });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      data = XLSX.utils.sheet_to_json(worksheet);
+      data = XLSX.utils.sheet_to_json(worksheet) as PrimitiveTransaction[];
     } else {
       const text = await file.text();
       data = JSON.parse(text);
     }
+
+    let categories = new Set<string>();
+
+    for (const item of data) {
+      if (!item.amount || !item.type || !item.category) {
+        return NextResponse.json(
+          {
+            message: "Each transaction must have amount, type, and category",
+            invalidItem: item,
+          },
+          { status: 400 },
+        );
+      }
+      categories.add(item.category);
+    }
+
+    for (const category of categories) {
+      await createCategoryWithoutColor({
+        userId,
+        name: category,
+      });
+    } // the color is generated randomly in the function.
 
     // Add userId to each transaction
     const transactions = (data as Record<string, unknown>[]).map((item) => ({
@@ -67,7 +99,6 @@ export async function POST(req: NextRequest) {
       userId,
     })) as TransactionInput[];
 
-    // Validate all transactions
     const validatedTransactions = transactionSchema.array().parse(transactions);
 
     // Create all transactions in bulk
