@@ -4,6 +4,7 @@ export function parseDate(input: string, max: boolean): Date | undefined {
   const dayOnly = /^\d{2}$/; // can't believe i am repeating this but whatever
   const yearMonth = /^\d{2}-\d{4}$/;
   const yearMonthDay = /^\d{2}-\d{2}-\d{4}$/;
+  const dateAndTime = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
 
   // YYYY
   if (yearOnly.test(input)) {
@@ -50,6 +51,16 @@ export function parseDate(input: string, max: boolean): Date | undefined {
     if (max) return new Date(Date.UTC(0, 0, day, 23, 59, 59, 999));
 
     return new Date(Date.UTC(0, 0, day, 0, 0, 0, 0));
+  }
+
+  if (dateAndTime.test(input)) {
+    const [datePart, timePart] = input.split("T");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute] = timePart.split(":").map(Number);
+
+    if (max) return new Date(Date.UTC(year, month - 1, day, hour, minute, 59, 999));
+
+    return new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
   }
 
   if (input === "" || input === null || input === undefined) {
