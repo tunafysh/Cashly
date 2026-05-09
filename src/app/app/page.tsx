@@ -8,6 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import data from "./data.json";
 import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
+import DataTable from "@/components/elements/data-table";
 
 export default function Page() {
   const [dateRange, setDateRange] = useState<{
@@ -32,6 +33,7 @@ export default function Page() {
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
             </div>
+            <DataTable />
           </div>
         </div>
       </div>
