@@ -13,7 +13,7 @@ import { db } from "..";
 import { categories, transactions } from "../schema";
 import { z } from "zod";
 
-type CreateTransactionInput = {
+export type TransactionInput = {
   userId: string;
   amount: number;
   type: "income" | "expense";
@@ -22,7 +22,7 @@ type CreateTransactionInput = {
 };
 
 
-const transactionSchema = z.object({
+export const transactionSchema = z.object({
   userId: z.string(),
   amount: z.number().positive(),
   type: z.enum(["income", "expense"]),
@@ -105,7 +105,7 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     .orderBy(desc(transactions.createdAt));
 }
 
-export async function createTransaction(input: CreateTransactionInput | CreateTransactionInput[]) {
+export async function createTransaction(input: TransactionInput | TransactionInput[]) {
   const transactionsToInsert = Array.isArray(input) ? input : [input];
   for (const tx of transactionsToInsert) {
     const parsed = transactionSchema.safeParse(tx);
