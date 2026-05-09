@@ -29,7 +29,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export const description = "An interactive area chart";
 
-type Transaction = {
+export type Transaction = {
   id: string;
   amount: string;
   type: "income" | "expense";
