@@ -38,13 +38,12 @@ const columns: ColumnDef<Transaction>[] = [
     cell: ({ row }) => {
       const category = row.original.category;
       return (
-        <div className="flex items-center gap-2">
-          <div
-            className="h-3 w-3 rounded-full"
-            style={{ backgroundColor: category.color }}
-          />
+        <Badge
+          variant="outline"
+          style={{ backgroundColor: `${category.color}10`, borderColor: category.color }}
+        >
           {category.name}
-        </div>
+        </Badge>
       );
     },
   },
@@ -131,7 +130,7 @@ export default function DataTable() {
         {table.getRowModel().rows.map((row) => (
           <TableRow
             key={row.id}
-            className={`border-border`}
+            className={`border`}
             style={{
               borderColor: row.original.category.color,
               backgroundColor: `${row.original.category.color}10`,
