@@ -132,9 +132,9 @@ export default function DataTable() {
         {table.getRowModel().rows.map((row) => (
           <TableRow
             key={row.id}
-            className={`border`}
             style={{
-              borderColor: row.original.category.color,
+                
+              border: `1px solid ${row.original.category.color}`,
               backgroundColor: `${row.original.category.color}10`,
             }}
           >
