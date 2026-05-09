@@ -48,10 +48,7 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-
-    const type =
-      (new URL(req.url).searchParams.get("type") as FileTypes) || "json";
-
+    const type = (formData.get("type") as string)?.toLowerCase() as FileTypes;
     if (!file) {
       return NextResponse.json(
         { message: "File parameter is required" },
