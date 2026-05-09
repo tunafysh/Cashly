@@ -40,8 +40,10 @@ const columns: ColumnDef<Transaction>[] = [
       return (
         <Badge
           variant="outline"
-          style={{ backgroundColor: `${category.color}10`, borderColor: category.color }}
+          style={{ backgroundColor: `${category.color}30`, borderColor: category.color }}
+          className="gap-2"
         >
+            <div className={`bg-[${category.color}] rounded-full w-3 h-3`} />
           {category.name}
         </Badge>
       );
