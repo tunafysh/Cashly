@@ -19,6 +19,7 @@ export type TransactionInput = {
   type: "income" | "expense";
   categoryId: string;
   description?: string;
+  createdAt?: Date;
 };
 
 export const transactionSchema = z.object({
@@ -125,6 +126,7 @@ export async function createTransaction(
         type: tx.type,
         categoryId: tx.categoryId,
         description: tx.description,
+        createdAt: tx.createdAt || new Date(),
       })),
     )
     .returning();

@@ -34,7 +34,7 @@ export type Transaction = {
   amount: string;
   type: "income" | "expense";
   description?: string | null;
-  createdAt: string;
+  createdAt: Date;
 
   category: {
     id: string;
