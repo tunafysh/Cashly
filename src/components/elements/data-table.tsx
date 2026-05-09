@@ -1,9 +1,20 @@
 "use client";
 
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
-import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "../ui/table";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell,
+} from "../ui/table";
 import { Transaction } from "./chart-area-interactive";
 import { Badge } from "../ui/badge";
 import { Cell } from "recharts";
@@ -107,7 +118,10 @@ export default function DataTable() {
               <TableHead key={header.id}>
                 {header.isPlaceholder
                   ? null
-                  : flexRender(header.column.columnDef.header, header.getContext())}
+                  : flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
               </TableHead>
             ))}
           </TableRow>
@@ -115,7 +129,14 @@ export default function DataTable() {
       </TableHeader>
       <TableBody>
         {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id} className={`hover:bg-[${row.original.category.color}]/10 border border-[${row.original.category.color}]`}>
+          <TableRow
+            key={row.id}
+            className={`border-border`}
+            style={{
+              borderColor: row.original.category.color,
+              backgroundColor: `${row.original.category.color}10`,
+            }}
+          >
             {row.getVisibleCells().map((cell) => (
               <TableCell key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
