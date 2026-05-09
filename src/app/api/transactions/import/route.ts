@@ -35,8 +35,10 @@ type PrimitiveTransaction = {
 };
 
 type FileTypes = "json" | "csv" | "xlsx";
+
 export async function POST(req: NextRequest) {
   const session = await auth();
+
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
@@ -46,8 +48,9 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const searchParams = new URL(req.url).searchParams;
-    const type: FileTypes = (searchParams.get("type") as FileTypes) || "json";
+
+    const type =
+      (new URL(req.url).searchParams.get("type") as FileTypes) || "json";
 
     if (!file) {
       return NextResponse.json(
@@ -58,23 +61,31 @@ export async function POST(req: NextRequest) {
 
     let data: PrimitiveTransaction[] = [];
 
-    
+    // Parse file
     if (type === "csv") {
       data = await parseCsv(file);
     } else if (type === "xlsx") {
-      const arrayBuffer = await file.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: "array" });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      data = XLSX.utils.sheet_to_json(worksheet) as PrimitiveTransaction[];
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+      data = XLSX.utils.sheet_to_json(sheet) as PrimitiveTransaction[];
     } else {
       const text = await file.text();
       data = JSON.parse(text);
     }
 
-    let categories = new Set<string>();
+    // Validate + collect categories
+    const categorySet = new Set<string>();
 
     for (const item of data) {
-      if (!item.amount || !item.type || !item.category) {
+      if (
+        item.amount === undefined ||
+        item.amount === null ||
+        !item.type ||
+        !item.category
+      ) {
         return NextResponse.json(
           {
             message: "Each transaction must have amount, type, and category",
@@ -83,36 +94,51 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
-      categories.add(item.category);
+
+      categorySet.add(item.category.trim());
     }
 
-    for (const category of categories) {
-      await createCategoryWithoutColor({
+    // Create categories
+    const createdCategories = await createCategoryWithoutColor(
+      [...categorySet].map((name) => ({
         userId,
-        name: category,
-      });
-    } // the color is generated randomly in the function.
+        name: name.trim(),
+      })),
+    );
 
-    // Add userId to each transaction
-    const transactions = (data as Record<string, unknown>[]).map((item) => ({
-      ...item,
-      userId,
-    })) as TransactionInput[];
+    // Build lookup map
+    const categoryMap = new Map(createdCategories.map((c) => [c.name, c.id]));
 
+    // Normalize transactions
+    const transactions: TransactionInput[] = data.map((item) => {
+      const categoryId = categoryMap.get(item.category.trim());
+
+      if (!categoryId) {
+        throw new Error(`Category mapping failed for: ${item.category}`);
+      }
+
+      return {
+        userId,
+        amount: Number(item.amount),
+        type: item.type,
+        description: item.description,
+        categoryId,
+      };
+    });
+
+    // Validate
     const validatedTransactions = transactionSchema.array().parse(transactions);
 
-    // Create all transactions in bulk
+    // Insert
     await createTransaction(validatedTransactions);
 
-    return NextResponse.json(
-      {
-        message: "Transactions imported successfully",
-        count: validatedTransactions.length,
-      },
-      { status: 200 },
-    );
+    return NextResponse.json({
+      message: "Transactions imported successfully",
+      count: validatedTransactions.length,
+    });
   } catch (error) {
     console.error("Error importing transactions:", error);
+
     return NextResponse.json(
       {
         message: "Internal Server Error",

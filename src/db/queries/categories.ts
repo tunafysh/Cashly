@@ -44,23 +44,32 @@ export async function createCategory({
     .returning();
 }
 
-export async function createCategoryWithoutColor({
-  userId,
-  name,
-}: Omit<CreateCategoryInput, "color">) {
-  // Generate a random color in hex format
-  const randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+function generateRandomColor() {
+  return `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+}
+
+export async function createCategoryWithoutColor(
+  tx: Omit<CreateCategoryInput, "color"> | Omit<CreateCategoryInput, "color">[],
+) {
+  const items = Array.isArray(tx) ? tx : [tx];
+
+  for (const item of items) {
+    if (!item.userId || !item.name) {
+      throw new Error("userId and name are required to create a category");
+    }
+  }
 
   return await db
     .insert(categories)
-    .values({
-      userId,
-      name,
-      color: randomColor,
-    })
+    .values(
+      items.map((item) => ({
+        userId: item.userId,
+        name: item.name,
+        color: generateRandomColor(),
+      })),
+    )
     .returning();
 }
-
 
 export async function deleteCategory(userId: string, categoryId: string) {
   return await db

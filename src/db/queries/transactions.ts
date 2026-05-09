@@ -21,7 +21,6 @@ export type TransactionInput = {
   description?: string;
 };
 
-
 export const transactionSchema = z.object({
   userId: z.string(),
   amount: z.number().positive(),
@@ -105,12 +104,16 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     .orderBy(desc(transactions.createdAt));
 }
 
-export async function createTransaction(input: TransactionInput | TransactionInput[]) {
+export async function createTransaction(
+  input: TransactionInput | TransactionInput[],
+) {
   const transactionsToInsert = Array.isArray(input) ? input : [input];
   for (const tx of transactionsToInsert) {
     const parsed = transactionSchema.safeParse(tx);
     if (!parsed.success) {
-      throw new Error(`Invalid transaction data: ${JSON.stringify(parsed.error.issues)}`);
+      throw new Error(
+        `Invalid transaction data: ${JSON.stringify(parsed.error.issues)}`,
+      );
     }
   }
   return await db
@@ -122,7 +125,7 @@ export async function createTransaction(input: TransactionInput | TransactionInp
         type: tx.type,
         categoryId: tx.categoryId,
         description: tx.description,
-      }))
+      })),
     )
     .returning();
 }

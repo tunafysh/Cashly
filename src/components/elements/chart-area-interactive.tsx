@@ -160,11 +160,12 @@ export function ChartAreaInteractive({
         <CardTitle>Total Transactions</CardTitle>
         <CardDescription>
           <span className="hidden @[540px]/card:block">
-            Transactions for the last {timeRange === "90d"
+            Transactions for the last{" "}
+            {timeRange === "90d"
               ? "3 months"
               : timeRange === "30d"
-              ? "30 days"
-              : "7 days"}
+                ? "30 days"
+                : "7 days"}
           </span>
           <span className="@[540px]/card:hidden">Last 3 months</span>
         </CardDescription>
