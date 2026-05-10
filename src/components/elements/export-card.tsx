@@ -27,7 +27,7 @@ async function handleExport(setLoading: (loading: boolean) => void, fileType: st
   setLoading(true);
 
   try {
-    const res = await fetch("/api/export", {
+    const res = await fetch("/api/transactions/export", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,7 +80,7 @@ export default function ExportPanel() {
 
       const primary = styles.getPropertyValue("--primary");
       const muted = styles.getPropertyValue("--muted");
-      
+
       await handleExport(setLoading, fileType, [primary, muted]); // example colors
     } finally {
       setLoading(false);
