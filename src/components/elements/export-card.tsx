@@ -62,26 +62,14 @@ async function handleExport(
 }
 
 function toHex(color: string): string {
-  // Create a temporary element to let the browser normalize the color
-  const el = document.createElement("div");
-  el.style.color = color;
-  document.body.appendChild(el);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
 
-  const rgb = getComputedStyle(el).color;
-  document.body.removeChild(el);
+  if (!ctx) return "#000000";
 
-  // rgb(a) -> hex
-  const match = rgb.match(/\d+/g);
-  if (!match) return "000000";
+  ctx.fillStyle = color;
 
-  const [r, g, b] = match.map(Number);
-
-  return (
-    "#" +
-    [r, g, b]
-      .map((x) => x.toString(16).padStart(2, "0"))
-      .join("")
-  );
+  return ctx.fillStyle;
 }
 
 export default function ExportPanel() {
