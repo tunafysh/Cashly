@@ -4,106 +4,124 @@ import { FileTypes } from "@/lib/types";
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx-js-style";
 
-export function buildStyledWorkbook(data: any[], colors: string[]) {
+function getTextColor(hex: string) {
+  const color = hex.replace("#", "");
+
+  const r = parseInt(color.substring(0, 2), 16);
+  const g = parseInt(color.substring(2, 4), 16);
+  const b = parseInt(color.substring(4, 6), 16);
+
+  // luminance formula (perceived brightness)
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return brightness > 160 ? "000000" : "FFFFFF";
+}
+
+export function buildStyledWorkbook(
+  data: any[],
+  colors: string[]
+) {
+  const PRIMARY = (colors[0] || "4F46E5").replace("#", "");
+  const MUTED = (colors[1] || "F3F4F6").replace("#", "");
+  const EXPENSE = (colors[2] || "EF4444").replace("#", "");
+  const INCOME = "22C55E";
+
   const header = ["Amount", "Type", "Category", "Description", "Created At"];
-
-  const rows = data.map((tx) => [
-    tx.amount,
-    tx.type,
-    tx.category?.name || "Uncategorized",
-    tx.description || "",
-    tx.createdAt.toISOString(),
-  ]);
-
-  // 📦 Add totals row
-  const totalIncome = data
-    .filter((t) => t.type === "income")
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  const totalExpense = data
-    .filter((t) => t.type === "expense")
-    .reduce((sum, t) => sum + t.amount, 0);
 
   const worksheetData = [
     header,
-    ...rows,
-    ["", "TOTAL INCOME", totalIncome, "", ""],
-    ["", "TOTAL EXPENSE", totalExpense, "", ""],
+    ...data.map((tx) => [
+      tx.amount,
+      tx.type,
+      tx.category?.name || "Uncategorized",
+      tx.description || "",
+      tx.createdAt.toISOString(),
+    ]),
   ];
 
   const ws = XLSX.utils.aoa_to_sheet(worksheetData);
 
-  // 🎨 Theme colors (match your UI)
-  const PRIMARY = colors[0] || "2563EB"; // default to blue if no color provided
-  const MUTED = colors[1] || "6B7280"; // default to gray if no color provided
-
   // =========================
-  // 1. HEADER STYLE
+  // 1. HEADER
   // =========================
   for (let c = 0; c < header.length; c++) {
     const cell = XLSX.utils.encode_cell({ r: 0, c });
 
     ws[cell].s = {
-      fill: { bgColor: { rgb: PRIMARY } },
-      font: { color: { rgb: "FFFFFF" }, bold: true },
-    };
-  }
-
-  // =========================
-  // 2. BODY ROWS (zebra + category color)
-  // =========================
-  for (let r = 1; r <= data.length; r++) {
-    const tx = data[r - 1];
-
-    const categoryColor = tx.category?.color || MUTED;
-
-    const cell = XLSX.utils.encode_cell({ r, c: 2 });
-
-    ws[cell] = ws[cell] || {};
-
-    ws[cell].s = {
-      fill: {
-        bgColor: { rgb: categoryColor.replace("#", "") },
-      },
+      fill: { fgColor: { rgb: PRIMARY } },
       font: {
-        color: { rgb: "FFFFFF" },
+        color: { rgb: getTextColor(PRIMARY) },
         bold: true,
       },
     };
   }
 
   // =========================
-  // 3. TOTAL ROW STYLING
+  // 2. BODY BASE STYLE (muted)
   // =========================
-  const totalStartRow = rows.length + 1;
+  for (let r = 1; r < worksheetData.length; r++) {
+    for (let c = 0; c < header.length; c++) {
+      const cell = XLSX.utils.encode_cell({ r, c });
 
-  for (let c = 0; c < header.length; c++) {
-    const cell = XLSX.utils.encode_cell({ r: totalStartRow, c });
-
-    ws[cell].s = {
-      fill: { bgColor: { rgb: MUTED } }, // dark
-      font: { color: { rgb: "FFFFFF" }, bold: true },
-    };
-  }
-
-  for (let c = 0; c < header.length; c++) {
-    const cell = XLSX.utils.encode_cell({ r: totalStartRow + 1, c });
-
-    ws[cell].s = {
-      fill: { fgColor: { rgb: "111827" } },
-      font: { color: { rgb: "FFFFFF" }, bold: true },
-    };
+      ws[cell] = ws[cell] || {};
+      ws[cell].s = {
+        fill: { fgColor: { rgb: MUTED } },
+        font: { color: { rgb: "111827" } },
+      };
+    }
   }
 
   // =========================
-  // 4. AUTO COLUMN WIDTHS
+  // 3. TYPE COLUMN (income / expense)
+  // =========================
+  for (let r = 1; r < worksheetData.length; r++) {
+    const tx = data[r - 1];
+
+    const bg = (tx.type === "income" ? INCOME : EXPENSE);
+    const text = getTextColor(bg);
+
+    const cell = XLSX.utils.encode_cell({ r, c: 1 });
+
+    ws[cell].s = {
+      fill: { fgColor: { rgb: bg } },
+      font: {
+        color: { rgb: text },
+        bold: true,
+      },
+    };
+  }
+
+  // =========================
+  // 4. CATEGORY COLUMN (DB COLOR)
+  // =========================
+  for (let r = 1; r < worksheetData.length; r++) {
+    const tx = data[r - 1];
+
+    const bg = (tx.category?.color || MUTED).replace("#", "");
+    const text = getTextColor(bg);
+
+    const cell = XLSX.utils.encode_cell({ r, c: 2 });
+
+    ws[cell].s = {
+      fill: { fgColor: { rgb: bg } },
+      font: {
+        color: { rgb: text },
+        bold: true,
+      },
+    };
+  }
+
+  // =========================
+  // 5. AUTO COLUMN WIDTHS
   // =========================
   ws["!cols"] = header.map((_, i) => {
-    const maxLength = Math.max(
-      ...worksheetData.map((row) => (row[i] ? String(row[i]).length : 10)),
+    const max = Math.max(
+      ...worksheetData.map((row) =>
+        row[i] ? String(row[i]).length : 10
+      )
     );
 
-    return { wch: maxLength + 2 };
+    return { wch: max + 2 };
   });
 
   const wb = XLSX.utils.book_new();
