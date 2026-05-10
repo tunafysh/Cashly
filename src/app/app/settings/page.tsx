@@ -1,8 +1,27 @@
 import ExportCard from "@/components/elements/export-card";
 import ImportCard from "@/components/elements/import-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from "@/components/ui/item";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ThemeSelector from "@/components/elements/theme-selector";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemTitle,
+} from "@/components/ui/item";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ComputerIcon, MoonIcon, Sun, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -26,41 +45,28 @@ export default function Settings() {
             <Item>
               <ItemContent>
                 <ItemTitle>Theme</ItemTitle>
-                <ItemDescription>Choose between light and dark mode or system default.</ItemDescription>
+                <ItemDescription>
+                  Choose between light and dark mode or system default.
+                </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <Select onValueChange={setTheme}>
-                  <SelectTrigger>
-                    <SelectValue>
-                      <ComputerIcon className="mr-2" />
-                       System
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="light" className="rounded-lg">
-                      <SunIcon className="mr-2" />
-                      Light
-                    </SelectItem>
-                    <SelectItem value="dark" className="rounded-lg">
-                      <MoonIcon className="mr-2 rotate-180" />
-                      Dark
-                    </SelectItem>
-                    <SelectItem value="system" className="rounded-lg">
-                      <ComputerIcon className="mr-2" />
-                      System
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+                <ThemeSelector />
               </ItemActions>
             </Item>
 
             <Item>
               <ItemContent>
                 <ItemTitle>Currency</ItemTitle>
-                <ItemDescription>Set your preferred currency for financial data display.</ItemDescription>
+                <ItemDescription>
+                  Set your preferred currency for financial data display.
+                </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <Select onValueChange={(value) => console.log("Selected currency:", value)}>
+                <Select
+                  onValueChange={(value) =>
+                    console.log("Selected currency:", value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue>USD</SelectValue>
                   </SelectTrigger>
@@ -81,7 +87,6 @@ export default function Settings() {
                 </Select>
               </ItemActions>
             </Item>
-
           </CardContent>
         </Card>
       </div>

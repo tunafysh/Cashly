@@ -81,7 +81,8 @@ const baseColumns = (currency: string): ColumnDef<Transaction>[] => [
               : "text-red-600 dark:text-red-400"
           }`}
         >
-          {type === "income" ? "+" : "-"}{formatCurrency(amount, currency)}
+          {type === "income" ? "+" : "-"}
+          {formatCurrency(amount, currency)}
         </span>
       );
     },

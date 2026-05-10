@@ -29,7 +29,7 @@ function solidFill(rgb: string) {
 
 export function buildStyledWorkbook(data: any[], colors: string[]) {
   const PRIMARY = (colors[0] || "4F46E5").replace("#", "");
-  const MUTED   = (colors[1] || "F3F4F6").replace("#", "");
+  const MUTED = (colors[1] || "F3F4F6").replace("#", "");
   const EXPENSE = (colors[2] || "EF4444").replace("#", "");
 
   const header = ["Amount", "Type", "Category", "Description", "Created At"];
@@ -73,8 +73,8 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
 
   // ── 3. TYPE COLUMN ───────────────────────────────────────────────────────
   for (let r = 1; r < worksheetData.length; r++) {
-    const tx   = data[r - 1];
-    const bg   = tx.type === "income" ? PRIMARY : EXPENSE;
+    const tx = data[r - 1];
+    const bg = tx.type === "income" ? PRIMARY : EXPENSE;
     const addr = XLSX.utils.encode_cell({ r, c: 1 });
     ws[addr].s = {
       fill: solidFill(bg),
@@ -84,8 +84,8 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
 
   // ── 4. CATEGORY COLUMN ───────────────────────────────────────────────────
   for (let r = 1; r < worksheetData.length; r++) {
-    const tx   = data[r - 1];
-    const bg   = (tx.category?.color || MUTED).replace("#", "");
+    const tx = data[r - 1];
+    const bg = (tx.category?.color || MUTED).replace("#", "");
     const addr = XLSX.utils.encode_cell({ r, c: 2 });
     ws[addr].s = {
       fill: solidFill(bg),
@@ -96,7 +96,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
   // ── 5. AUTO COLUMN WIDTHS ────────────────────────────────────────────────
   ws["!cols"] = header.map((_, i) => {
     const max = Math.max(
-      ...worksheetData.map((row) => (row[i] ? String(row[i]).length : 10))
+      ...worksheetData.map((row) => (row[i] ? String(row[i]).length : 10)),
     );
     return { wch: max + 2 };
   });

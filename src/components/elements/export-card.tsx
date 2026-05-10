@@ -89,9 +89,13 @@ export default function ExportPanel() {
 
   async function exportTransactions() {
     const styles = getComputedStyle(document.documentElement);
-    const primary = toHex(styles.getPropertyValue("--primary").trim() || "2563eb");
+    const primary = toHex(
+      styles.getPropertyValue("--primary").trim() || "2563eb",
+    );
     const muted = toHex(styles.getPropertyValue("--muted").trim() || "f5f5f5");
-    const destructive = toHex(styles.getPropertyValue("--destructive").trim() || "ef4444");
+    const destructive = toHex(
+      styles.getPropertyValue("--destructive").trim() || "ef4444",
+    );
     console.log("Exporting with colors:", { primary, muted, destructive });
     await handleExport(setLoading, fileType, [primary, muted, destructive]);
   }

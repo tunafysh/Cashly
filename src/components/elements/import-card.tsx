@@ -103,8 +103,7 @@ export default function ImportPanel() {
                 disabled={!file || loading}
                 className="gap-2"
               >
-
-                  <Upload className="w-4 h-4" />
+                <Upload className="w-4 h-4" />
                 {loading ? "Importing..." : "Import"}
               </Button>
             </div>

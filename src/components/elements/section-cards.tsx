@@ -28,7 +28,7 @@ function SectionCard({
   trendIcon,
   fromDate,
   toDate,
-  currency
+  currency,
 }: {
   title: string;
   value: number;
