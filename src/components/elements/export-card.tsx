@@ -61,6 +61,29 @@ async function handleExport(
   }
 }
 
+function toHex(color: string): string {
+  // Create a temporary element to let the browser normalize the color
+  const el = document.createElement("div");
+  el.style.color = color;
+  document.body.appendChild(el);
+
+  const rgb = getComputedStyle(el).color;
+  document.body.removeChild(el);
+
+  // rgb(a) -> hex
+  const match = rgb.match(/\d+/g);
+  if (!match) return "000000";
+
+  const [r, g, b] = match.map(Number);
+
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => x.toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+
 export default function ExportPanel() {
   const [fileType, setFileType] = useState("csv");
   const [loading, setLoading] = useState(false);
@@ -78,9 +101,9 @@ export default function ExportPanel() {
 
   async function exportTransactions() {
     const styles = getComputedStyle(document.documentElement);
-    const primary = styles.getPropertyValue("--primary").trim() || "2563eb";
-    const muted = styles.getPropertyValue("--muted").trim() || "f5f5f5";
-    const destructive = styles.getPropertyValue("--destructive").trim() || "ef4444";
+    const primary = toHex(styles.getPropertyValue("--primary").trim() || "2563eb");
+    const muted = toHex(styles.getPropertyValue("--muted").trim() || "f5f5f5");
+    const destructive = toHex(styles.getPropertyValue("--destructive").trim() || "ef4444");
     console.log("Exporting with colors:", { primary, muted, destructive });
     await handleExport(setLoading, fileType, [primary, muted, destructive]);
   }
