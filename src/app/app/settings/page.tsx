@@ -16,15 +16,8 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-export default function Settings({ currency }: { currency?: string }) {
+export default function Settings() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-4 p-4 md:p-6">
@@ -60,7 +53,7 @@ export default function Settings({ currency }: { currency?: string }) {
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <CurrencySelector currency={currency} />
+                <CurrencySelector />
               </ItemActions>
             </Item>
           </CardContent>
