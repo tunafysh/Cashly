@@ -69,11 +69,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async signIn({ user, account }) {
-
       if (user && user.id) {
         await ensureProfileExists(user.id);
-      }
-      else {
+      } else {
         console.warn("User object does not contain an id:", user);
       }
 

@@ -1,7 +1,12 @@
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Transactions() {
-    return(
-        <></>
-    )
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Transactions</CardTitle>
+      </CardHeader>
+      <CardContent></CardContent>
+    </Card>
+  );
 }

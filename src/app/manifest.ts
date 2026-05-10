@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Cashly",
     short_name: "Cashly",
-    description: "A personal finance management app built with Next.js and TypeScript.",
+    description:
+      "A personal finance management app built with Next.js and TypeScript.",
     icons: [
       {
         src: "/icons/icon-192x192.png",

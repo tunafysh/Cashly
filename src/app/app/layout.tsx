@@ -9,17 +9,20 @@ function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default async function AppRootLayout({ children }: React.PropsWithChildren) {
+export default async function AppRootLayout({
+  children,
+}: React.PropsWithChildren) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "/";
 
-  const title = pathname
-    .split("/")
-    .filter(Boolean)        // removes empty parts
-    .pop()                  // last segment
-    ?.replace(/-/g, " ")    // optional: "user-settings" → "user settings"
-    .replace(/\b\w/g, c => c.toUpperCase()) // capitalize
-    ?? "Home";
+  const title =
+    pathname
+      .split("/")
+      .filter(Boolean) // removes empty parts
+      .pop() // last segment
+      ?.replace(/-/g, " ") // optional: "user-settings" → "user settings"
+      .replace(/\b\w/g, (c) => c.toUpperCase()) ?? // capitalize
+    "Home";
 
   return (
     <SessionProvider>

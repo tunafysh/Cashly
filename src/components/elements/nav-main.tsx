@@ -38,8 +38,8 @@ export function NavMain({
             <a href={item.url}>
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton tooltip={item.title}>
-                    {item.icon}
-                    <span>{item.title}</span>
+                  {item.icon}
+                  <span>{item.title}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </a>

@@ -31,8 +31,6 @@ import {
   FileIcon,
   CommandIcon,
 } from "lucide-react";
-import { Suspense } from "react";
-import { Skeleton } from "../ui/skeleton";
 
 const data = {
   navMain: [
@@ -57,6 +55,13 @@ const data = {
       icon: <FolderIcon />,
     },
   ],
+  navSecondary: [
+    {
+      title: "Settings",
+      url: "/app/settings",
+      icon: <Settings2Icon />,
+    },
+  ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -79,10 +84,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser />
-      </SidebarFooter>
+      <SidebarFooter>{/* <NavUser /> */}</SidebarFooter>
     </Sidebar>
   );
 }

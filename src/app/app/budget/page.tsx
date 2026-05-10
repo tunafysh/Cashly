@@ -1,3 +1,3 @@
 export default function Budget() {
-    return(<></>)
+  return <></>;
 }
