@@ -32,6 +32,7 @@ type PrimitiveTransaction = {
   type: "income" | "expense";
   category: string;
   description?: string;
+  createdAt?: string | Date;
 };
 
 type FileTypes = "json" | "csv" | "xlsx";
@@ -120,6 +121,7 @@ export async function POST(req: NextRequest) {
         type: item.type,
         description: item.description,
         categoryId,
+        createdAt: item.createdAt ? new Date(item.createdAt) : undefined,
       };
     });
 

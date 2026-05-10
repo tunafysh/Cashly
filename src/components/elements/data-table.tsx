@@ -28,7 +28,11 @@ const columns: ColumnDef<Transaction>[] = [
       const date = new Date(row.getValue("createdAt"));
       return (
         <span className="text-sm">
-          {date.toLocaleDateString()} {date.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}
+          {date.toLocaleDateString()}{" "}
+          {date.toLocaleTimeString(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </span>
       );
     },

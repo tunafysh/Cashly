@@ -28,6 +28,7 @@ export const transactionSchema = z.object({
   type: z.enum(["income", "expense"]),
   categoryId: z.string(),
   description: z.string().optional(),
+  createdAt: z.date().optional(),
 });
 
 const transactionSelect = {

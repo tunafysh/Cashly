@@ -1,10 +1,12 @@
 import { AppSidebar } from "@/components/elements/app-sidebar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "sonner";
 
 export default function AppRootLayout({ children }: React.PropsWithChildren) {
   return (
     <SessionProvider>
+      <Toaster richColors position="bottom-right" />
       <SidebarProvider
         style={
           {

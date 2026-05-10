@@ -66,6 +66,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session;
     },
+
+    async signIn({ user, account }) {
+      return true;
+    },
   },
   providers: [
     Credentials({
