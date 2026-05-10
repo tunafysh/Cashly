@@ -119,6 +119,7 @@ export function ChartAreaInteractive({
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState("90d");
   const [chartData, setChartData] = React.useState<ChartData[]>([]);
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (isMobile) {
@@ -128,37 +129,42 @@ export function ChartAreaInteractive({
 
   React.useEffect(() => {
     async function fetchChartData() {
-      const referenceDate = new Date();
+      try {
+        setError(null);
+        const referenceDate = new Date();
 
-      let daysToSubtract = 90;
+        let daysToSubtract = 90;
 
-      if (timeRange === "30d") {
-        daysToSubtract = 30;
+        if (timeRange === "30d") {
+          daysToSubtract = 30;
+        }
+
+        if (timeRange === "7d") {
+          daysToSubtract = 7;
+        }
+
+        const fromDate = new Date(referenceDate);
+
+        fromDate.setUTCDate(fromDate.getUTCDate() - daysToSubtract);
+        fromDate.setUTCHours(0, 0, 0, 0);
+
+        const params = new URLSearchParams({
+          fromDate: fromDate.toISOString(),
+          toDate: referenceDate.toISOString(),
+        });
+
+        const response = await fetch(`/api/transactions?${params}`);
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch transactions");
+        }
+
+        const data = await response.json();
+
+        setChartData(aggregateTransactions(data.transactions));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An error occurred");
       }
-
-      if (timeRange === "7d") {
-        daysToSubtract = 7;
-      }
-
-      const fromDate = new Date(referenceDate);
-
-      fromDate.setUTCDate(fromDate.getUTCDate() - daysToSubtract);
-      fromDate.setUTCHours(0, 0, 0, 0);
-
-      const params = new URLSearchParams({
-        fromDate: fromDate.toISOString(),
-        toDate: referenceDate.toISOString(),
-      });
-
-      const response = await fetch(`/api/transactions?${params}`);
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch transactions");
-      }
-
-      const data = await response.json();
-
-      setChartData(aggregateTransactions(data.transactions));
     }
 
     fetchChartData();
@@ -214,11 +220,18 @@ export function ChartAreaInteractive({
         </CardAction>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-62.5 w-full"
-        >
-          <AreaChart data={chartData}>
+        {error ? (
+          <div className="border-red-200 bg-red-50 p-4 text-center dark:border-red-900 dark:bg-red-950 rounded">
+            <p className="text-sm text-red-600 dark:text-red-400">
+              Error: {error}
+            </p>
+          </div>
+        ) : (
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-62.5 w-full"
+          >
+            <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillIncome" x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -285,7 +298,8 @@ export function ChartAreaInteractive({
               stackId="a"
             />
           </AreaChart>
-        </ChartContainer>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );
