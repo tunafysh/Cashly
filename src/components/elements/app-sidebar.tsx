@@ -43,22 +43,22 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/app/dashboard",
+      url: "/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
       title: "Transactions",
-      url: "/app/transactions",
+      url: "/transactions",
       icon: <ListIcon />,
     },
     {
       title: "Categories",
-      url: "/app/categories",
+      url: "/categories",
       icon: <ChartBarIcon />,
     },
     {
       title: "Budget",
-      url: "/app/budget",
+      url: "/budget",
       icon: <FolderIcon />,
     },
   ],
