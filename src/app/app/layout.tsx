@@ -2,15 +2,16 @@ import { AppSidebar } from "@/components/elements/app-sidebar";
 import { SiteHeader } from "@/components/elements/site-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { SessionProvider } from "next-auth/react";
-import { usePathname } from "next/navigation";
+import { headers } from "next/headers";
 import { Toaster } from "sonner";
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default function AppRootLayout({ children }: React.PropsWithChildren) {
-  const pathname = usePathname(); // e.g. "/transactions"
+export default async function AppRootLayout({ children }: React.PropsWithChildren) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "/";
 
   const title = pathname
     .split("/")
