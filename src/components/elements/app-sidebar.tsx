@@ -35,11 +35,6 @@ import { Suspense } from "react";
 import { Skeleton } from "../ui/skeleton";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -74,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
-              <a href="#">
+              <a href="/app/dashboard">
                 <CommandIcon className="size-5!" />
                 <span className="text-base font-semibold">Acme Inc.</span>
               </a>
@@ -86,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        {/* <NavUser /> */}
       </SidebarFooter>
     </Sidebar>
   );
