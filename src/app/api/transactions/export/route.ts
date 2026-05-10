@@ -66,7 +66,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
       }
       ws[addr].s = {
         fill: solidFill(MUTED),
-        font: { color: { rgb: "111827" } },
+        font: { color: { rgb: getTextColor(MUTED) } },
       };
     }
   }
@@ -84,6 +84,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
 
   // ── 4. CATEGORY COLUMN ───────────────────────────────────────────────────
   for (let r = 1; r < worksheetData.length; r++) {
+    if (!data[r - 1].category?.color) continue; // skip uncategorized
     const tx   = data[r - 1];
     const bg   = (tx.category?.color || MUTED).replace("#", "");
     const addr = XLSX.utils.encode_cell({ r, c: 2 });
