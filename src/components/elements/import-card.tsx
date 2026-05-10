@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { UploadCloud, File, X } from "lucide-react";
+import { UploadCloud, File, X, Upload } from "lucide-react";
 
 export default function ImportPanel() {
   const [file, setFile] = useState<File | null>(null);
@@ -101,8 +101,9 @@ export default function ImportPanel() {
                 type="submit"
                 onClick={onImport as any}
                 disabled={!file || loading}
-                size="sm"
               >
+
+                  <Upload className="w-4 h-4" />
                 {loading ? "Importing..." : "Import"}
               </Button>
             </div>
