@@ -27,7 +27,6 @@ export default function ThemeSelect() {
     <Select value={stringtheme} onValueChange={setTheme}>
       <SelectTrigger className="w-45">
         <div className="flex items-center gap-2">
-          <SelectedIcon className="h-4 w-4" />
           <SelectValue />
         </div>
       </SelectTrigger>

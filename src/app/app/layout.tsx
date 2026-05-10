@@ -5,6 +5,8 @@ import { auth } from "@/lib/auth";
 import { SessionProvider } from "next-auth/react";
 import { headers } from "next/headers";
 import { Toaster } from "sonner";
+import { ProfileProvider } from "@/lib/profile-context";
+import { getUserProfile, UserProfile } from "@/db/queries/profiles";
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -16,6 +18,16 @@ export default async function AppRootLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "/";
   const session = await auth();
+  
+  let profile;
+  try {
+    if(session?.user?.id) {
+      const partialProfile = await getUserProfile(session.user.id)
+      profile = { ...partialProfile, budget: Number(partialProfile.budget) } as UserProfile;
+    }
+  } catch (error) {
+    console.error("Failed to load profile:", error);
+  }
 
   const title =
     pathname
@@ -28,21 +40,23 @@ export default async function AppRootLayout({
 
   return (
     <SessionProvider session={session}>
-      <Toaster richColors position="bottom-right" />
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "calc(var(--spacing) * 72)",
-            "--header-height": "calc(var(--spacing) * 12)",
-          } as React.CSSProperties
-        }
-      >
-        <AppSidebar variant="inset" />
-        <SidebarInset>
-          <SiteHeader title={`${capitalize(title)}`} />
-          {children}
-        </SidebarInset>
-      </SidebarProvider>
+      <ProfileProvider profile={profile}>
+        <Toaster richColors position="bottom-right" />
+        <SidebarProvider
+          style={
+            {
+              "--sidebar-width": "calc(var(--spacing) * 72)",
+              "--header-height": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties
+          }
+        >
+          <AppSidebar variant="inset" />
+          <SidebarInset>
+            <SiteHeader title={`${capitalize(title)}`} />
+            {children}
+          </SidebarInset>
+        </SidebarProvider>
+      </ProfileProvider>
     </SessionProvider>
   );
 }

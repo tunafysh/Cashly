@@ -19,11 +19,11 @@ function updateCurrency(value: string) {
   });
 }
 
-export default function CurrencySelector() {
+export default function CurrencySelector({ currency }: { currency?: string }) {
   return (
-    <Select onValueChange={(value) => updateCurrency(value)}>
+    <Select value={currency} onValueChange={(value) => updateCurrency(value)}>
       <SelectTrigger>
-        <SelectValue>USD</SelectValue>
+        <SelectValue placeholder="Select currency" />
       </SelectTrigger>
       <SelectContent className="rounded-xl">
         <SelectItem value="USD" className="rounded-lg">

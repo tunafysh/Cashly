@@ -1,10 +1,10 @@
 "use client";
 import { ChartAreaInteractive } from "@/components/elements/chart-area-interactive";
 import { SectionCards } from "@/components/elements/section-cards";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DataTable from "@/components/elements/data-table";
 import { formatCurrency } from "@/lib/utils";
-import { UserProfile } from "@/db/queries/profiles";
+import { useProfile } from "@/lib/profile-context";
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{
@@ -12,23 +12,7 @@ export default function Dashboard() {
     toDate?: Date;
   }>({});
 
-  const [profile, setProfile] = useState<UserProfile>();
-
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const response = await fetch("/api/profile");
-        if (!response.ok) {
-          throw new Error("Failed to load profile");
-        }
-        const data = await response.json();
-        setProfile(data.profile);
-      } catch (error) {
-        console.error("Error loading profile:", error);
-      }
-    }
-    loadProfile();
-  }, []);
+  const profile = useProfile();
 
   const handleDateRangeChange = (fromDate?: Date, toDate?: Date) => {
     setDateRange({ fromDate, toDate });

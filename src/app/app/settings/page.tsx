@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function Settings() {
+export default function Settings({ currency }: { currency?: string }) {
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-4 p-4 md:p-6">
@@ -60,7 +60,7 @@ export default function Settings() {
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <CurrencySelector />
+                <CurrencySelector currency={currency} />
               </ItemActions>
             </Item>
           </CardContent>
