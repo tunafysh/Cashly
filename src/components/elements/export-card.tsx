@@ -81,7 +81,7 @@ export default function ExportPanel() {
     const primary = styles.getPropertyValue("--primary").trim() || "2563eb";
     const muted = styles.getPropertyValue("--muted").trim() || "f5f5f5";
     const destructive = styles.getPropertyValue("--destructive").trim() || "ef4444";
-
+    console.log("Exporting with colors:", { primary, muted, destructive });
     await handleExport(setLoading, fileType, [primary, muted, destructive]);
   }
 

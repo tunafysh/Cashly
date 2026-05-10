@@ -24,7 +24,6 @@ export function buildStyledWorkbook(
   const PRIMARY = (colors[0] || "4F46E5").replace("#", "");
   const MUTED = (colors[1] || "F3F4F6").replace("#", "");
   const EXPENSE = (colors[2] || "EF4444").replace("#", "");
-  const INCOME = "22C55E";
 
   const header = ["Amount", "Type", "Category", "Description", "Created At"];
 
@@ -48,7 +47,7 @@ export function buildStyledWorkbook(
     const cell = XLSX.utils.encode_cell({ r: 0, c });
 
     ws[cell].s = {
-      fill: { bgColor: { rgb: PRIMARY } },
+      fill: { fgColor: { rgb: PRIMARY } },
       font: {
         color: { rgb: getTextColor(PRIMARY) },
         bold: true,
@@ -77,7 +76,7 @@ export function buildStyledWorkbook(
   for (let r = 1; r < worksheetData.length; r++) {
     const tx = data[r - 1];
 
-    const bg = (tx.type === "income" ? INCOME : EXPENSE);
+    const bg = (tx.type === "income" ? PRIMARY : EXPENSE);
     const text = getTextColor(bg);
 
     const cell = XLSX.utils.encode_cell({ r, c: 1 });
