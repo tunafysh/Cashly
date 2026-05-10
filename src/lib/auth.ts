@@ -7,6 +7,7 @@ import argon2 from "argon2";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/db";
 import { users, accounts, authenticators } from "@/db/schema";
+import { ensureProfileExists } from "@/db/queries/profiles";
 
 export async function hashPassword(password: string) {
   return await argon2.hash(password);
@@ -68,6 +69,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async signIn({ user, account }) {
+
+      if (user && user.id) { 
+        await ensureProfileExists(user.id);
+      }
+      else {
+        console.warn("User object does not contain an id:", user);
+      }
+
       return true;
     },
   },
