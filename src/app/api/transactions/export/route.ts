@@ -48,7 +48,7 @@ export function buildStyledWorkbook(
     const cell = XLSX.utils.encode_cell({ r: 0, c });
 
     ws[cell].s = {
-      fill: { fgColor: { rgb: PRIMARY } },
+      fill: { bgColor: { rgb: PRIMARY } },
       font: {
         color: { rgb: getTextColor(PRIMARY) },
         bold: true,
