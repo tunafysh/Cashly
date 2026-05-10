@@ -1,4 +1,5 @@
 "use client";
+import { useProfile } from "@/lib/profile-context";
 import {
   Select,
   SelectContent,
@@ -19,9 +20,10 @@ function updateCurrency(value: string) {
   });
 }
 
-export default function CurrencySelector({ currency }: { currency?: string }) {
+export default function CurrencySelector() {
+  const profile = useProfile();
   return (
-    <Select value={currency} onValueChange={(value) => updateCurrency(value)}>
+    <Select value={profile?.currency} onValueChange={(value) => updateCurrency(value)}>
       <SelectTrigger>
         <SelectValue placeholder="Select currency" />
       </SelectTrigger>

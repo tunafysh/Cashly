@@ -32,14 +32,14 @@ export default function Settings({ currency }: { currency?: string }) {
           <ImportCard />
           <ExportCard />
         </div>
-        <Card className="@container/card">
+        <Card className="@container/card mt-2">
           <CardHeader>
             <CardTitle className="font-bold text-lg">Settings</CardTitle>
             <CardDescription>
               Manage your application settings and preferences.
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+          <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6 gap-4 flex flex-col">
             <Item className="border border-border">
               <ItemContent>
                 <ItemTitle>Theme</ItemTitle>
