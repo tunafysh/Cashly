@@ -1,11 +1,14 @@
 "use client";
 import { ChartAreaInteractive } from "@/components/elements/chart-area-interactive";
 import { SectionCards } from "@/components/elements/section-cards";
-import { SiteHeader } from "@/components/elements/site-header";
 import { useState } from "react";
 import DataTable from "@/components/elements/data-table";
 
-export default function Page() {
+export const metadata = {
+    title: "Dashboard"
+}
+
+export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{
     fromDate?: Date;
     toDate?: Date;
@@ -17,7 +20,6 @@ export default function Page() {
 
   return (
     <>
-      <SiteHeader title="Dashboard" />
       <div className="flex flex-1 flex-col">
         <div className="@container/main flex flex-1 flex-col gap-2">
           <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
