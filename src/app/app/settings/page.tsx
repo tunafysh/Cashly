@@ -1,6 +1,7 @@
+import CurrencySelector from "@/components/elements/currency-selector";
 import ExportCard from "@/components/elements/export-card";
 import ImportCard from "@/components/elements/import-card";
-import ThemeSelector from "@/components/elements/theme-selector";
+import ThemeSelect from "@/components/elements/theme-selector";
 import {
   Card,
   CardContent,
@@ -26,20 +27,20 @@ import {
 export default function Settings() {
   return (
     <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2 p-4 md:p-6">
+      <div className="@container/main flex flex-1 flex-col gap-4 p-4 md:p-6">
         <div className="w-full grid grid-cols-2">
           <ImportCard />
           <ExportCard />
         </div>
         <Card className="@container/card">
           <CardHeader>
-            <CardTitle>Settings</CardTitle>
+            <CardTitle className="font-bold text-lg">Settings</CardTitle>
             <CardDescription>
               Manage your application settings and preferences.
             </CardDescription>
           </CardHeader>
           <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-            <Item>
+            <Item className="border border-border">
               <ItemContent>
                 <ItemTitle>Theme</ItemTitle>
                 <ItemDescription>
@@ -47,18 +48,20 @@ export default function Settings() {
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <ThemeSelector />
+                <ThemeSelect />
               </ItemActions>
             </Item>
 
-            <Item>
+            <Item className="border border-border">
               <ItemContent>
                 <ItemTitle>Currency</ItemTitle>
                 <ItemDescription>
                   Set your preferred currency for financial data display.
                 </ItemDescription>
               </ItemContent>
-              <ItemActions></ItemActions>
+              <ItemActions>
+                <CurrencySelector />
+              </ItemActions>
             </Item>
           </CardContent>
         </Card>

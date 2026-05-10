@@ -8,15 +8,15 @@ import {
 } from "../ui/select";
 
 function updateCurrency(value: string) {
-    console.log("Selected currency:", value);
+  console.log("Selected currency:", value);
 
-    fetch("/api/profile", {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ currency: value }),
-    });
+  fetch("/api/profile", {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ currency: value }),
+  });
 }
 
 export default function CurrencySelector() {

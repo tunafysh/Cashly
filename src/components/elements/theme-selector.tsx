@@ -10,29 +10,39 @@ import {
 } from "../ui/select";
 import { useTheme } from "next-themes";
 
-export default function ThemeSelector() {
-  const { setTheme } = useTheme();
+type Theme = "light" | "dark" | "system";
+
+const themes = {
+  light: { label: "Light", icon: SunIcon },
+  dark: { label: "Dark", icon: MoonIcon },
+  system: { label: "System", icon: ComputerIcon },
+};
+
+export default function ThemeSelect() {
+  const { theme, setTheme } = useTheme();
+  const stringtheme = theme as Theme;
+  const SelectedIcon = themes[stringtheme]?.icon ?? ComputerIcon;
+
   return (
-    <Select onValueChange={setTheme}>
-      <SelectTrigger>
-        <SelectValue>
-          <ComputerIcon className="mr-2" />
-          System
-        </SelectValue>
+    <Select value={stringtheme} onValueChange={setTheme}>
+      <SelectTrigger className="w-45">
+        <div className="flex items-center gap-2">
+          <SelectedIcon className="h-4 w-4" />
+          <SelectValue />
+        </div>
       </SelectTrigger>
+
       <SelectContent className="rounded-xl">
-        <SelectItem value="light" className="rounded-lg">
-          <SunIcon className="mr-2" />
-          Light
-        </SelectItem>
-        <SelectItem value="dark" className="rounded-lg">
-          <MoonIcon className="mr-2 rotate-180" />
-          Dark
-        </SelectItem>
-        <SelectItem value="system" className="rounded-lg">
-          <ComputerIcon className="mr-2" />
-          System
-        </SelectItem>
+        {Object.entries(themes).map(([value, { label, icon: Icon }]) => (
+          <SelectItem
+            key={value}
+            value={value}
+            className="rounded-lg flex items-center gap-2"
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );
