@@ -260,13 +260,18 @@ export function ChartAreaInteractive({
             </defs>
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="dateTime"
+              dataKey="date"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                return value;
+                return new Date(value).toLocaleString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
               }}
             />
             <ChartTooltip

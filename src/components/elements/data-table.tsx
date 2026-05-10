@@ -19,8 +19,13 @@ import { Transaction } from "./chart-area-interactive";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/card";
 import { Spinner } from "../ui/spinner";
+import { formatCurrency } from "@/lib/utils";
 
-const columns: ColumnDef<Transaction>[] = [
+interface DataTableProps {
+  currency?: string;
+}
+
+const baseColumns = (currency: string): ColumnDef<Transaction>[] => [
   {
     accessorKey: "createdAt",
     header: "Date & Time",
@@ -76,7 +81,7 @@ const columns: ColumnDef<Transaction>[] = [
               : "text-red-600 dark:text-red-400"
           }`}
         >
-          {type === "income" ? "+" : "-"}${amount.toFixed(2)}
+          {type === "income" ? "+" : "-"}{formatCurrency(amount, currency)}
         </span>
       );
     },
@@ -98,7 +103,7 @@ const columns: ColumnDef<Transaction>[] = [
   },
 ];
 
-export default function DataTable() {
+export default function DataTable({ currency = "USD" }: DataTableProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -122,6 +127,8 @@ export default function DataTable() {
 
     fetchTransactions();
   }, []);
+
+  const columns = baseColumns(currency);
 
   const table = useReactTable({
     data: transactions,

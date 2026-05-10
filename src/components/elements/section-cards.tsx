@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 import { TrendingUpIcon, TrendingDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -27,6 +28,7 @@ function SectionCard({
   trendIcon,
   fromDate,
   toDate,
+  currency
 }: {
   title: string;
   value: number;
@@ -36,13 +38,14 @@ function SectionCard({
   trendIcon: React.ReactNode;
   fromDate?: Date;
   toDate?: Date;
+  currency?: string;
 }) {
   return (
     <Card className="@container/card">
       <CardHeader>
         <CardDescription>{title}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          ${value.toFixed(2)}
+          {formatCurrency(value, currency || "USD")}
         </CardTitle>
         <CardAction>
           <Badge variant="outline">
@@ -66,9 +69,11 @@ function SectionCard({
 export function SectionCards({
   fromDate,
   toDate,
+  currency,
 }: {
   fromDate?: Date;
   toDate?: Date;
+  currency?: string;
 }) {
   const [data, setData] = useState<SummaryData>({
     balance: 0,
