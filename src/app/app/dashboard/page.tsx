@@ -4,10 +4,6 @@ import { SectionCards } from "@/components/elements/section-cards";
 import { useState } from "react";
 import DataTable from "@/components/elements/data-table";
 
-export const metadata = {
-    title: "Dashboard"
-}
-
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{
     fromDate?: Date;
