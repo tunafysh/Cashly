@@ -1,0 +1,1 @@
+export type FileTypes = "json" | "csv" | "xlsx";

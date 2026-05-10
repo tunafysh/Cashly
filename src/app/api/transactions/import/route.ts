@@ -8,6 +8,7 @@ import {
 } from "@/db/queries/transactions";
 import { auth } from "@/lib/auth";
 import { createCategoryWithoutColor } from "@/db/queries/categories";
+import { FileTypes } from "@/lib/types";
 
 const parseCsv = (file: File): Promise<PrimitiveTransaction[]> => {
   return new Promise((resolve, reject) => {
@@ -34,8 +35,6 @@ type PrimitiveTransaction = {
   description?: string;
   createdAt?: string | Date;
 };
-
-type FileTypes = "json" | "csv" | "xlsx";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
