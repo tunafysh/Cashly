@@ -101,6 +101,7 @@ export default function ImportPanel() {
                 type="submit"
                 onClick={onImport as any}
                 disabled={!file || loading}
+                className="gap-2"
               >
 
                   <Upload className="w-4 h-4" />

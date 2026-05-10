@@ -20,17 +20,11 @@ import {
   ListIcon,
   ChartBarIcon,
   FolderIcon,
-  UsersIcon,
-  CameraIcon,
-  FileTextIcon,
+  BadgeCentIcon,
   Settings2Icon,
-  CircleHelpIcon,
-  SearchIcon,
-  DatabaseIcon,
-  FileChartColumnIcon,
-  FileIcon,
-  CommandIcon,
 } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
+import { Suspense } from "react";
 
 const data = {
   navMain: [
@@ -75,8 +69,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <a href="/app/dashboard">
-                <CommandIcon className="size-5!" />
-                <span className="text-base font-semibold">Acme Inc.</span>
+                <BadgeCentIcon className="size-5! text-accent" />
+                <span className="text-base font-semibold">Cashly</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -87,7 +81,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <Suspense fallback={<Skeleton className="w-full h-10 rounded-md" />}>
+          <NavUser />
+        </Suspense>
       </SidebarFooter>
     </Sidebar>
   );
