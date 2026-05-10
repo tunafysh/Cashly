@@ -23,6 +23,40 @@ import {
 
 import { Download, FileJson, FileSpreadsheet, FileText } from "lucide-react";
 
+async function handleExport(setLoading: (loading: boolean) => void, fileType: string, colors: string[]) {
+  setLoading(true);
+
+  try {
+    const res = await fetch("/api/export", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: fileType,
+        colors: colors.join(":"), // send colors as colon-separated string
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Export failed");
+    }
+
+    const blob = await res.blob();
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `transactions.${fileType}`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  } finally {
+    setLoading(false);
+  }
+}
+
 export default function ExportPanel() {
   const [fileType, setFileType] = useState("csv");
   const [loading, setLoading] = useState(false);
@@ -38,12 +72,16 @@ export default function ExportPanel() {
       <FileText className="w-5 h-5" />
     );
 
-  async function handleExport() {
+  async function exportTransactions() {
     setLoading(true);
 
     try {
-      // your export logic here
-      await new Promise((r) => setTimeout(r, 1000));
+      const styles = getComputedStyle(document.documentElement);
+
+      const primary = styles.getPropertyValue("--primary");
+      const muted = styles.getPropertyValue("--muted");
+      
+      await handleExport(setLoading, fileType, [primary, muted]); // example colors
     } finally {
       setLoading(false);
     }
@@ -95,7 +133,7 @@ export default function ExportPanel() {
 
         {/* ACTIONS */}
         <div className="flex justify-end">
-          <Button onClick={handleExport} disabled={loading} className="gap-2">
+          <Button onClick={exportTransactions} disabled={loading} className="gap-2">
             <Download className="w-4 h-4" />
 
             {loading ? "Exporting..." : "Export"}
