@@ -58,31 +58,7 @@ export default function Settings() {
                   Set your preferred currency for financial data display.
                 </ItemDescription>
               </ItemContent>
-              <ItemActions>
-                <Select
-                  onValueChange={(value) =>
-                    console.log("Selected currency:", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue>USD</SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl">
-                    <SelectItem value="USD" className="rounded-lg">
-                      USD - US Dollar
-                    </SelectItem>
-                    <SelectItem value="EUR" className="rounded-lg">
-                      EUR - Euro
-                    </SelectItem>
-                    <SelectItem value="GBP" className="rounded-lg">
-                      GBP - British Pound
-                    </SelectItem>
-                    <SelectItem value="JPY" className="rounded-lg">
-                      JPY - Japanese Yen
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </ItemActions>
+              <ItemActions></ItemActions>
             </Item>
           </CardContent>
         </Card>
