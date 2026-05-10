@@ -1,12 +1,7 @@
 "use client";
-import { AppSidebar } from "@/components/elements/app-sidebar";
 import { ChartAreaInteractive } from "@/components/elements/chart-area-interactive";
 import { SectionCards } from "@/components/elements/section-cards";
 import { SiteHeader } from "@/components/elements/site-header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-
-import data from "./data.json";
-import { SessionProvider } from "next-auth/react";
 import { useState } from "react";
 import DataTable from "@/components/elements/data-table";
 
