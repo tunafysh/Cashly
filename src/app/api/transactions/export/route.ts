@@ -31,7 +31,7 @@ export async function POST(req: Request) {
         ...data.map((tx) => [
           tx.amount,
           tx.type,
-          tx.category,
+          tx.category?.name || "",
           tx.description || "",
           tx.createdAt.toISOString(),
         ]),
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
         ...data.map((tx) => [
           tx.amount,
           tx.type,
-          tx.category,
+          tx.category?.name || "",
           tx.description || "",
           tx.createdAt.toISOString(),
         ]),
