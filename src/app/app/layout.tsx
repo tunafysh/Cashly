@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/elements/app-sidebar";
 import { SiteHeader } from "@/components/elements/site-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { auth } from "@/lib/auth";
 import { SessionProvider } from "next-auth/react";
 import { headers } from "next/headers";
 import { Toaster } from "sonner";
@@ -14,6 +15,7 @@ export default async function AppRootLayout({
 }: React.PropsWithChildren) {
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "/";
+  const session = await auth();
 
   const title =
     pathname
@@ -25,7 +27,7 @@ export default async function AppRootLayout({
     "Home";
 
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <Toaster richColors position="bottom-right" />
       <SidebarProvider
         style={
