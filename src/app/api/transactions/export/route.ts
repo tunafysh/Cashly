@@ -50,7 +50,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
     const cell = XLSX.utils.encode_cell({ r: 0, c });
 
     ws[cell].s = {
-      fill: { fgColor: { rgb: PRIMARY } },
+      fill: { bgColor: { rgb: PRIMARY } },
       font: { color: { rgb: "FFFFFF" }, bold: true },
     };
   }
@@ -61,7 +61,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
   for (let r = 1; r <= data.length; r++) {
   const tx = data[r - 1];
 
-  const categoryColor = tx.category?.color || "9CA3AF";
+  const categoryColor = tx.category?.color || MUTED;
 
   const cell = XLSX.utils.encode_cell({ r, c: 2 });
 
@@ -69,7 +69,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
 
   ws[cell].s = {
     fill: {
-      fgColor: { rgb: categoryColor.replace("#", "") },
+      bgColor: { rgb: categoryColor.replace("#", "") },
     },
     font: {
       color: { rgb: "FFFFFF" },
@@ -87,7 +87,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
     const cell = XLSX.utils.encode_cell({ r: totalStartRow, c });
 
     ws[cell].s = {
-      fill: { fgColor: { rgb: "111827" } }, // dark
+      fill: { bgColor: { rgb: MUTED } }, // dark
       font: { color: { rgb: "FFFFFF" }, bold: true },
     };
   }
