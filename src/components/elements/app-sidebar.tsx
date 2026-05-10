@@ -38,22 +38,22 @@ const data = {
   navMain: [
     {
       title: "Dashboard",
-      url: "/dashboard",
+      url: "/app/dashboard",
       icon: <LayoutDashboardIcon />,
     },
     {
       title: "Transactions",
-      url: "/transactions",
+      url: "/app/transactions",
       icon: <ListIcon />,
     },
     {
       title: "Categories",
-      url: "/categories",
+      url: "/app/categories",
       icon: <ChartBarIcon />,
     },
     {
       title: "Budget",
-      url: "/budget",
+      url: "/app/budget",
       icon: <FolderIcon />,
     },
   ],
@@ -81,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        {/* <NavUser /> */}
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );
