@@ -22,11 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ComputerIcon, MoonIcon, Sun, SunIcon } from "lucide-react";
-import { useTheme } from "next-themes";
 
 export default function Settings() {
-  const { setTheme } = useTheme();
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2 p-4 md:p-6">
