@@ -5,13 +5,7 @@ import { NextResponse } from "next/server";
 import * as XLSX from "xlsx-js-style";
 
 export function buildStyledWorkbook(data: any[], colors: string[]) {
-  const header = [
-    "Amount",
-    "Type",
-    "Category",
-    "Description",
-    "Created At",
-  ];
+  const header = ["Amount", "Type", "Category", "Description", "Created At"];
 
   const rows = data.map((tx) => [
     tx.amount,
@@ -59,24 +53,24 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
   // 2. BODY ROWS (zebra + category color)
   // =========================
   for (let r = 1; r <= data.length; r++) {
-  const tx = data[r - 1];
+    const tx = data[r - 1];
 
-  const categoryColor = tx.category?.color || MUTED;
+    const categoryColor = tx.category?.color || MUTED;
 
-  const cell = XLSX.utils.encode_cell({ r, c: 2 });
+    const cell = XLSX.utils.encode_cell({ r, c: 2 });
 
-  ws[cell] = ws[cell] || {};
+    ws[cell] = ws[cell] || {};
 
-  ws[cell].s = {
-    fill: {
-      bgColor: { rgb: categoryColor.replace("#", "") },
-    },
-    font: {
-      color: { rgb: "FFFFFF" },
-      bold: true,
-    },
-  };
-}
+    ws[cell].s = {
+      fill: {
+        bgColor: { rgb: categoryColor.replace("#", "") },
+      },
+      font: {
+        color: { rgb: "FFFFFF" },
+        bold: true,
+      },
+    };
+  }
 
   // =========================
   // 3. TOTAL ROW STYLING
@@ -106,9 +100,7 @@ export function buildStyledWorkbook(data: any[], colors: string[]) {
   // =========================
   ws["!cols"] = header.map((_, i) => {
     const maxLength = Math.max(
-      ...worksheetData.map((row) =>
-        row[i] ? String(row[i]).length : 10,
-      ),
+      ...worksheetData.map((row) => (row[i] ? String(row[i]).length : 10)),
     );
 
     return { wch: maxLength + 2 };
@@ -126,11 +118,11 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  
+
   try {
-    const formData = await req.formData();
-    const colors = (formData.get("colors") as string | null)?.split(":") || [];
-    const type = (formData.get("type") as string)?.toLowerCase() as FileTypes;
+    const body = await req.json();
+    const colors = (body.colors as string | null)?.split(":") || [];
+    const type = (body.type as string)?.toLowerCase() as FileTypes;
 
     if (!type || !["json", "csv", "xlsx"].includes(type)) {
       return NextResponse.json(
@@ -178,7 +170,6 @@ export async function POST(req: Request) {
         },
       });
     }
-
   } catch (error) {
     console.error("Error processing file upload:", error);
     return NextResponse.json(
@@ -186,5 +177,4 @@ export async function POST(req: Request) {
       { status: 500 },
     );
   }
-
 }

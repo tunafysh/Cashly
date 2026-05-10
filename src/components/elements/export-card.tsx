@@ -23,7 +23,11 @@ import {
 
 import { Download, FileJson, FileSpreadsheet, FileText } from "lucide-react";
 
-async function handleExport(setLoading: (loading: boolean) => void, fileType: string, colors: string[]) {
+async function handleExport(
+  setLoading: (loading: boolean) => void,
+  fileType: string,
+  colors: string[],
+) {
   setLoading(true);
 
   try {
@@ -73,18 +77,11 @@ export default function ExportPanel() {
     );
 
   async function exportTransactions() {
-    setLoading(true);
+    const styles = getComputedStyle(document.documentElement);
+    const primary = styles.getPropertyValue("--primary").trim() || "2563eb";
+    const muted = styles.getPropertyValue("--muted").trim() || "f5f5f5";
 
-    try {
-      const styles = getComputedStyle(document.documentElement);
-
-      const primary = styles.getPropertyValue("--primary");
-      const muted = styles.getPropertyValue("--muted");
-
-      await handleExport(setLoading, fileType, [primary, muted]); // example colors
-    } finally {
-      setLoading(false);
-    }
+    await handleExport(setLoading, fileType, [primary, muted]);
   }
 
   return (
@@ -133,7 +130,11 @@ export default function ExportPanel() {
 
         {/* ACTIONS */}
         <div className="flex justify-end">
-          <Button onClick={exportTransactions} disabled={loading} className="gap-2">
+          <Button
+            onClick={exportTransactions}
+            disabled={loading}
+            className="gap-2"
+          >
             <Download className="w-4 h-4" />
 
             {loading ? "Exporting..." : "Export"}
