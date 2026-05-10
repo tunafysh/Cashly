@@ -2,27 +2,34 @@ import { getUserTransactions } from "@/db/queries/transactions";
 import { auth } from "@/lib/auth";
 import { FileTypes } from "@/lib/types";
 import { NextResponse } from "next/server";
-import * as XLSX from "xlsx-js-style";
+import * as XLSX from "xlsx-js-style"; // must use xlsx-js-style, not plain xlsx
 
-function getTextColor(hex: string) {
-  const color = hex.replace("#", "");
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-  const r = parseInt(color.substring(0, 2), 16);
-  const g = parseInt(color.substring(2, 4), 16);
-  const b = parseInt(color.substring(4, 6), 16);
-
-  // luminance formula (perceived brightness)
-  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-
-  return brightness > 160 ? "000000" : "FFFFFF";
+/** Returns "FFFFFF" or "000000" depending on which contrasts better with bg. */
+function getTextColor(hex: string): string {
+  const r = parseInt(hex.slice(0, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
+  // Perceived luminance (WCAG formula)
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "000000" : "FFFFFF";
 }
 
-export function buildStyledWorkbook(
-  data: any[],
-  colors: string[]
-) {
+function solidFill(rgb: string) {
+  // patternType: "solid" is REQUIRED — Excel silently ignores fills without it
+  return { patternType: "solid", fgColor: { rgb } };
+}
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
+export function buildStyledWorkbook(data: any[], colors: string[]) {
   const PRIMARY = (colors[0] || "4F46E5").replace("#", "");
-  const MUTED = (colors[1] || "F3F4F6").replace("#", "");
+  const MUTED   = (colors[1] || "F3F4F6").replace("#", "");
   const EXPENSE = (colors[2] || "EF4444").replace("#", "");
 
   const header = ["Amount", "Type", "Category", "Description", "Created At"];
@@ -40,92 +47,62 @@ export function buildStyledWorkbook(
 
   const ws = XLSX.utils.aoa_to_sheet(worksheetData);
 
-  // =========================
-  // 1. HEADER
-  // =========================
+  // ── 1. HEADER ────────────────────────────────────────────────────────────
   for (let c = 0; c < header.length; c++) {
-    const cell = XLSX.utils.encode_cell({ r: 0, c });
-
-    ws[cell].s = {
-      fill: { fgColor: { rgb: PRIMARY } },
-      font: {
-        color: { rgb: getTextColor(PRIMARY) },
-        bold: true,
-      },
+    const addr = XLSX.utils.encode_cell({ r: 0, c });
+    ws[addr].s = {
+      fill: solidFill(PRIMARY),
+      font: { color: { rgb: getTextColor(PRIMARY) }, bold: true },
     };
   }
 
-  // =========================
-  // 2. BODY BASE STYLE (muted)
-  // =========================
+  // ── 2. BODY BASE STYLE ───────────────────────────────────────────────────
   for (let r = 1; r < worksheetData.length; r++) {
     for (let c = 0; c < header.length; c++) {
-      const cell = XLSX.utils.encode_cell({ r, c });
-
-      ws[cell] = ws[cell] || {};
-      ws[cell].s = {
-        fill: { fgColor: { rgb: MUTED } },
+      const addr = XLSX.utils.encode_cell({ r, c });
+      // aoa_to_sheet skips empty strings — initialise the cell if absent
+      if (!ws[addr]) {
+        ws[addr] = { t: "z", v: "" };
+      }
+      ws[addr].s = {
+        fill: solidFill(MUTED),
         font: { color: { rgb: "111827" } },
       };
     }
   }
 
-  // =========================
-  // 3. TYPE COLUMN (income / expense)
-  // =========================
+  // ── 3. TYPE COLUMN ───────────────────────────────────────────────────────
   for (let r = 1; r < worksheetData.length; r++) {
-    const tx = data[r - 1];
-
-    const bg = (tx.type === "income" ? PRIMARY : EXPENSE);
-    const text = getTextColor(bg);
-
-    const cell = XLSX.utils.encode_cell({ r, c: 1 });
-
-    ws[cell].s = {
-      fill: { fgColor: { rgb: bg } },
-      font: {
-        color: { rgb: text },
-        bold: true,
-      },
+    const tx   = data[r - 1];
+    const bg   = tx.type === "income" ? PRIMARY : EXPENSE;
+    const addr = XLSX.utils.encode_cell({ r, c: 1 });
+    ws[addr].s = {
+      fill: solidFill(bg),
+      font: { color: { rgb: getTextColor(bg) }, bold: true },
     };
   }
 
-  // =========================
-  // 4. CATEGORY COLUMN (DB COLOR)
-  // =========================
+  // ── 4. CATEGORY COLUMN ───────────────────────────────────────────────────
   for (let r = 1; r < worksheetData.length; r++) {
-    const tx = data[r - 1];
-
-    const bg = (tx.category?.color || MUTED).replace("#", "");
-    const text = getTextColor(bg);
-
-    const cell = XLSX.utils.encode_cell({ r, c: 2 });
-
-    ws[cell].s = {
-      fill: { fgColor: { rgb: bg } },
-      font: {
-        color: { rgb: text },
-        bold: true,
-      },
+    const tx   = data[r - 1];
+    const bg   = (tx.category?.color || MUTED).replace("#", "");
+    const addr = XLSX.utils.encode_cell({ r, c: 2 });
+    ws[addr].s = {
+      fill: solidFill(bg),
+      font: { color: { rgb: getTextColor(bg) }, bold: true },
     };
   }
 
-  // =========================
-  // 5. AUTO COLUMN WIDTHS
-  // =========================
+  // ── 5. AUTO COLUMN WIDTHS ────────────────────────────────────────────────
   ws["!cols"] = header.map((_, i) => {
     const max = Math.max(
-      ...worksheetData.map((row) =>
-        row[i] ? String(row[i]).length : 10
-      )
+      ...worksheetData.map((row) => (row[i] ? String(row[i]).length : 10))
     );
-
     return { wch: max + 2 };
   });
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Transactions");
-
   return wb;
 }
 
