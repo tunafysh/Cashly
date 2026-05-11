@@ -138,6 +138,7 @@ export function SectionCards({
         trendIcon={<TrendingDownIcon />}
         fromDate={fromDate}
         toDate={toDate}
+        currency={currency}
       />
       <SectionCard
         title="Total Income"
@@ -148,6 +149,7 @@ export function SectionCards({
         trendIcon={<TrendingUpIcon />}
         fromDate={fromDate}
         toDate={toDate}
+        currency={currency}
       />
       <SectionCard
         title="Transaction Count"
@@ -158,6 +160,7 @@ export function SectionCards({
         trendIcon={<TrendingUpIcon />}
         fromDate={fromDate}
         toDate={toDate}
+        currency={currency}
       />
     </div>
   );

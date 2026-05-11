@@ -102,7 +102,7 @@ export default function BudgetCard() {
   if (error || !summary) {
     console.log("BudgetCard: error or no summary, showing error message", error, summary);
     return (
-      <Card>
+      <Card className="mx-4">
         <CardContent className="p-6 text-sm text-destructive">
           Failed to load budget: {error ?? "Unknown error"}
         </CardContent>
@@ -126,7 +126,7 @@ export default function BudgetCard() {
   });
 
   return (
-    <Card>
+    <Card className="mx-4 lg:mx-6">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold">
           {`${capitalize(profile.budgetPeriod)}ly Budget`}
