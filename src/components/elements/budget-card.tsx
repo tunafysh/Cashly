@@ -1,4 +1,4 @@
-e ""use client"
+"use client"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { capitalize, formatCurrency } from "@/lib/utils"
 import { Progress } from "../ui/progress"
