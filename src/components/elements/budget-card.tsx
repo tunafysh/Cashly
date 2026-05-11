@@ -24,50 +24,72 @@ type Summary = {
 };
 
 export default function BudgetCard() {
+  console.log("BudgetCard: rendering");
   const { profile } = useProfile();
+  console.log("BudgetCard: profile loaded", profile);
 
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  console.log("BudgetCard: initial state - loading:", loading, "summary:", summary, "error:", error);
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function load() {
       try {
+        console.log("BudgetCard: load() starting");
         setLoading(true);
         setError(null);
 
         const res = await fetch("/api/summary", {
           signal: controller.signal,
         });
+        console.log("BudgetCard: fetch response received", res.ok, res.status);
 
         if (!res.ok) {
           throw new Error(`Request failed: ${res.status}`);
         }
 
         const data: ApiSummary = await res.json();
+        console.log("BudgetCard: API data", data);
 
-        setSummary({
+        const newSummary = {
           spent: data.expenses,
           budget: profile?.budget ?? data.income,
-        });
+        };
+        console.log("BudgetCard: setting summary", newSummary);
+        setSummary(newSummary);
       } catch (err: any) {
-        if (err.name === "AbortError") return;
-        setError(err.message ?? "Something went wrong");
+        console.error("BudgetCard: error caught", err);
+        if (err.name === "AbortError") {
+          console.log("BudgetCard: request aborted");
+          return;
+        }
+        const errorMsg = err.message ?? "Something went wrong";
+        console.log("BudgetCard: setting error", errorMsg);
+        setError(errorMsg);
       } finally {
+        console.log("BudgetCard: load() finally block");
         setLoading(false);
       }
     }
 
     load();
 
-    return () => controller.abort();
+    return () => {
+      console.log("BudgetCard: useEffect cleanup - aborting");
+      controller.abort();
+    };
   }, []);
 
-  if (!profile) return null;
+  if (!profile) {
+    console.log("BudgetCard: no profile, returning null");
+    return null;
+  }
 
   if (loading) {
+    console.log("BudgetCard: loading state, showing loading message");
     return (
       <Card>
         <CardContent className="p-6 text-sm text-muted-foreground">
@@ -78,6 +100,7 @@ export default function BudgetCard() {
   }
 
   if (error || !summary) {
+    console.log("BudgetCard: error or no summary, showing error message", error, summary);
     return (
       <Card>
         <CardContent className="p-6 text-sm text-destructive">
@@ -87,11 +110,20 @@ export default function BudgetCard() {
     );
   }
 
-  const budget = typeof summary.budget === "string" ? parseFloat(summary.budget) : summary.budget;
+  const budget = typeof summary.budget === "string" ? Number(summary.budget) : summary.budget;
   const spent = summary.spent;
 
   const percentage = budget > 0 ? (spent / budget) * 100 : 0;
   const remaining = budget - spent;
+
+  console.log("BudgetCard: rendering with calculations", {
+    budget,
+    spent,
+    percentage,
+    remaining,
+    currency: profile.currency,
+    budgetPeriod: profile.budgetPeriod,
+  });
 
   return (
     <Card>
