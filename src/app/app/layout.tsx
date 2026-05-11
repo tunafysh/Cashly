@@ -7,10 +7,7 @@ import { headers } from "next/headers";
 import { Toaster } from "sonner";
 import { ProfileProvider } from "@/lib/profile-context";
 import { getUserProfile, UserProfile } from "@/db/queries/profiles";
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import { capitalize } from "@/lib/utils";
 
 export default async function AppRootLayout({
   children,
@@ -18,7 +15,7 @@ export default async function AppRootLayout({
   const headersList = await headers();
   const pathname = headersList.get("x-pathname") || "/";
   const session = await auth();
-  
+
   let profile;
   try {
     if(session?.user?.id) {

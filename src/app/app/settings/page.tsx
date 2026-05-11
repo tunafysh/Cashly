@@ -1,7 +1,7 @@
 import CurrencySelector from "@/components/elements/currency-selector";
 import ExportCard from "@/components/elements/export-card";
 import ImportCard from "@/components/elements/import-card";
-import ThemeSelect from "@/components/elements/theme-selector";
+import { ModeToggle } from "@/components/elements/theme-selector";
 import {
   Card,
   CardContent,
@@ -41,7 +41,7 @@ export default function Settings() {
                 </ItemDescription>
               </ItemContent>
               <ItemActions>
-                <ThemeSelect />
+                <ModeToggle />
               </ItemActions>
             </Item>
 

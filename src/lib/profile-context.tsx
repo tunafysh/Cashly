@@ -1,24 +1,51 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { UserProfile } from '@/db/queries/profiles';
 
-const ProfileContext = createContext<UserProfile | undefined>(undefined);
+type ProfileContextType = {
+  profile?: UserProfile;
+  updateProfile: (data: Partial<UserProfile>) => Promise<void>;
+};
+
+const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export function ProfileProvider({
-  profile,
+  profile: initialProfile,
   children,
 }: {
   profile?: UserProfile;
   children: React.ReactNode;
 }) {
+  const [profile, setProfile] = useState(initialProfile);
+
+  const updateProfile = async (data: Partial<UserProfile>) => {
+    try {
+      const response = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setProfile((prev) => prev ? { ...prev, ...data } : prev);
+      }
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      throw error;
+    }
+  };
+
   return (
-    <ProfileContext.Provider value={profile}>
+    <ProfileContext.Provider value={{ profile, updateProfile }}>
       {children}
     </ProfileContext.Provider>
   );
 }
 
 export function useProfile() {
-  return useContext(ProfileContext);
+  const context = useContext(ProfileContext);
+  return { profile: context?.profile, updateProfile: context?.updateProfile };
 }

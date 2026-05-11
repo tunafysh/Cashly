@@ -7,23 +7,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-
-function updateCurrency(value: string) {
-  console.log("Selected currency:", value);
-
-  fetch("/api/profile", {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ currency: value }),
-  });
-}
+import { useEffect, useState } from "react";
 
 export default function CurrencySelector() {
-  const profile = useProfile();
+  const { profile, updateProfile } = useProfile();
+  const [currency, setCurrency] = useState(profile?.currency || "USD");
+
+  useEffect(() => {
+    if (profile?.currency) {
+      setCurrency(profile.currency);
+    }
+  }, [profile]);
+
+  const handleCurrencyChange = async (value: string) => {
+    setCurrency(value);
+    try {
+      if (updateProfile) await updateProfile({ currency: value } as any);
+    } catch (error) {
+      console.error("Failed to update currency:", error);
+      // Revert on error
+      setCurrency(profile?.currency || "USD");
+    }
+  };
+
   return (
-    <Select value={profile?.currency} onValueChange={(value) => updateCurrency(value)}>
+    <Select value={currency} onValueChange={handleCurrencyChange}>
       <SelectTrigger>
         <SelectValue placeholder="Select currency" />
       </SelectTrigger>

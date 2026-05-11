@@ -5,6 +5,7 @@ import { useState } from "react";
 import DataTable from "@/components/elements/data-table";
 import { formatCurrency } from "@/lib/utils";
 import { useProfile } from "@/lib/profile-context";
+import BudgetCard from "@/components/elements/budget-card";
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{
@@ -12,7 +13,7 @@ export default function Dashboard() {
     toDate?: Date;
   }>({});
 
-  const profile = useProfile();
+  const { profile } = useProfile();
 
   const handleDateRangeChange = (fromDate?: Date, toDate?: Date) => {
     setDateRange({ fromDate, toDate });
@@ -28,6 +29,7 @@ export default function Dashboard() {
               toDate={dateRange.toDate}
               currency={profile?.currency}
             />
+            { profile?.budget && <BudgetCard />}
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
             </div>

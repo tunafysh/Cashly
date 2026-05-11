@@ -1,48 +1,39 @@
-"use client";
+"use client"
 
-import { ComputerIcon, SunIcon, MoonIcon } from "lucide-react";
+import { Moon, Sun } from "lucide-react"
+import { useTheme } from "next-themes"
+
+import { Button } from "@/components/ui/button"
 import {
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-  Select,
-} from "../ui/select";
-import { useTheme } from "next-themes";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-type Theme = "light" | "dark" | "system";
-
-const themes = {
-  light: { label: "Light", icon: SunIcon },
-  dark: { label: "Dark", icon: MoonIcon },
-  system: { label: "System", icon: ComputerIcon },
-};
-
-export default function ThemeSelect() {
-  const { theme, setTheme } = useTheme();
-  const stringtheme = theme as Theme;
-  const SelectedIcon = themes[stringtheme]?.icon ?? ComputerIcon;
+export function ModeToggle() {
+  const { setTheme } = useTheme()
 
   return (
-    <Select value={stringtheme} onValueChange={setTheme}>
-      <SelectTrigger className="w-45">
-        <div className="flex items-center gap-2">
-          <SelectedIcon className="h-4 w-4" />
-        </div>
-      </SelectTrigger>
-
-      <SelectContent className="rounded-xl">
-        {Object.entries(themes).map(([value, { label, icon: Icon }]) => (
-          <SelectItem
-            key={value}
-            value={value}
-            className="rounded-lg flex items-center gap-2"
-          >
-            <Icon className="h-4 w-4" />
-            {label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon">
+          <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          System
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
