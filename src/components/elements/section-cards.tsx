@@ -127,6 +127,7 @@ export function SectionCards({
         }
         fromDate={fromDate}
         toDate={toDate}
+        currency={currency}
       />
       <SectionCard
         title="Total Expenses"

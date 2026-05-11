@@ -18,9 +18,12 @@ export default async function AppRootLayout({
 
   let profile;
   try {
-    if(session?.user?.id) {
-      const partialProfile = await getUserProfile(session.user.id)
-      profile = { ...partialProfile, budget: Number(partialProfile.budget) } as UserProfile;
+    if (session?.user?.id) {
+      const partialProfile = await getUserProfile(session.user.id);
+      profile = {
+        ...partialProfile,
+        budget: Number(partialProfile.budget),
+      } as UserProfile;
     }
   } catch (error) {
     console.error("Failed to load profile:", error);

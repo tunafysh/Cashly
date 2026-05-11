@@ -29,7 +29,7 @@ export default function Dashboard() {
               toDate={dateRange.toDate}
               currency={profile?.currency}
             />
-            { profile?.budget && <BudgetCard />}
+            {profile?.budget && <BudgetCard />}
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
             </div>

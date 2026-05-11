@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState } from 'react';
-import { UserProfile } from '@/db/queries/profiles';
+import { createContext, useContext, useState } from "react";
+import { UserProfile } from "@/db/queries/profiles";
 
 type ProfileContextType = {
   profile?: UserProfile;
@@ -21,19 +21,19 @@ export function ProfileProvider({
 
   const updateProfile = async (data: Partial<UserProfile>) => {
     try {
-      const response = await fetch('/api/profile', {
-        method: 'PATCH',
+      const response = await fetch("/api/profile", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        setProfile((prev) => prev ? { ...prev, ...data } : prev);
+        setProfile((prev) => (prev ? { ...prev, ...data } : prev));
       }
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error("Failed to update profile:", error);
       throw error;
     }
   };
