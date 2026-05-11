@@ -48,10 +48,19 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
-    const type = (formData.get("type") as string)?.toLowerCase() as FileTypes;
+    const typeRaw = formData.get("type") as string | undefined;
+    const type = typeRaw?.toLowerCase() as FileTypes | undefined;
+    
     if (!file) {
       return NextResponse.json(
         { message: "File parameter is required" },
+        { status: 400 },
+      );
+    }
+
+    if (!type || !["json", "csv", "xlsx"].includes(type)) {
+      return NextResponse.json(
+        { message: "Invalid or missing file type" },
         { status: 400 },
       );
     }

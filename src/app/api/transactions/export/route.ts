@@ -116,7 +116,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const colors = (body.colors as string | null)?.split(":") || [];
-    const type = (body.type as string)?.toLowerCase() as FileTypes;
+    const typeRaw = body.type as string | undefined;
+    const type = typeRaw?.toLowerCase() as FileTypes | undefined;
 
     if (!type || !["json", "csv", "xlsx"].includes(type)) {
       return NextResponse.json(

@@ -51,7 +51,7 @@ function generateRandomColor() {
 }
 
 export async function createCategoryWithoutColor(
-  tx: Omit<CreateCategoryInput, "color"> | Omit<CreateCategoryInput, "color">[],
+  tx: Omit<CreateCategoryInput, "color"> | (Omit<CreateCategoryInput, "color">)[],
 ) {
   const items = Array.isArray(tx) ? tx : [tx];
 

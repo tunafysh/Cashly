@@ -16,14 +16,16 @@ export default async function AppRootLayout({
   const pathname = headersList.get("x-pathname") || "/";
   const session = await auth();
 
-  let profile;
+  let profile: UserProfile | undefined;
   try {
     if (session?.user?.id) {
       const partialProfile = await getUserProfile(session.user.id);
-      profile = {
-        ...partialProfile,
-        budget: Number(partialProfile.budget),
-      } as UserProfile;
+      if (partialProfile) {
+        profile = {
+          ...partialProfile,
+          budget: partialProfile.budget ? Number(partialProfile.budget) : null,
+        };
+      }
     }
   } catch (error) {
     console.error("Failed to load profile:", error);

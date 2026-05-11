@@ -13,7 +13,14 @@ export async function ensureProfileExists(userId: string) {
   }
 }
 
-export async function getUserProfile(userId: string) {
+export type RawUserProfile = {
+  id: string;
+  currency: string;
+  budget: string | null;
+  budgetPeriod: string;
+};
+
+export async function getUserProfile(userId: string): Promise<RawUserProfile | null> {
   const profile = await db
     .select()
     .from(profiles)

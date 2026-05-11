@@ -26,13 +26,16 @@ import { signOut, useSession } from "next-auth/react";
 import { Skeleton } from "../ui/skeleton";
 import LogoutButton from "./logout-button";
 
-function getInitials(name: string) {
-  const words = name.split(" ");
+function getInitials(name: string): string {
+  if (!name || name.trim().length === 0) return "";
+  const words = name.trim().split(" ");
   let initials = "";
-  words.forEach((word, index) => {
-    initials += word[0].toUpperCase();
+  words.forEach((word) => {
+    if (word.length > 0) {
+      initials += word[0].toUpperCase();
+    }
   });
-  return initials;
+  return initials || "U";
 }
 
 export function NavUser() {
