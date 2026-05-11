@@ -87,7 +87,7 @@ export default function BudgetCard() {
     );
   }
 
-  const budget = profile.budget ?? 0;
+  const budget = typeof summary.budget === "string" ? parseFloat(summary.budget) : summary.budget;
   const spent = summary.spent;
 
   const percentage = budget > 0 ? (spent / budget) * 100 : 0;
