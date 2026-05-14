@@ -2,10 +2,9 @@
 
 import * as React from "react";
 
-import { NavDocuments } from "@/components/elements/nav-documents";
-import { NavMain } from "@/components/elements/nav-main";
-import { NavSecondary } from "@/components/elements/nav-secondary";
-import { NavUser } from "@/components/elements/nav-user";
+import { NavMain } from "@/components/elements/sidebar-stuff/nav-main";
+import { NavSecondary } from "@/components/elements/sidebar-stuff/nav-secondary";
+import { NavUser } from "@/components/elements/sidebar-stuff/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -23,7 +22,7 @@ import {
   BadgeCentIcon,
   Settings2Icon,
 } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../../ui/skeleton";
 import { Suspense } from "react";
 
 const data = {

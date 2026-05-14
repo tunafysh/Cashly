@@ -1,11 +1,11 @@
 "use client";
-import { ChartAreaInteractive } from "@/components/elements/chart-area-interactive";
-import { SectionCards } from "@/components/elements/section-cards";
+import { ChartAreaInteractive } from "@/components/elements/stat-cards/chart-area-interactive";
+import { SectionCards } from "@/components/elements/stat-cards/section-cards";
 import { useState } from "react";
-import DataTable from "@/components/elements/data-table";
+import TransactionOverview from "@/components/elements/tables/transaction-overview-table";
 import { formatCurrency } from "@/lib/utils";
 import { useProfile } from "@/lib/profile-context";
-import BudgetCard from "@/components/elements/budget-card";
+import BudgetCard from "@/components/elements/stat-cards/budget-card";
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{
@@ -33,7 +33,7 @@ export default function Dashboard() {
             <div className="px-4 lg:px-6">
               <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
             </div>
-            <DataTable currency={profile?.currency} />
+            <TransactionOverview currency={profile?.currency} />
           </div>
         </div>
       </div>

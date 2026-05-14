@@ -23,7 +23,7 @@ import {
   Settings2Icon,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
-import { Skeleton } from "../ui/skeleton";
+import { Skeleton } from "../../ui/skeleton";
 import LogoutButton from "./logout-button";
 
 function getInitials(name: string): string {
@@ -102,13 +102,6 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Settings2Icon />
-                Settings
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <LogoutButton>
               <DropdownMenuItem

@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/components/elements/app-sidebar";
-import { SiteHeader } from "@/components/elements/site-header";
+import { AppSidebar } from "@/components/elements/sidebar-stuff/app-sidebar";
+import { SiteHeader } from "@/components/elements/uncategorized/site-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
 import { SessionProvider } from "next-auth/react";

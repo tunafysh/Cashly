@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 
 export default function CurrencySelector() {

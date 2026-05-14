@@ -1,8 +1,8 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { capitalize, formatCurrency } from "@/lib/utils";
-import { Progress } from "../ui/progress";
+import { Progress } from "@/components/ui/progress";
 import { useProfile } from "@/lib/profile-context";
 import { useEffect, useState } from "react";
 
@@ -31,7 +31,14 @@ export default function BudgetCard() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  console.log("BudgetCard: initial state - loading:", loading, "summary:", summary, "error:", error);
+  console.log(
+    "BudgetCard: initial state - loading:",
+    loading,
+    "summary:",
+    summary,
+    "error:",
+    error,
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -91,7 +98,7 @@ export default function BudgetCard() {
   if (loading) {
     console.log("BudgetCard: loading state, showing loading message");
     return (
-      <Card>
+      <Card className="mx-4 lg:mx-6">
         <CardContent className="p-6 text-sm text-muted-foreground">
           Loading budget…
         </CardContent>
@@ -100,7 +107,11 @@ export default function BudgetCard() {
   }
 
   if (error || !summary) {
-    console.log("BudgetCard: error or no summary, showing error message", error, summary);
+    console.log(
+      "BudgetCard: error or no summary, showing error message",
+      error,
+      summary,
+    );
     return (
       <Card className="mx-4">
         <CardContent className="p-6 text-sm text-destructive">
@@ -110,7 +121,10 @@ export default function BudgetCard() {
     );
   }
 
-  const budget = typeof summary.budget === "string" ? Number(summary.budget) : summary.budget;
+  const budget =
+    typeof summary.budget === "string"
+      ? Number(summary.budget)
+      : summary.budget;
   const spent = summary.spent;
 
   const percentage = budget > 0 ? (spent / budget) * 100 : 0;
@@ -129,7 +143,7 @@ export default function BudgetCard() {
     <Card className="mx-4 lg:mx-6">
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-bold">
-          {`${capitalize(profile.budgetPeriod)}ly Budget`}
+          {`${capitalize(profile.budgetPeriod)} Budget`}
         </CardTitle>
       </CardHeader>
 

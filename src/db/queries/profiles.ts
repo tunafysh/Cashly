@@ -20,7 +20,9 @@ export type RawUserProfile = {
   budgetPeriod: string;
 };
 
-export async function getUserProfile(userId: string): Promise<RawUserProfile | null> {
+export async function getUserProfile(
+  userId: string,
+): Promise<RawUserProfile | null> {
   const profile = await db
     .select()
     .from(profiles)

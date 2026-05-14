@@ -26,22 +26,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Transaction } from "@/lib/types";
 
 export const description = "An interactive area chart";
-
-export type Transaction = {
-  id: string;
-  amount: string;
-  type: "income" | "expense";
-  description?: string | null;
-  createdAt: Date;
-
-  category: {
-    id: string;
-    name: string;
-    color: string;
-  };
-};
 
 type ChartData = {
   date: string;

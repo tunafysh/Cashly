@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     const typeRaw = formData.get("type") as string | undefined;
     const type = typeRaw?.toLowerCase() as FileTypes | undefined;
-    
+
     if (!file) {
       return NextResponse.json(
         { message: "File parameter is required" },

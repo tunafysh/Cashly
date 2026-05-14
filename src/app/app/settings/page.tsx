@@ -1,7 +1,7 @@
-import CurrencySelector from "@/components/elements/currency-selector";
-import ExportCard from "@/components/elements/export-card";
-import ImportCard from "@/components/elements/import-card";
-import { ModeToggle } from "@/components/elements/theme-selector";
+import CurrencySelector from "@/components/elements/selectors/currency-selector";
+import ExportCard from "@/components/elements/stat-cards/export-card";
+import ImportCard from "@/components/elements/stat-cards/import-card";
+import { ModeToggle } from "@/components/elements/selectors/theme-selector";
 import {
   Card,
   CardContent,

@@ -14,11 +14,11 @@ import {
   TableHeader,
   TableRow,
   TableCell,
-} from "../ui/table";
-import { Transaction } from "./chart-area-interactive";
-import { Badge } from "../ui/badge";
-import { Card } from "../ui/card";
-import { Spinner } from "../ui/spinner";
+} from "@/components/ui/table";
+import { Transaction } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { formatCurrency } from "@/lib/utils";
 
 interface DataTableProps {
@@ -104,7 +104,7 @@ const baseColumns = (currency: string): ColumnDef<Transaction>[] => [
   },
 ];
 
-export default function DataTable({ currency = "USD" }: DataTableProps) {
+export default function TransactionOverview({ currency = "USD" }: DataTableProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

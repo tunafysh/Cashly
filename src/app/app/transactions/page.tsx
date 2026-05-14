@@ -1,12 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import TransactionOverview from "@/components/elements/tables/transaction-overview-table";
+import { useProfile } from "@/lib/profile-context";
 
 export default function Transactions() {
+  const { profile } = useProfile();
+  const currency = profile?.currency;
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Transactions</CardTitle>
-      </CardHeader>
-      <CardContent></CardContent>
-    </Card>
+    <TransactionOverview currency={currency} />
   );
 }
