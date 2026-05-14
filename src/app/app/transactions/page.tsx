@@ -1,3 +1,6 @@
+"use client"
+//i have to make it to render client side bruh
+
 import TransactionOverview from "@/components/elements/tables/transaction-overview-table";
 import { useProfile } from "@/lib/profile-context";
 
