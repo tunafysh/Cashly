@@ -1,9 +1,9 @@
-import TransactionOverview from "@/components/elements/tables/transaction-overview-table";
+import TransactionsTable from "@/components/elements/tables/transaction-table";
 
 export default function Transactions() {
   return (
     <div className="pt-6 md:pt-4">
-      <TransactionOverview />
+      <TransactionsTable />
     </div>
   );
 }

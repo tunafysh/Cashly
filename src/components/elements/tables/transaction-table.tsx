@@ -31,6 +31,45 @@ async function deleteTransaction(id: string) {
     throw err;
   }
 }
+
+interface DeleteButtonProps {
+  id: string;
+  onDelete: (id: string) => void;
+}
+
+function DeleteButton({ id, onDelete }: DeleteButtonProps) {
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this transaction?")) return;
+    
+    try {
+      setDeleting(true);
+      await deleteTransaction(id);
+      onDelete(id);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete transaction");
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <Button
+      size="sm"
+      variant="ghost"
+      className="hover:bg-destructive/10 hover:text-destructive"
+      onClick={handleDelete}
+      disabled={deleting}
+    >
+      {deleting ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <Trash2 className="w-4 h-4" />
+      )}
+    </Button>
+  );
+}
+
 const transactionColumns = (currency: string, onDelete: (id: string) => void): ColumnDef<Transaction>[] => [
   {
     accessorKey: "createdAt",
@@ -112,36 +151,7 @@ const transactionColumns = (currency: string, onDelete: (id: string) => void): C
     header: "Actions",
     cell: ({ row }) => {
       const id: string = row.original.id;
-      const [deleting, setDeleting] = useState(false);
-
-      const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this transaction?")) return;
-        
-        try {
-          setDeleting(true);
-          await deleteTransaction(id);
-          onDelete(id);
-        } catch (err) {
-          alert(err instanceof Error ? err.message : "Failed to delete transaction");
-          setDeleting(false);
-        }
-      };
-
-      return (
-        <Button
-          size="sm"
-          variant="ghost"
-          className="hover:bg-destructive/10 hover:text-destructive"
-          onClick={handleDelete}
-          disabled={deleting}
-        >
-          {deleting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Trash2 className="w-4 h-4" />
-          )}
-        </Button>
-      );
+      return <DeleteButton id={id} onDelete={onDelete} />;
     },
   },
 ];
