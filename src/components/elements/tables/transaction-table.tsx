@@ -112,10 +112,10 @@ const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
       const id: string = row.getValue("id");
 
       return (
-        <Button size="icon" onClick={async () => {
+        <Button size="icon" className="w-8 h-8" onClick={async () => {
           await deleteTransaction(id);
         }}>
-          <Trash className="w-4 h-4" />
+          <Trash className="w-4 h-4 text-destructive" />
         </Button>
       );
     },
