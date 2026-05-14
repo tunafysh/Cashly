@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useProfile } from "@/lib/profile-context";
 import { Transaction } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -13,7 +14,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Trash } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 async function deleteTransaction(id: string) {
@@ -24,21 +25,21 @@ async function deleteTransaction(id: string) {
     if (!response.ok) {
       throw new Error("Failed to delete transaction");
     }
+    return true;
   } catch (err) {
     console.error(err);
-    alert(err instanceof Error ? err.message : "An error occurred");
+    throw err;
   }
 }
-const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
+const transactionColumns = (currency: string, onDelete: (id: string) => void): ColumnDef<Transaction>[] => [
   {
     accessorKey: "createdAt",
     header: "Date & Time",
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdAt"));
       return (
-        <span className="text-sm">
-          {date.toLocaleDateString()}{" "}
-          {date.toLocaleTimeString(undefined, {
+        <span className="text-sm text-muted-foreground">
+          {date.toLocaleDateString("en-US", { month: "short", day: "numeric" })} {date.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
           })}
@@ -63,7 +64,7 @@ const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
       return (
         <div className="flex items-center gap-2">
           <div
-            className="h-2.5 w-2.5 rounded-full"
+            className="h-3 w-3 rounded-full ring-1 ring-offset-1 ring-offset-background"
             style={{ backgroundColor: category.color }}
           />
           <span className="text-sm">{category.name}</span>
@@ -108,28 +109,48 @@ const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const id: string = row.original.id;
+      const [deleting, setDeleting] = useState(false);
+
+      const handleDelete = async () => {
+        if (!confirm("Are you sure you want to delete this transaction?")) return;
+        
+        try {
+          setDeleting(true);
+          await deleteTransaction(id);
+          onDelete(id);
+        } catch (err) {
+          alert(err instanceof Error ? err.message : "Failed to delete transaction");
+          setDeleting(false);
+        }
+      };
 
       return (
-        <Button size="icon" className="w-8 h-8" onClick={async () => {
-          await deleteTransaction(id);
-        }}>
-          <Trash className="w-4 h-4 text-destructive" />
+        <Button
+          size="sm"
+          variant="ghost"
+          className="hover:bg-destructive/10 hover:text-destructive"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Trash2 className="w-4 h-4" />
+          )}
         </Button>
       );
     },
   },
 ];
 
-export default function TransactionsTable({
-  currency = "USD",
-}: {
-  currency: string;
-}) {
+export default function TransactionsTable() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { profile } = useProfile();
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -151,7 +172,11 @@ export default function TransactionsTable({
     fetchTransactions();
   }, []);
 
-  const columns = transactionColumns(currency);
+  const handleDelete = (id: string) => {
+    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const columns = transactionColumns(profile?.currency || "USD", handleDelete);
   const table = useReactTable({
     data: transactions,
     columns,
@@ -189,10 +214,10 @@ export default function TransactionsTable({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="border-b bg-muted/40 hover:bg-muted/40"
+              className="border-b bg-muted/50 hover:bg-muted/50"
             >
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="font-semibold">
+                <TableHead key={header.id} className="font-semibold text-foreground/70 h-12">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -208,10 +233,10 @@ export default function TransactionsTable({
           {table.getRowModel().rows.map((row) => (
             <TableRow
               key={row.id}
-              className="hover:bg-muted/50 transition-colors"
+              className="hover:bg-muted/30 transition-colors border-b"
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell key={cell.id} className="py-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}
