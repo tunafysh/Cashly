@@ -16,6 +16,19 @@ import {
 import { Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 
+async function deleteTransaction(id: string) {
+  try {
+    const response = await fetch(`/api/transactions/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete transaction");
+    }
+  } catch (err) {
+    console.error(err);
+    alert(err instanceof Error ? err.message : "An error occurred");
+  }
+}
 const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
   {
     accessorKey: "createdAt",
@@ -94,13 +107,14 @@ const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
     },
   },
   {
-    accessorKey: "id", // using id to create the actions column
-    header: " ",
+    id: "actions",
     cell: ({ row }) => {
-      const id = row.getValue("id");
+      const id: string = row.getValue("id");
 
       return (
-        <Button size="icon">
+        <Button size="icon" onClick={async () => {
+          await deleteTransaction(id);
+        }}>
           <Trash className="w-4 h-4" />
         </Button>
       );
