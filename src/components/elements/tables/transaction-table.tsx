@@ -61,7 +61,6 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
           size="sm"
           variant="ghost"
           className="hover:bg-destructive/10 hover:text-destructive"
-          onClick={handleDelete}
           disabled={deleting}
         >
           {deleting ? (
