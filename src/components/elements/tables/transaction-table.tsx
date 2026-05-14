@@ -3,6 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useProfile } from "@/lib/profile-context";
@@ -41,7 +42,7 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this transaction?")) return;
+    if (!confirm("Are you sure you want to delete 1this transaction?")) return;
     
     try {
       setDeleting(true);
@@ -54,19 +55,44 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
   };
 
   return (
-    <Button
-      size="sm"
-      variant="ghost"
-      className="hover:bg-destructive/10 hover:text-destructive"
-      onClick={handleDelete}
-      disabled={deleting}
-    >
-      {deleting ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <Trash2 className="w-4 h-4" />
-      )}
-    </Button>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="hover:bg-destructive/10 hover:text-destructive"
+          onClick={handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Trash2 className="w-4 h-4" />
+          )}
+        </Button>
+      </DialogTrigger>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this transaction?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                handleDelete();
+              }}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 }
 
@@ -101,7 +127,7 @@ const transactionColumns = (currency: string, onDelete: (id: string) => void): C
     cell: ({ row }) => {
       const category = row.original.category;
       return (
-        <Badge className={`text-sm border-[${category.color}] bg-[${category.color}/10]`} variant="outline">
+        <Badge className={`text-sm border-[${category.color}] bg-[${category.color}/10] py-2`} variant="secondary">
           <div
             className="h-3 w-3 rounded-full ring-1 ring-offset-1 ring-offset-background"
             style={{ backgroundColor: category.color }}
