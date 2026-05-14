@@ -180,7 +180,7 @@ export default function TransactionOverview({ currency = "USD" }: DataTableProps
               className="border-b bg-muted/40 hover:bg-muted/40"
             >
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="font-semibold">
+                <TableHead key={header.id} className="h-12 font-semibold text-foreground/70">
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -199,7 +199,7 @@ export default function TransactionOverview({ currency = "USD" }: DataTableProps
               className="hover:bg-muted/50 transition-colors"
             >
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell key={cell.id} className="py-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}

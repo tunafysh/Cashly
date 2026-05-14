@@ -101,13 +101,13 @@ const transactionColumns = (currency: string, onDelete: (id: string) => void): C
     cell: ({ row }) => {
       const category = row.original.category;
       return (
-        <div className="flex items-center gap-2">
+        <Badge className={`text-sm border-[${category.color}] bg-[${category.color}/10]`} variant="outline">
           <div
             className="h-3 w-3 rounded-full ring-1 ring-offset-1 ring-offset-background"
             style={{ backgroundColor: category.color }}
           />
           <span className="text-sm">{category.name}</span>
-        </div>
+        </Badge>
       );
     },
   },
