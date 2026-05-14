@@ -109,7 +109,7 @@ const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
   {
     id: "actions",
     cell: ({ row }) => {
-      const id: string = row.getValue("id");
+      const id: string = row.original.id;
 
       return (
         <Button size="icon" className="w-8 h-8" onClick={async () => {
@@ -149,7 +149,7 @@ export default function TransactionsTable({
     };
 
     fetchTransactions();
-  });
+  }, []);
 
   const columns = transactionColumns(currency);
   const table = useReactTable({
