@@ -95,7 +95,7 @@ const transactionColumns = (currency: string): ColumnDef<Transaction>[] => [
   },
   {
     accessorKey: "id", // using id to create the actions column
-    header: "",
+    header: " ",
     cell: ({ row }) => {
       const id = row.getValue("id");
 
