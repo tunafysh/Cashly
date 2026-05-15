@@ -56,6 +56,13 @@ const baseColumns = (currency: string): ColumnDef<Transaction>[] => [
     header: "Category",
     cell: ({ row }) => {
       const category = row.original.category;
+      if (!category) {
+        return (
+          <Badge variant="outline" className="text-sm">
+            Uncategorized
+          </Badge>
+        );
+      }
       return (
         <div className="flex items-center gap-2">
           <div

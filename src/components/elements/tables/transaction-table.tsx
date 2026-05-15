@@ -148,6 +148,14 @@ const transactionColumns = (
     header: "Category",
     cell: ({ row }) => {
       const category = row.original.category;
+      if (!category) {
+        return (
+          <Badge variant="outline" className="text-sm">
+            Uncategorized
+          </Badge>
+        );
+      }
+      
       return (
         <Badge
           className={`text-sm border-[${category.color}] bg-[${category.color}/10] py-2`}
