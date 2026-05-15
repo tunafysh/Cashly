@@ -46,18 +46,13 @@ export function NavMain({
             <a href={item.url} key={item.title} className="block">
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  tooltip={item.title}
+                  tooltip={item.description || item.title}
                   className="group transition-all duration-150 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                 >
                   <div className="flex items-center gap-1 text-muted-foreground transition-colors group-hover:text-foreground">
                     {item.icon}
                   </div>
-                  <div className="flex flex-col gap-0.5 flex-1">
-                    <span className="text-sm font-medium">{item.title}</span>
-                    <span className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">
-                      {item.description}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium">{item.title}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </a>
