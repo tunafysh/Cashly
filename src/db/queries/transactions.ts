@@ -18,7 +18,7 @@ export type TransactionInput = {
   userId: string;
   amount: number;
   type: "income" | "expense";
-  categoryId: string;
+  categoryId?: string;
   description?: string;
   createdAt?: Date;
   subscriptionId?: string;

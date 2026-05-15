@@ -2,6 +2,7 @@ import { eq, and, desc, lte } from "drizzle-orm";
 import { db } from "..";
 import { subscriptions } from "../schema/subscriptions";
 import { z } from "zod";
+import { createTransaction } from "./transactions";
 
 type SubscriptionInput = {
   userId: string;
@@ -127,6 +128,17 @@ export async function renewDueSubscriptionsNow(type: "monthly" | "yearly") {
     } else {
       next.setFullYear(next.getFullYear() + 1);
     }
+
+    // create transaction here based on subscription details
+    createTransaction({
+        createdAt: next,
+        amount: parseFloat(s.amount),
+        type: "expense",
+        description: `Subscription renewal: ${s.name}`,
+        userId: s.userId,
+        subscriptionId: s.id,
+        categoryId: undefined, // you might want to assign a default category for subscriptions
+      })
 
     const [updated] = await db
       .update(subscriptions)
