@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
 import { categories } from "./categories";
+import { subscriptions } from "./subscriptions";
 
 export const transactionTypeEnum = pgEnum("transaction_type", [
   "income",
@@ -29,8 +30,11 @@ export const transactions = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    subscriptionId: uuid("subscription_id").references(() => subscriptions.id, {
+      onDelete: "set null",
+    }),
   },
   (table) => {
-    return [index("user_id_idx").on(table.userId)];
+    return [index("transactions_user_id_idx").on(table.userId)];
   },
 );

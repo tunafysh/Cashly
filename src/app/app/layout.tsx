@@ -1,13 +1,9 @@
 import { AppSidebar } from "@/components/elements/sidebar-stuff/app-sidebar";
 import { SiteHeader } from "@/components/elements/uncategorized/site-header";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { SidebarInset } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth";
-import { SessionProvider } from "next-auth/react";
 import { headers } from "next/headers";
-import { Toaster } from "sonner";
-import { ProfileProvider } from "@/lib/profile-context";
 import { getUserProfile, UserProfile } from "@/db/queries/profiles";
-import { capitalize } from "@/lib/utils";
 import Providers from "@/components/elements/uncategorized/providers";
 
 export default async function AppRootLayout({
@@ -45,7 +41,7 @@ export default async function AppRootLayout({
     <Providers profile={profile} session={session}>
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={`${capitalize(title)}`} />
+        <SiteHeader title={`${title}`} />
         {children}
       </SidebarInset>
     </Providers>

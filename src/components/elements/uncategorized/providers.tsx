@@ -20,16 +20,16 @@ export default function Providers({
       <ProfileProvider profile={profile}>
         <Toaster richColors position="bottom-right" />
         <TooltipProvider>
-        <SidebarProvider
-          style={
-            {
-              "--sidebar-width": "calc(var(--spacing) * 72)",
-              "--header-height": "calc(var(--spacing) * 12)",
-            } as React.CSSProperties
-          }
-        >
-          {children}
-        </SidebarProvider>
+          <SidebarProvider
+            style={
+              {
+                "--sidebar-width": "calc(var(--spacing) * 72)",
+                "--header-height": "calc(var(--spacing) * 12)",
+              } as React.CSSProperties
+            }
+          >
+            {children}
+          </SidebarProvider>
         </TooltipProvider>
       </ProfileProvider>
     </SessionProvider>

@@ -12,6 +12,7 @@ import {
 import { db } from "..";
 import { categories, transactions } from "../schema";
 import { z } from "zod";
+import { subscriptions } from "../schema/subscriptions";
 
 export type TransactionInput = {
   userId: string;
@@ -20,6 +21,7 @@ export type TransactionInput = {
   categoryId: string;
   description?: string;
   createdAt?: Date;
+  subscriptionId?: string;
 };
 
 export const transactionSchema = z.object({
@@ -29,6 +31,7 @@ export const transactionSchema = z.object({
   categoryId: z.string(),
   description: z.string().optional(),
   createdAt: z.date().optional(),
+  subscriptionId: z.string().optional(),
 });
 
 const transactionSelect = {
@@ -43,13 +46,18 @@ const transactionSelect = {
     name: categories.name,
     color: categories.color,
   },
+  subscription: {
+    id: subscriptions.id,
+    name: subscriptions.name,
+  },
 };
 
 function baseTransactionQuery() {
   return db
     .select(transactionSelect)
     .from(transactions)
-    .leftJoin(categories, eq(transactions.categoryId, categories.id));
+    .leftJoin(categories, eq(transactions.categoryId, categories.id))
+    .leftJoin(subscriptions, eq(transactions.subscriptionId, subscriptions.id));
 }
 
 export type Filters = {
@@ -58,6 +66,7 @@ export type Filters = {
   withDescription?: boolean;
   categoryId?: string;
   type?: "income" | "expense";
+  subscriptionId?: string;
 };
 
 export async function getUserTransactions(userId: string, filters?: Filters) {
@@ -101,6 +110,10 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     );
   }
 
+  if (filters?.subscriptionId) {
+    conditions.push(eq(transactions.subscriptionId, filters.subscriptionId));
+  }
+
   return await baseTransactionQuery()
     .where(and(...conditions))
     .orderBy(desc(transactions.createdAt));
@@ -128,6 +141,7 @@ export async function createTransaction(
         categoryId: tx.categoryId,
         description: tx.description,
         createdAt: tx.createdAt || new Date(),
+        subscriptionId: tx.subscriptionId,
       })),
     )
     .returning();
