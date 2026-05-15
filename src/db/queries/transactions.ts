@@ -138,7 +138,7 @@ export async function createTransaction(
         userId: tx.userId,
         amount: tx.amount.toFixed(2), // Ensure amount is stored with 2 decimal places
         type: tx.type,
-        categoryId: tx.categoryId || null,
+        categoryId: tx.categoryId ?? undefined,
         description: tx.description,
         createdAt: tx.createdAt || new Date(),
         subscriptionId: tx.subscriptionId,
