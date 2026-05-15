@@ -6,6 +6,7 @@ import {
   updateCategory,
 } from "@/db/queries/categories";
 import { auth } from "@/lib/auth";
+import { Category } from "@/lib/types";
 
 export async function GET() {
   const session = await auth();
@@ -15,7 +16,7 @@ export async function GET() {
   }
 
   try {
-    const categories = await getUserCategories(session.user.id);
+    const categories: Category[] = await getUserCategories(session.user.id);
 
     return NextResponse.json({ categories });
   } catch (error) {

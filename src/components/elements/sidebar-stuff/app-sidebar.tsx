@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboardIcon,
@@ -30,29 +31,33 @@ const data = {
     {
       title: "Dashboard",
       url: "/app/dashboard",
-      icon: <LayoutDashboardIcon />,
+      icon: <LayoutDashboardIcon className="size-4" />,
+      description: "Overview & analytics",
     },
     {
       title: "Transactions",
       url: "/app/transactions",
-      icon: <ListIcon />,
+      icon: <ListIcon className="size-4" />,
+      description: "View all transactions",
     },
     {
-      title: "Categories",
-      url: "/app/categories",
-      icon: <ChartBarIcon />,
+      title: "Subscriptions",
+      url: "/app/subscriptions",
+      icon: <ChartBarIcon className="size-4" />,
+      description: "Manage subscriptions",
     },
     {
       title: "Budget",
       url: "/app/budget",
-      icon: <FolderIcon />,
+      icon: <FolderIcon className="size-4" />,
+      description: "Budget planning",
     },
   ],
   navSecondary: [
     {
       title: "Settings",
       url: "/app/settings",
-      icon: <Settings2Icon />,
+      icon: <Settings2Icon className="size-4" />,
     },
   ],
 };
@@ -60,16 +65,23 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="border-b bg-linear-to-b from-sidebar to-sidebar/50">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="h-11 px-4 transition-all duration-200 hover:bg-sidebar-accent active:bg-sidebar-accent/80"
             >
-              <a href="/app/dashboard">
-                <BadgeCentIcon className="size-5! text-primary" />
-                <span className="text-base font-semibold">Cashly</span>
+              <a href="/app/dashboard" className="gap-2.5">
+                <div className="flex items-center justify-center rounded-lg bg-linear-to-br from-primary to-primary/80 p-1.5">
+                  <BadgeCentIcon className="size-5 text-primary-foreground" />
+                </div>
+                <div className="flex flex-col gap-0.5 leading-tight">
+                  <span className="font-bold tracking-tight">Cashly</span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    Finance tracker
+                  </span>
+                </div>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -77,10 +89,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <SidebarSeparator className="my-4" />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-        <Suspense fallback={<Skeleton className="w-full h-10 rounded-md" />}>
+      <SidebarFooter className="border-t">
+        <Suspense fallback={<Skeleton className="w-full h-12 rounded-lg" />}>
           <NavUser />
         </Suspense>
       </SidebarFooter>

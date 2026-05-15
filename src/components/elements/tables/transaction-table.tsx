@@ -1,11 +1,28 @@
-"use client"
+"use client";
 
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogOverlay, DialogPortal, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useProfile } from "@/lib/profile-context";
 import { Transaction } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
@@ -43,20 +60,22 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
 
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete 1this transaction?")) return;
-    
+
     try {
       setDeleting(true);
       await deleteTransaction(id);
       onDelete(id);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete transaction");
+      alert(
+        err instanceof Error ? err.message : "Failed to delete transaction",
+      );
       setDeleting(false);
     }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
         <Button
           size="sm"
           variant="ghost"
@@ -69,17 +88,17 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
             <Trash2 className="w-4 h-4" />
           )}
         </Button>
-      </DialogTrigger>
-      <DialogPortal>
-        <DialogOverlay />
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Delete</DialogTitle>
-            <DialogDescription>
+      </AlertDialogTrigger>
+      <AlertDialogPortal>
+        <AlertDialogOverlay />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
+            <AlertDialogDescription>
               Are you sure you want to delete this transaction?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
             <Button
               variant="destructive"
               onClick={() => {
@@ -88,14 +107,17 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
             >
               Delete
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialog>
   );
 }
 
-const transactionColumns = (currency: string, onDelete: (id: string) => void): ColumnDef<Transaction>[] => [
+const transactionColumns = (
+  currency: string,
+  onDelete: (id: string) => void,
+): ColumnDef<Transaction>[] => [
   {
     accessorKey: "createdAt",
     header: "Date & Time",
@@ -103,7 +125,8 @@ const transactionColumns = (currency: string, onDelete: (id: string) => void): C
       const date = new Date(row.getValue("createdAt"));
       return (
         <span className="text-sm text-muted-foreground">
-          {date.toLocaleDateString("en-US", { month: "short", day: "numeric" })} {date.toLocaleTimeString("en-US", {
+          {date.toLocaleDateString("en-US", { month: "short", day: "numeric" })}{" "}
+          {date.toLocaleTimeString("en-US", {
             hour: "2-digit",
             minute: "2-digit",
           })}
@@ -126,7 +149,10 @@ const transactionColumns = (currency: string, onDelete: (id: string) => void): C
     cell: ({ row }) => {
       const category = row.original.category;
       return (
-        <Badge className={`text-sm border-[${category.color}] bg-[${category.color}/10] py-2`} variant="secondary">
+        <Badge
+          className={`text-sm border-[${category.color}] bg-[${category.color}/10] py-2`}
+          variant="secondary"
+        >
           <div
             className="h-3 w-3 rounded-full ring-1 ring-offset-1 ring-offset-background"
             style={{ backgroundColor: category.color }}
@@ -252,7 +278,10 @@ export default function TransactionsTable() {
               className="border-b bg-muted/50 hover:bg-muted/50"
             >
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="font-semibold text-foreground/70 h-12">
+                <TableHead
+                  key={header.id}
+                  className="font-semibold text-foreground/70 h-12"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(

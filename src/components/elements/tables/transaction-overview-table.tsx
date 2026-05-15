@@ -104,7 +104,9 @@ const baseColumns = (currency: string): ColumnDef<Transaction>[] => [
   },
 ];
 
-export default function TransactionOverview({ currency = "USD" }: DataTableProps) {
+export default function TransactionOverview({
+  currency = "USD",
+}: DataTableProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -180,7 +182,10 @@ export default function TransactionOverview({ currency = "USD" }: DataTableProps
               className="border-b bg-muted/40 hover:bg-muted/40"
             >
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id} className="h-12 font-semibold text-foreground/70">
+                <TableHead
+                  key={header.id}
+                  className="h-12 font-semibold text-foreground/70"
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
