@@ -137,7 +137,7 @@ export async function renewDueSubscriptionsNow(type: "monthly" | "yearly") {
         description: `Subscription renewal: ${s.name}`,
         userId: s.userId,
         subscriptionId: s.id,
-        categoryId: undefined, // no fts it's uncategorized.
+        categoryId: null, // no fts it's uncategorized.
       })
 
     const [updated] = await db

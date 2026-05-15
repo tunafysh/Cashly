@@ -18,7 +18,7 @@ export type TransactionInput = {
   userId: string;
   amount: number;
   type: "income" | "expense";
-  categoryId?: string;
+  categoryId: string | null;
   description?: string;
   createdAt?: Date;
   subscriptionId?: string;
@@ -28,7 +28,7 @@ export const transactionSchema = z.object({
   userId: z.string(),
   amount: z.number().positive(),
   type: z.enum(["income", "expense"]),
-  categoryId: z.string().optional().nullable(), // javascript what the FUCK is wrong with you.
+  categoryId: z.string().nullable(), // javascript what the FUCK is wrong with you.
   description: z.string().optional(),
   createdAt: z.date().optional(),
   subscriptionId: z.string().optional(),
@@ -138,7 +138,7 @@ export async function createTransaction(
         userId: tx.userId,
         amount: tx.amount.toFixed(2), // Ensure amount is stored with 2 decimal places
         type: tx.type,
-        categoryId: tx.categoryId ?? undefined,
+        categoryId: tx.categoryId ?? null,
         description: tx.description,
         createdAt: tx.createdAt || new Date(),
         subscriptionId: tx.subscriptionId,
