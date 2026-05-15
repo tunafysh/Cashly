@@ -28,7 +28,7 @@ export const transactionSchema = z.object({
   userId: z.string(),
   amount: z.number().positive(),
   type: z.enum(["income", "expense"]),
-  categoryId: z.string().optional(),
+  categoryId: z.string().optional().nullable(), // javascript what the FUCK is wrong with you.
   description: z.string().optional(),
   createdAt: z.date().optional(),
   subscriptionId: z.string().optional(),
