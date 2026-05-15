@@ -28,7 +28,7 @@ export const transactionSchema = z.object({
   userId: z.string(),
   amount: z.number().positive(),
   type: z.enum(["income", "expense"]),
-  categoryId: z.string(),
+  categoryId: z.string().optional(),
   description: z.string().optional(),
   createdAt: z.date().optional(),
   subscriptionId: z.string().optional(),
