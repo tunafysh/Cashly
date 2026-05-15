@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
       userId: session.user.id,
       amount,
       type,
-      categoryId,
+      categoryId: categoryId || null,
       description,
     });
 
