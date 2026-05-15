@@ -17,7 +17,9 @@ export default function CategoryList() {
         const data: Category[] = await response.json();
         setCategories(data);
       } catch (e: unknown) {
-        toast.error(e instanceof Error ? e.message : "Failed to load categories");
+        toast.error(
+          e instanceof Error ? e.message : "Failed to load categories",
+        );
       } finally {
         setLoading(false);
       }

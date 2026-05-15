@@ -8,6 +8,7 @@ import { Toaster } from "sonner";
 import { ProfileProvider } from "@/lib/profile-context";
 import { getUserProfile, UserProfile } from "@/db/queries/profiles";
 import { capitalize } from "@/lib/utils";
+import Providers from "@/components/elements/uncategorized/providers";
 
 export default async function AppRootLayout({
   children,
@@ -41,24 +42,12 @@ export default async function AppRootLayout({
     "Home";
 
   return (
-    <SessionProvider session={session}>
-      <ProfileProvider profile={profile}>
-        <Toaster richColors position="bottom-right" />
-        <SidebarProvider
-          style={
-            {
-              "--sidebar-width": "calc(var(--spacing) * 72)",
-              "--header-height": "calc(var(--spacing) * 12)",
-            } as React.CSSProperties
-          }
-        >
-          <AppSidebar variant="inset" />
-          <SidebarInset>
-            <SiteHeader title={`${capitalize(title)}`} />
-            {children}
-          </SidebarInset>
-        </SidebarProvider>
-      </ProfileProvider>
-    </SessionProvider>
+    <Providers profile={profile} session={session}>
+      <AppSidebar variant="inset" />
+      <SidebarInset>
+        <SiteHeader title={`${capitalize(title)}`} />
+        {children}
+      </SidebarInset>
+    </Providers>
   );
 }
