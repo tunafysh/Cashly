@@ -17,9 +17,9 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboardIcon,
-  ListIcon,
-  ChartBarIcon,
-  FolderIcon,
+  WalletIcon,
+  RefreshCwIcon,
+  TrendingUpIcon,
   BadgeCentIcon,
   Settings2Icon,
 } from "lucide-react";
@@ -37,19 +37,19 @@ const data = {
     {
       title: "Transactions",
       url: "/app/transactions",
-      icon: <ListIcon className="size-4" />,
+      icon: <WalletIcon className="size-4" />,
       description: "View all transactions",
     },
     {
       title: "Subscriptions",
       url: "/app/subscriptions",
-      icon: <ChartBarIcon className="size-4" />,
+      icon: <RefreshCwIcon className="size-4" />,
       description: "Manage subscriptions",
     },
     {
       title: "Budget",
       url: "/app/budget",
-      icon: <FolderIcon className="size-4" />,
+      icon: <TrendingUpIcon className="size-4" />,
       description: "Budget planning",
     },
   ],

@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { CirclePlusIcon, MailIcon } from "lucide-react";
+import { CirclePlusIcon } from "lucide-react";
 
 export function NavMain({
   items,
@@ -17,29 +18,46 @@ export function NavMain({
     title: string;
     url: string;
     icon?: React.ReactNode;
+    description?: string;
   }[];
 }) {
   return (
     <SidebarGroup>
+      <SidebarGroupLabel className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Main
+      </SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="min-w-8 bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+            <Button
+              asChild
+              size="sm"
+              className="w-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:bg-primary/80"
             >
-              <CirclePlusIcon />
-              <span>Quick Create</span>
-            </SidebarMenuButton>
+              <a href="/app/dashboard" className="flex items-center gap-2">
+                <CirclePlusIcon className="size-4" />
+                <span>Quick Create</span>
+              </a>
+            </Button>
           </SidebarMenuItem>
         </SidebarMenu>
-        <SidebarMenu>
+        <SidebarMenu className="gap-1">
           {items.map((item) => (
-            <a href={item.url}>
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon}
-                  <span>{item.title}</span>
+            <a href={item.url} key={item.title} className="block">
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  className="group transition-all duration-150 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                >
+                  <div className="flex items-center gap-1 text-muted-foreground transition-colors group-hover:text-foreground">
+                    {item.icon}
+                  </div>
+                  <div className="flex flex-col gap-0.5 flex-1">
+                    <span className="text-sm font-medium">{item.title}</span>
+                    <span className="text-xs text-muted-foreground group-hover:text-muted-foreground/80">
+                      {item.description}
+                    </span>
+                  </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </a>
