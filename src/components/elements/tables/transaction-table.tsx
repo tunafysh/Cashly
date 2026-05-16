@@ -56,6 +56,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DateRangePicker } from "@/components/elements/selectors/date-range-picker";
+import { useDebounce } from "@/hooks/use-debounce";
+import { parseNaturalLanguageSearch } from "@/lib/parse-natural-language";
 
 async function deleteTransaction(id: string) {
   try {
@@ -391,6 +393,8 @@ export default function TransactionsTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const debouncedSearchInput = useDebounce(searchInput, 300);
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
     "all"
@@ -399,6 +403,14 @@ export default function TransactionsTable() {
   const [dateRangeStart, setDateRangeStart] = useState<string>("");
   const [dateRangeEnd, setDateRangeEnd] = useState<string>("");
   const { profile } = useProfile();
+
+  // Parse natural language from search input
+  useEffect(() => {
+    const parsed = parseNaturalLanguageSearch(debouncedSearchInput);
+    setGlobalFilter(parsed.search);
+    if (parsed.fromDate) setDateRangeStart(parsed.fromDate);
+    if (parsed.toDate) setDateRangeEnd(parsed.toDate);
+  }, [debouncedSearchInput]);
 
   const fetchTransactions = async () => {
     try {
@@ -507,12 +519,19 @@ export default function TransactionsTable() {
 
         {/* Filter Controls */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          <Input
-            placeholder="Search by description..."
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            className="text-sm"
-          />
+          <div>
+            <Input
+              placeholder="Search by description... (e.g. 'from 4 days ago')"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="text-sm"
+            />
+            {debouncedSearchInput && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Searching: {globalFilter || "(no text)"}{dateRangeStart ? ` from ${dateRangeStart}` : ""}{dateRangeEnd ? ` to ${dateRangeEnd}` : ""}
+              </p>
+            )}
+          </div>
           <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
             <SelectTrigger className="text-sm">
               <SelectValue />
@@ -547,19 +566,19 @@ export default function TransactionsTable() {
         </div>
 
         {/* Active Filters Display */}
-        {(globalFilter ||
+        {(searchInput ||
           typeFilter !== "all" ||
           categoryFilter ||
           dateRangeStart ||
           dateRangeEnd) && (
           <div className="flex flex-wrap gap-2">
-            {globalFilter && (
+            {searchInput && (
               <Badge
                 variant="secondary"
                 className="gap-1 cursor-pointer"
-                onClick={() => setGlobalFilter("")}
+                onClick={() => setSearchInput("")}
               >
-                Search: {globalFilter}
+                Search: {searchInput}
                 <X className="h-3 w-3" />
               </Badge>
             )}
@@ -625,7 +644,7 @@ export default function TransactionsTable() {
         <Card className="mx-4 py-12 lg:mx-6">
           <p className="text-center text-sm text-muted-foreground">
             No transactions found
-            {globalFilter ||
+            {searchInput ||
             typeFilter !== "all" ||
             categoryFilter ||
             dateRangeStart ||

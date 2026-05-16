@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { type DateRange } from "react-day-picker";
 
@@ -35,35 +35,28 @@ export function DateRangePicker({
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
     if (newDate?.from) {
-      onDateRangeChange(
-        newDate.from.toISOString().split("T")[0],
-        newDate.to ? newDate.to.toISOString().split("T")[0] : ""
-      );
+      const fromString = newDate.from.toISOString().split("T")[0];
+      const toString = newDate.to
+        ? newDate.to.toISOString().split("T")[0]
+        : fromString;
+      onDateRangeChange(fromString, toString);
     } else {
       onDateRangeChange("", "");
     }
   };
 
+  const displayText = date?.from
+    ? date.to
+      ? `${format(date.from, "MMM dd")} - ${format(date.to, "MMM dd")}`
+      : format(date.from, "MMM dd")
+    : "Pick a date range";
+
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          className="justify-start text-left font-normal text-sm"
-        >
+        <Button variant="outline" className="justify-start text-left font-normal text-sm w-full">
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date?.from ? (
-            date.to ? (
-              <>
-                {format(date.from, "MMM dd, yyyy")} -{" "}
-                {format(date.to, "MMM dd, yyyy")}
-              </>
-            ) : (
-              format(date.from, "MMM dd, yyyy")
-            )
-          ) : (
-            <span>Pick a date range</span>
-          )}
+          <span className="truncate">{displayText}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
@@ -73,6 +66,7 @@ export function DateRangePicker({
           selected={date}
           onSelect={handleDateSelect}
           numberOfMonths={2}
+          disabled={(d) => d > new Date()}
         />
       </PopoverContent>
     </Popover>
