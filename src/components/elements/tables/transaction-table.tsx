@@ -35,7 +35,7 @@ import {
   getExpandedRowModel,
   ExpandedState,
 } from "@tanstack/react-table";
-import { Loader2, Trash2, Plus, X } from "lucide-react";
+import { Loader2, Trash2, Plus, X, Calendar } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -55,6 +55,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { DateRangePicker } from "@/components/elements/selectors/date-range-picker";
 
 async function deleteTransaction(id: string) {
   try {
@@ -406,8 +407,8 @@ export default function TransactionsTable() {
       if (globalFilter) params.append("search", globalFilter);
       if (typeFilter !== "all") params.append("type", typeFilter);
       if (categoryFilter) params.append("categoryId", categoryFilter);
-      if (dateRangeStart) params.append("startDate", dateRangeStart);
-      if (dateRangeEnd) params.append("endDate", dateRangeEnd);
+      if (dateRangeStart) params.append("fromDate", dateRangeStart);
+      if (dateRangeEnd) params.append("toDate", dateRangeEnd);
 
       const response = await fetch(
         `/api/transactions?${params.toString()}`
@@ -505,7 +506,7 @@ export default function TransactionsTable() {
         </div>
 
         {/* Filter Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <Input
             placeholder="Search by description..."
             value={globalFilter}
@@ -534,20 +535,13 @@ export default function TransactionsTable() {
               ))}
             </SelectContent>
           </Select>
-          <div className="flex gap-2">
-            <Input
-              type="date"
-              value={dateRangeStart}
-              onChange={(e) => setDateRangeStart(e.target.value)}
-              className="text-sm"
-              placeholder="From"
-            />
-            <Input
-              type="date"
-              value={dateRangeEnd}
-              onChange={(e) => setDateRangeEnd(e.target.value)}
-              className="text-sm"
-              placeholder="To"
+          <div className="md:col-span-1">
+            <DateRangePicker
+              value={{ from: dateRangeStart, to: dateRangeEnd }}
+              onDateRangeChange={(from, to) => {
+                setDateRangeStart(from);
+                setDateRangeEnd(to);
+              }}
             />
           </div>
         </div>
@@ -589,7 +583,20 @@ export default function TransactionsTable() {
                 <X className="h-3 w-3" />
               </Badge>
             )}
-            {dateRangeStart && (
+            {dateRangeStart && dateRangeEnd && (
+              <Badge
+                variant="secondary"
+                className="gap-1 cursor-pointer"
+                onClick={() => {
+                  setDateRangeStart("");
+                  setDateRangeEnd("");
+                }}
+              >
+                {dateRangeStart} to {dateRangeEnd}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+            {dateRangeStart && !dateRangeEnd && (
               <Badge
                 variant="secondary"
                 className="gap-1 cursor-pointer"
@@ -599,7 +606,7 @@ export default function TransactionsTable() {
                 <X className="h-3 w-3" />
               </Badge>
             )}
-            {dateRangeEnd && (
+            {dateRangeEnd && !dateRangeStart && (
               <Badge
                 variant="secondary"
                 className="gap-1 cursor-pointer"

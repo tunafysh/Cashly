@@ -67,6 +67,7 @@ export type Filters = {
   categoryId?: string;
   type?: "income" | "expense";
   subscriptionId?: string;
+  search?: string;
 };
 
 export async function getUserTransactions(userId: string, filters?: Filters) {
@@ -112,6 +113,19 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
 
   if (filters?.subscriptionId) {
     conditions.push(eq(transactions.subscriptionId, filters.subscriptionId));
+  }
+
+  if (filters?.search) {
+    // Search in description field
+    conditions.push(
+      or(
+        and(
+          isNotNull(transactions.description),
+          //@ts-ignore - ilike is a Postgres operator for case-insensitive search
+          transactions.description.ilike(`%${filters.search}%`)
+        )
+      )!
+    );
   }
 
   return await baseTransactionQuery()

@@ -30,6 +30,10 @@ export function parseTransactionFilters(body: any): Filters | undefined {
     filters.type = body.type;
   }
 
+  if (body.search && body.search !== "") {
+    filters.search = body.search;
+  }
+
   if (body.withDescription !== undefined) {
     filters.withDescription = body.withDescription;
   }
