@@ -35,9 +35,9 @@ export function DateRangePicker({
   const handleDateSelect = (newDate: DateRange | undefined) => {
     setDate(newDate);
     if (newDate?.from) {
-      const fromString = newDate.from.toISOString().split("T")[0];
+      const fromString = format(newDate.from, "yyyy-MM-dd");
       const toString = newDate.to
-        ? newDate.to.toISOString().split("T")[0]
+        ? format(newDate.to, "yyyy-MM-dd")
         : fromString;
       onDateRangeChange(fromString, toString);
     } else {

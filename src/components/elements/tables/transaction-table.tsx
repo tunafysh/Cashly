@@ -476,12 +476,12 @@ export default function TransactionsTable() {
   });
 
   if (loading && transactions.length === 0) {
-    return <Skeleton className="py-12 lg:mx-6 mx-4" />;
+    return <Skeleton className="py-12" />;
   }
 
   if (error) {
     return (
-      <Card className="mx-4 border-red-200 bg-red-50 py-6 dark:border-red-900 dark:bg-red-950 lg:mx-6">
+      <Card className="border-red-200 bg-red-50 py-6 dark:border-red-900 dark:bg-red-950 mx-4 lg:mx-6">
         <p className="px-6 text-sm text-red-600 dark:text-red-400">
           Error: {error}
         </p>
@@ -492,7 +492,7 @@ export default function TransactionsTable() {
   return (
     <div className="space-y-4">
       {/* Filters Section */}
-      <div className="mx-4 lg:mx-6 space-y-4">
+      <div className="space-y-4 bg-background px-4 lg:px-6 py-4">
         {/* Header with Create Button */}
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">Transactions</h2>
@@ -642,7 +642,7 @@ export default function TransactionsTable() {
 
       {/* Table */}
       {transactions.length === 0 ? (
-        <Card className="mx-4 py-12 lg:mx-6">
+        <Card className="py-12 mx-4 lg:mx-6">
           <p className="text-center text-sm text-muted-foreground">
             No transactions found
             {searchInput ||
@@ -655,7 +655,7 @@ export default function TransactionsTable() {
           </p>
         </Card>
       ) : (
-        <Card className="mx-4 overflow-hidden lg:mx-6">
+        <Card className="overflow-hidden mx-4 lg:mx-6">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
