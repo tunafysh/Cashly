@@ -13,39 +13,55 @@ export function parseNaturalLanguageSearch(input: string): ParsedDateRange {
   if (!input.trim()) return result;
 
   try {
-    // Common patterns
-    const fromPattern = /from\s+(.+?)(?:\s+to\s+|$)/gi;
-    const toPattern = /to\s+(.+?)$/gi;
+    // Common patterns - match "from X to/until Y" or "from X" or "to/until Y"
+    const fromToPattern = /from\s+(.+?)(?:\s+(?:to|until)\s+(.+?))?$/i;
     
-    let fromMatch = fromPattern.exec(input);
-    let toMatch = toPattern.exec(input);
+    let fromMatch = fromToPattern.exec(input);
+    let fromText = "";
+    let toText = "";
 
     if (fromMatch) {
-      const fromText = fromMatch[1];
+      fromText = fromMatch[1];
+      toText = fromMatch[2] || "";
+      
+      let parsedAny = false;
+      
       const fromDate = chrono.parseDate(fromText);
       if (fromDate) {
         result.fromDate = fromDate.toISOString().split("T")[0];
-        // Remove the parsed part from search
+        parsedAny = true;
+      }
+      
+      if (toText) {
+        const toDate = chrono.parseDate(toText);
+        if (toDate) {
+          result.toDate = toDate.toISOString().split("T")[0];
+          parsedAny = true;
+        }
+      }
+      
+      // Remove the pattern from search if we successfully parsed at least one date
+      if (parsedAny) {
         result.search = input.replace(fromMatch[0], "").trim();
       }
     }
 
-    if (toMatch) {
-      const toText = toMatch[1];
-      const toDate = chrono.parseDate(toText);
-      if (toDate) {
-        result.toDate = toDate.toISOString().split("T")[0];
-        // Remove the parsed part from search
-        result.search = result.search.replace(toMatch[0], "").trim();
+    // Handle standalone "until/to" pattern if no "from" was found
+    if (!fromMatch) {
+      const untilPattern = /(?:until|to)\s+(.+?)$/i;
+      const untilMatch = untilPattern.exec(input);
+      if (untilMatch) {
+        const untilText = untilMatch[1];
+        const untilDate = chrono.parseDate(untilText);
+        if (untilDate) {
+          result.toDate = untilDate.toISOString().split("T")[0];
+          result.search = input.replace(untilMatch[0], "").trim();
+        }
       }
     }
 
-    // If only one date is mentioned, assume it's a single day
-    if ((result.fromDate || result.toDate) && !result.fromDate && result.toDate) {
-      result.fromDate = result.toDate;
-    } else if (result.fromDate && !result.toDate) {
-      result.toDate = result.fromDate;
-    }
+    // If only set toDate without fromDate, don't auto-set fromDate
+    // This allows "until now" to work without forcing a fromDate
   } catch (error) {
     console.error("Error parsing natural language date:", error);
   }

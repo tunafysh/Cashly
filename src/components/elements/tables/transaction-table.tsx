@@ -256,7 +256,7 @@ function CreateTransactionForm({
     description: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -394,7 +394,7 @@ export default function TransactionsTable() {
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
-  const debouncedSearchInput = useDebounce(searchInput, 300);
+  const debouncedSearchInput = useDebounce(searchInput, 1000);
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
     "all"
@@ -408,8 +408,9 @@ export default function TransactionsTable() {
   useEffect(() => {
     const parsed = parseNaturalLanguageSearch(debouncedSearchInput);
     setGlobalFilter(parsed.search);
-    if (parsed.fromDate) setDateRangeStart(parsed.fromDate);
-    if (parsed.toDate) setDateRangeEnd(parsed.toDate);
+    // Clear and set dates - only keep them if parsed dates exist
+    setDateRangeStart(parsed.fromDate || "");
+    setDateRangeEnd(parsed.toDate || "");
   }, [debouncedSearchInput]);
 
   const fetchTransactions = async () => {
