@@ -519,7 +519,7 @@ export default function TransactionsTable() {
         </div>
 
         {/* Filter Controls */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <div>
             <Input
               placeholder="Search by description... (e.g. 'from 4 days ago')"
