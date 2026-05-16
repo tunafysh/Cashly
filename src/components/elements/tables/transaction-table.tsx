@@ -456,7 +456,7 @@ export default function TransactionsTable() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [typeFilter, categoryFilter, dateRangeStart, dateRangeEnd];
+  }, [typeFilter, categoryFilter, dateRangeStart, dateRangeEnd])
 
   const handleDelete = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
