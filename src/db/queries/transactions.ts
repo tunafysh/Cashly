@@ -123,13 +123,10 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
 
     if (searchWords.length > 0) {
       const wordConditions = searchWords.map(word =>
-        and(
-          isNotNull(transactions.description),
-          //@ts-ignore - ilike is a Postgres operator for case-insensitive search
-          transactions.description.ilike(`%${word}%`)
-        )
+        //@ts-ignore - ilike is a Postgres operator for case-insensitive search
+        transactions.description.ilike(`%${word}%`)
       );
-      conditions.push(and(...wordConditions)!);
+      conditions.push(or(...wordConditions)!);
     }
   }
 
