@@ -37,8 +37,9 @@ import { useEffect, useState } from "react";
 
 async function deleteTransaction(id: string) {
   try {
-    const response = await fetch(`/api/transactions/${id}`, {
+    const response = await fetch(`/api/transactions`, {
       method: "DELETE",
+      body: JSON.stringify({ id: id }),
     });
     if (!response.ok) {
       throw new Error("Failed to delete transaction");
@@ -59,8 +60,6 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
   const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete 1this transaction?")) return;
-
     try {
       setDeleting(true);
       await deleteTransaction(id);
@@ -155,7 +154,7 @@ const transactionColumns = (
           </Badge>
         );
       }
-      
+
       return (
         <Badge
           className={`text-sm border-[${category.color}] bg-[${category.color}/10] py-2`}
