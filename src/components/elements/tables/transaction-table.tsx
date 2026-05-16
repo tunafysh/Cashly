@@ -476,7 +476,7 @@ export default function TransactionsTable() {
   });
 
   if (loading && transactions.length === 0) {
-    return <Skeleton className="py-12" />;
+    return <Skeleton className="py-12 space-y-4" />;
   }
 
   return (
@@ -631,13 +631,7 @@ export default function TransactionsTable() {
       </div>
 
       {/* Table */}
-      {error? (
-        <Card className="border-red-200 bg-red-50 py-6 dark:border-red-900 dark:bg-red-950 mx-4 lg:mx-6">
-        <p className="px-6 text-sm text-red-600 dark:text-red-400">
-          Error: {error}
-        </p>
-      </Card>
-      ): transactions.length === 0 ? (
+      {error || transactions.length === 0 ? (
         <Card className="py-12 mx-4 lg:mx-6">
           <p className="text-center text-sm text-muted-foreground">
             No transactions found
