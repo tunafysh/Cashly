@@ -116,16 +116,21 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
   }
 
   if (filters?.search) {
-    // Search in description field
-    conditions.push(
-      or(
+    // Split search by spaces and match each word individually
+    const searchWords = filters.search
+      .split(/\s+/)
+      .filter(word => word.length > 0);
+
+    if (searchWords.length > 0) {
+      const wordConditions = searchWords.map(word =>
         and(
           isNotNull(transactions.description),
           //@ts-ignore - ilike is a Postgres operator for case-insensitive search
-          transactions.description.ilike(`%${filters.search}%`)
+          transactions.description.ilike(`%${word}%`)
         )
-      )!
-    );
+      );
+      conditions.push(and(...wordConditions)!);
+    }
   }
 
   return await baseTransactionQuery()
