@@ -394,7 +394,7 @@ export default function TransactionsTable() {
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
-  const debouncedSearchInput = useDebounce(searchInput, 1000);
+  const debouncedSearchInput = useDebounce(searchInput, 750);
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
     "all"
@@ -417,7 +417,6 @@ export default function TransactionsTable() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (globalFilter) params.append("search", globalFilter);
       if (typeFilter !== "all") params.append("type", typeFilter);
       if (categoryFilter) params.append("categoryId", categoryFilter);
       if (dateRangeStart) params.append("fromDate", dateRangeStart);
@@ -457,7 +456,7 @@ export default function TransactionsTable() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [globalFilter, typeFilter, categoryFilter, dateRangeStart, dateRangeEnd]);
+  }, [typeFilter, categoryFilter, dateRangeStart, dateRangeEnd];
 
   const handleDelete = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
@@ -468,9 +467,16 @@ export default function TransactionsTable() {
     fetchTransactions();
   };
 
+  // Client-side search filter
+  const filteredTransactions = transactions.filter((tx) => {
+    if (!globalFilter) return true;
+    const searchLower = globalFilter.toLowerCase();
+    return (tx.description || "").toLowerCase().includes(searchLower);
+  });
+
   const columns = transactionColumns(profile?.currency || "USD", handleDelete);
   const table = useReactTable({
-    data: transactions,
+    data: filteredTransactions,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
@@ -631,7 +637,7 @@ export default function TransactionsTable() {
       </div>
 
       {/* Table */}
-      {error || transactions.length === 0 ? (
+      {error || filteredTransactions.length === 0 ? (
         <Card className="py-12 mx-4 lg:mx-6">
           <p className="text-center text-sm text-muted-foreground">
             No transactions found

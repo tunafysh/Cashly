@@ -40,6 +40,15 @@ export function parseNaturalLanguageSearch(input: string): ParsedDateRange {
         }
       }
       
+      // If fromDate is set but toDate is not, default toDate to the same day as fromDate
+      // unless "until now" or similar was explicitly mentioned
+      if (result.fromDate && !result.toDate) {
+        const hasExplicitUntil = /until\s+now|to\s+now/i.test(input);
+        if (!hasExplicitUntil) {
+          result.toDate = result.fromDate;
+        }
+      }
+      
       // Remove the pattern from search if we successfully parsed at least one date
       if (parsedAny) {
         result.search = input.replace(fromMatch[0], "").trim();
