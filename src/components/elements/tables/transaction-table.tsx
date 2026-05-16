@@ -24,16 +24,37 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useProfile } from "@/lib/profile-context";
-import { Transaction } from "@/lib/types";
+import { Transaction, Category } from "@/lib/types";
 import { formatCurrency } from "@/lib/utils";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
+  getFilteredRowModel,
+  getExpandedRowModel,
+  ExpandedState,
 } from "@tanstack/react-table";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogPortal,
+  DialogOverlay,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 async function deleteTransaction(id: string) {
   try {
@@ -214,34 +235,223 @@ const transactionColumns = (
   },
 ];
 
+interface CreateTransactionFormProps {
+  categories: Category[];
+  onSuccess: () => void;
+}
+
+function CreateTransactionForm({
+  categories,
+  onSuccess,
+}: CreateTransactionFormProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    amount: "",
+    type: "expense" as "income" | "expense",
+    categoryId: "",
+    description: "",
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (!formData.amount || isNaN(parseFloat(formData.amount))) {
+        throw new Error("Please enter a valid amount");
+      }
+
+      const response = await fetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: parseFloat(formData.amount),
+          type: formData.type,
+          categoryId: formData.categoryId || null,
+          description: formData.description || null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create transaction");
+      }
+
+      setFormData({ amount: "", type: "expense", categoryId: "", description: "" });
+      onSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="rounded-md bg-red-50 p-3 dark:bg-red-950">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      )}
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Amount</label>
+        <Input
+          type="number"
+          step="0.01"
+          placeholder="0.00"
+          value={formData.amount}
+          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+          disabled={loading}
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Type</label>
+        <Select
+          value={formData.type}
+          onValueChange={(value) =>
+            setFormData({ ...formData, type: value as "income" | "expense" })
+          }
+          disabled={loading}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="expense">Expense</SelectItem>
+            <SelectItem value="income">Income</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Category (Optional)</label>
+        <Select
+          value={formData.categoryId}
+          onValueChange={(value) =>
+            setFormData({ ...formData, categoryId: value })
+          }
+          disabled={loading}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select a category" />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="h-3 w-3 rounded-full"
+                    style={{ backgroundColor: cat.color }}
+                  />
+                  {cat.name}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Description (Optional)</label>
+        <Input
+          type="text"
+          placeholder="Add a note..."
+          value={formData.description}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
+          disabled={loading}
+        />
+      </div>
+
+      <DialogFooter className="pt-4">
+        <Button type="submit" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating...
+            </>
+          ) : (
+            "Create Transaction"
+          )}
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}
+
 export default function TransactionsTable() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
+    "all"
+  );
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [dateRangeStart, setDateRangeStart] = useState<string>("");
+  const [dateRangeEnd, setDateRangeEnd] = useState<string>("");
   const { profile } = useProfile();
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/transactions");
-        if (!response.ok) {
-          throw new Error("Failed to fetch transactions");
-        }
-        const data = await response.json();
-        setTransactions(data.transactions);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      if (globalFilter) params.append("search", globalFilter);
+      if (typeFilter !== "all") params.append("type", typeFilter);
+      if (categoryFilter) params.append("categoryId", categoryFilter);
+      if (dateRangeStart) params.append("startDate", dateRangeStart);
+      if (dateRangeEnd) params.append("endDate", dateRangeEnd);
 
-    fetchTransactions();
+      const response = await fetch(
+        `/api/transactions?${params.toString()}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+      const data = await response.json();
+      setTransactions(data.transactions);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("/api/categories");
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+      const data = await response.json();
+      setCategories(data.categories);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [globalFilter, typeFilter, categoryFilter, dateRangeStart, dateRangeEnd]);
 
   const handleDelete = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleCreateSuccess = () => {
+    setCreateOpen(false);
+    fetchTransactions();
   };
 
   const columns = transactionColumns(profile?.currency || "USD", handleDelete);
@@ -251,7 +461,7 @@ export default function TransactionsTable() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (loading) {
+  if (loading && transactions.length === 0) {
     return <Skeleton className="py-12 lg:mx-6 mx-4" />;
   }
 
@@ -265,56 +475,204 @@ export default function TransactionsTable() {
     );
   }
 
-  if (transactions.length === 0) {
-    return (
-      <Card className="mx-4 py-12 lg:mx-6">
-        <p className="text-center text-sm text-muted-foreground">
-          No transactions found
-        </p>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="mx-4 overflow-hidden lg:mx-6">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow
-              key={headerGroup.id}
-              className="border-b bg-muted/50 hover:bg-muted/50"
-            >
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className="font-semibold text-foreground/70 h-12"
+    <div className="space-y-4">
+      {/* Filters Section */}
+      <div className="mx-4 lg:mx-6 space-y-4">
+        {/* Header with Create Button */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Transactions</h2>
+          <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Transaction
+              </Button>
+            </DialogTrigger>
+            <DialogPortal>
+              <DialogOverlay />
+              <DialogContent className="sm:max-w-106.25">
+                <DialogHeader>
+                  <DialogTitle>Create Transaction</DialogTitle>
+                </DialogHeader>
+                <CreateTransactionForm
+                  categories={categories}
+                  onSuccess={handleCreateSuccess}
+                />
+              </DialogContent>
+            </DialogPortal>
+          </Dialog>
+        </div>
+
+        {/* Filter Controls */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <Input
+            placeholder="Search by description..."
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="text-sm"
+          />
+          <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
+            <SelectTrigger className="text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="income">Income</SelectItem>
+              <SelectItem value="expense">Expense</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="text-sm">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">All Categories</SelectItem>
+              {categories.map((cat) => (
+                <SelectItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex gap-2">
+            <Input
+              type="date"
+              value={dateRangeStart}
+              onChange={(e) => setDateRangeStart(e.target.value)}
+              className="text-sm"
+              placeholder="From"
+            />
+            <Input
+              type="date"
+              value={dateRangeEnd}
+              onChange={(e) => setDateRangeEnd(e.target.value)}
+              className="text-sm"
+              placeholder="To"
+            />
+          </div>
+        </div>
+
+        {/* Active Filters Display */}
+        {(globalFilter ||
+          typeFilter !== "all" ||
+          categoryFilter ||
+          dateRangeStart ||
+          dateRangeEnd) && (
+          <div className="flex flex-wrap gap-2">
+            {globalFilter && (
+              <Badge
+                variant="secondary"
+                className="gap-1 cursor-pointer"
+                onClick={() => setGlobalFilter("")}
+              >
+                Search: {globalFilter}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+            {typeFilter !== "all" && (
+              <Badge
+                variant="secondary"
+                className="gap-1 cursor-pointer"
+                onClick={() => setTypeFilter("all")}
+              >
+                Type: {typeFilter}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+            {categoryFilter && (
+              <Badge
+                variant="secondary"
+                className="gap-1 cursor-pointer"
+                onClick={() => setCategoryFilter("")}
+              >
+                Category: {categories.find((c) => c.id === categoryFilter)?.name}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+            {dateRangeStart && (
+              <Badge
+                variant="secondary"
+                className="gap-1 cursor-pointer"
+                onClick={() => setDateRangeStart("")}
+              >
+                From: {dateRangeStart}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+            {dateRangeEnd && (
+              <Badge
+                variant="secondary"
+                className="gap-1 cursor-pointer"
+                onClick={() => setDateRangeEnd("")}
+              >
+                To: {dateRangeEnd}
+                <X className="h-3 w-3" />
+              </Badge>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Table */}
+      {transactions.length === 0 ? (
+        <Card className="mx-4 py-12 lg:mx-6">
+          <p className="text-center text-sm text-muted-foreground">
+            No transactions found
+            {globalFilter ||
+            typeFilter !== "all" ||
+            categoryFilter ||
+            dateRangeStart ||
+            dateRangeEnd
+              ? " matching your filters"
+              : ""}
+          </p>
+        </Card>
+      ) : (
+        <Card className="mx-4 overflow-hidden lg:mx-6">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  className="border-b bg-muted/50 hover:bg-muted/50"
                 >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      className="font-semibold text-foreground/70 h-12"
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  className="hover:bg-muted/30 transition-colors border-b"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-4">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
                       )}
-                </TableHead>
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              className="hover:bg-muted/30 transition-colors border-b"
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className="py-4">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Card>
+            </TableBody>
+          </Table>
+        </Card>
+      )}
+    </div>
   );
 }
