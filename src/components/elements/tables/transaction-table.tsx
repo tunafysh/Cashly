@@ -479,16 +479,6 @@ export default function TransactionsTable() {
     return <Skeleton className="py-12" />;
   }
 
-  if (error) {
-    return (
-      <Card className="border-red-200 bg-red-50 py-6 dark:border-red-900 dark:bg-red-950 mx-4 lg:mx-6">
-        <p className="px-6 text-sm text-red-600 dark:text-red-400">
-          Error: {error}
-        </p>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-4">
       {/* Filters Section */}
@@ -641,7 +631,13 @@ export default function TransactionsTable() {
       </div>
 
       {/* Table */}
-      {transactions.length === 0 ? (
+      {error? (
+        <Card className="border-red-200 bg-red-50 py-6 dark:border-red-900 dark:bg-red-950 mx-4 lg:mx-6">
+        <p className="px-6 text-sm text-red-600 dark:text-red-400">
+          Error: {error}
+        </p>
+      </Card>
+      ): transactions.length === 0 ? (
         <Card className="py-12 mx-4 lg:mx-6">
           <p className="text-center text-sm text-muted-foreground">
             No transactions found
