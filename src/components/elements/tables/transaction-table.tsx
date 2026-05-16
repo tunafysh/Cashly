@@ -36,7 +36,7 @@ import {
   ExpandedState,
 } from "@tanstack/react-table";
 import { Loader2, Trash2, Plus, X, Calendar } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -467,12 +467,14 @@ export default function TransactionsTable() {
     fetchTransactions();
   };
 
-  // Client-side search filter
-  const filteredTransactions = transactions.filter((tx) => {
-    if (!globalFilter) return true;
-    const searchLower = globalFilter.toLowerCase();
-    return (tx.description || "").toLowerCase().includes(searchLower);
-  });
+  // Client-side search filter with memoization
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      if (!globalFilter) return true;
+      const searchLower = globalFilter.toLowerCase();
+      return (tx.description || "").toLowerCase().includes(searchLower);
+    });
+  }, [transactions, globalFilter]);
 
   const columns = transactionColumns(profile?.currency || "USD", handleDelete);
   const table = useReactTable({
