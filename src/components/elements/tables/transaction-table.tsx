@@ -36,7 +36,7 @@ import {
   ExpandedState,
 } from "@tanstack/react-table";
 import { Loader2, Trash2, Plus, X, Calendar } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useTransition } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -390,7 +390,7 @@ function CreateTransactionForm({
 export default function TransactionsTable() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -402,6 +402,7 @@ export default function TransactionsTable() {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [dateRangeStart, setDateRangeStart] = useState<string>("");
   const [dateRangeEnd, setDateRangeEnd] = useState<string>("");
+  const [isPending, startTransition] = useTransition();
   const { profile } = useProfile();
 
   // Parse natural language from search input
@@ -413,28 +414,31 @@ export default function TransactionsTable() {
     setDateRangeEnd(parsed.toDate || "");
   }, [debouncedSearchInput]);
 
-  const fetchTransactions = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (typeFilter !== "all") params.append("type", typeFilter);
-      if (categoryFilter) params.append("categoryId", categoryFilter);
-      if (dateRangeStart) params.append("fromDate", dateRangeStart);
-      if (dateRangeEnd) params.append("toDate", dateRangeEnd);
+  const fetchTransactions = () => {
+    startTransition(() => {
+      (async () => {
+        try {
+          const params = new URLSearchParams();
+          if (typeFilter !== "all") params.append("type", typeFilter);
+          if (categoryFilter) params.append("categoryId", categoryFilter);
+          if (dateRangeStart) params.append("fromDate", dateRangeStart);
+          if (dateRangeEnd) params.append("toDate", dateRangeEnd);
 
-      const response = await fetch(
-        `/api/transactions?${params.toString()}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch transactions");
-      }
-      const data = await response.json();
-      setTransactions(data.transactions);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setLoading(false);
-    }
+          const response = await fetch(
+            `/api/transactions?${params.toString()}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch transactions");
+          }
+          const data = await response.json();
+          setTransactions(data.transactions);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "An error occurred");
+        } finally {
+          setInitialLoading(false);
+        }
+      })();
+    });
   };
 
   const fetchCategories = async () => {
@@ -483,7 +487,7 @@ export default function TransactionsTable() {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (loading && transactions.length === 0) {
+  if (initialLoading && transactions.length === 0) {
     return <Skeleton className="py-12 space-y-4" />;
   }
 
