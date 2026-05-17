@@ -414,6 +414,8 @@ export default function TransactionsTable() {
     setDateRangeEnd(parsed.toDate || "");
   }, [debouncedSearchInput]);
 
+  const isSearching = searchInput !== debouncedSearchInput;
+
   const fetchTransactions = () => {
     startTransition(() => {
       (async () => {
@@ -643,7 +645,7 @@ export default function TransactionsTable() {
       </div>
 
       {/* Table */}
-      {isPending && transactions.length > 0 ? (
+      {(isPending || isSearching) && transactions.length > 0 ? (
         <Card className="py-12 mx-4 lg:mx-6">
           <div className="flex justify-center items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
