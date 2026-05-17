@@ -488,7 +488,7 @@ export default function TransactionsTable() {
   });
 
   if (initialLoading && transactions.length === 0) {
-    return <Skeleton className="py-12 space-y-4" />;
+    return <Skeleton className="py-12 mx-4 md:mx-6" />;
   }
 
   return (
@@ -643,7 +643,14 @@ export default function TransactionsTable() {
       </div>
 
       {/* Table */}
-      {error || filteredTransactions.length === 0 ? (
+      {isPending && transactions.length > 0 ? (
+        <Card className="py-12 mx-4 lg:mx-6">
+          <div className="flex justify-center items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <p className="text-sm text-muted-foreground">Loading transactions...</p>
+          </div>
+        </Card>
+      ) : error || filteredTransactions.length === 0 ? (
         <Card className="py-12 mx-4 lg:mx-6">
           <p className="text-center text-sm text-muted-foreground">
             No transactions found
