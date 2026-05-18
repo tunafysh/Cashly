@@ -1,4 +1,4 @@
-import { MCPTokensManager } from "@/components/elements/mcp-tokens-manager";
+import { MCPTokensManager } from "@/components/elements/uncategorized/mcp-tokens-manager";
 
 export default function McpTokens() {
     return (

@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { useMCPTokens } from "@/hooks/use-mcp-tokens";
 import { Button } from "@/components/ui/button";
