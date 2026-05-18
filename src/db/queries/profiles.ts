@@ -33,7 +33,7 @@ export async function getUserProfile(
 
 export async function updateUserProfile(
   userId: string,
-  data: Partial<{ currency: string; budget: number; budgetPeriod: string }>,
+  data: Partial<{ currency: string; budget?: number; budgetPeriod: string }>,
 ) {
   await db
     .update(profiles)
