@@ -1,0 +1,20 @@
+$kind: http-request
+description: >-
+  Deletes an existing category by its ID. Sends a `DELETE` request to
+  `/api/categories` with a JSON body containing:
+
+  - `id` (string): The unique identifier of the category to delete. Defaults to
+  the `{{categoryId}}` environment variable.
+
+
+  On success, the response returns a confirmation message: `"Category deleted
+  successfully"`.
+url: "{{base_url}}/api/categories"
+method: DELETE
+body:
+  type: json
+  content: |-
+    {
+        "id": "{{categoryId}}"
+    }
+order: 4000

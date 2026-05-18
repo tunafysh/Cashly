@@ -1,0 +1,35 @@
+$kind: http-request
+description: >-
+  Updates an existing category. Sends a `PATCH` request to `/api/categories`
+  with a JSON body containing:
+
+  - `id` (string): The unique identifier of the category to update.
+
+  - `name` (string): The new display name for the category.
+
+  - `color` (string): The new color for the category, in hex format (e.g.
+  `#FF0000`).
+
+
+  All fields should be provided even if only one is being changed.
+url: "{{base_url}}/api/categories"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+        "id": "CategoryId",
+        "name": "CategoryName",
+        "color": "CategoryColor(hex format pls)"
+    }
+auth:
+  type: jwt
+  credentials:
+    algorithm: HS256
+    isSecretBase64Encoded: false
+    payload: "{}"
+    addTokenTo: header
+    headerPrefix: Bearer
+    queryParamKey: token
+    header: "{}"
+order: 3000

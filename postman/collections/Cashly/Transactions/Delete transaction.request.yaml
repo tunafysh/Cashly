@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/api/transactions"
+method: DELETE
+body:
+  type: json
+  content: |-
+    {
+        "id": "{{transactionId}}"
+    }
+order: 5000

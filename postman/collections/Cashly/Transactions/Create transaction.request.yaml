@@ -1,0 +1,45 @@
+$kind: http-request
+description: >-
+  Creates a new financial transaction for the authenticated user. Sends a `POST`
+  request to `/api/transactions` with a JSON body containing:
+
+  - `amount` (number): The monetary value of the transaction.
+
+  - `type` (string): The transaction type — either `"income"` or `"expense"`.
+
+  - `categoryId` (string, optional): The ID of the category to associate with
+  the transaction. Defaults to the `{{categoryId}}` environment variable.
+
+  - `description` (string, optional): A short description of the transaction.
+
+
+  On success, the response returns the created transaction object including its
+  `id`, `userId`, `amount`, `type`, `categoryId`, `description`, and `createdAt`
+  timestamp.
+url: "{{base_url}}/api/transactions"
+method: POST
+body:
+  type: json
+  content: >-
+    //[ // Supports bulk transactions through an array
+
+    {
+        "amount": 50,
+        "type": "expense", // i have spending issues
+        "categoryId": null, // not required
+        "description": "[insert original description here]" // not required either (duh)
+    }
+
+    //]
+scripts:
+  - type: afterResponse
+    code: >-
+      const json = pm.response.json();
+
+
+      pm.environment.set("transactionId", json.transaction[0].id);
+
+      console.log("Saved transaction id: " +
+      pm.environment.get("transactionId"));
+    language: text/javascript
+order: 3000

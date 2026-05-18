@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/api/profile"
+method: DELETE
+body:
+  type: text
+  content: |-
+    {
+        "currency": "EUR", // will use a lookup table for the symbol
+        "budget": 100, 
+        "budgetPeriod": "monthly" // monthly, yearly, weekly
+    }
+order: 3000

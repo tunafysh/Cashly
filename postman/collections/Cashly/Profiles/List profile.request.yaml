@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/api/profile"
+method: GET
+body:
+  type: text
+  content: |-
+    {
+        "id": "{{transactionId}}"
+    }
+order: 1000

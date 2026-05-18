@@ -1,0 +1,42 @@
+$kind: http-request
+description: >-
+  Creates a new category for the authenticated user. Sends a `POST` request to
+  `/api/categories` with a JSON body containing:
+
+  - `name` (string): The display name of the category.
+
+  - `color` (string): The color associated with the category, in hex format
+  (e.g. `#FF0000`).
+
+
+  On success, the response returns the created category object including its
+  generated `id`. The test script automatically extracts and saves the category
+  `id` to the `categoryId` environment variable for use in subsequent requests.
+url: "{{base_url}}/api/categories"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "name": "CategoryName",
+        "color": "#FF0000"
+    }
+auth:
+  type: jwt
+  credentials:
+    algorithm: HS256
+    isSecretBase64Encoded: false
+    payload: "{}"
+    addTokenTo: header
+    headerPrefix: Bearer
+    queryParamKey: token
+    header: "{}"
+scripts:
+  - type: afterResponse
+    code: |-
+      const json = pm.response.json();
+
+      pm.environment.set("categoryId", json.category[0].id);
+      console.log("Saved category id: " + pm.environment.get("categoryId"));
+    language: text/javascript
+order: 1000

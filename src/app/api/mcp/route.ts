@@ -174,3 +174,46 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     global.mcpCurrentUserId = null;
   }
 }
+
+/**
+ * GET handler for SSE (Server-Sent Events) streaming.
+ * Required by MCP Streamable HTTP transport for bi-directional communication.
+ */
+export async function GET(req: NextRequest): Promise<Response> {
+  // Authenticate request
+  const userId = await authenticateRequest(req);
+  if (!userId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
+  // Set user context for tools
+  global.mcpCurrentUserId = userId;
+
+  try {
+    // Create a fresh server and transport for this SSE stream
+    const mcpServer = createMcpServer();
+    const transport = new WebStandardStreamableHTTPServerTransport({
+      sessionIdGenerator: undefined, // Stateless: no session management
+    });
+
+    // Connect server to transport
+    await mcpServer.connect(transport);
+
+    // Use transport's built-in request handler for SSE
+    const response = await transport.handleRequest(req as unknown as Request);
+
+    return response;
+  } catch (error) {
+    console.error("MCP GET (SSE) error:", error);
+    return new Response(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        error: { code: -32603, message: "Internal server error" },
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  } finally {
+    // Clean up user context
+    global.mcpCurrentUserId = null;
+  }
+}

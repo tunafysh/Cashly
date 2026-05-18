@@ -1,0 +1,31 @@
+$kind: http-request
+url: "{{base_url}}/api/transactions"
+method: GET
+queryParams:
+  - key: toDate
+    value: 08-05-2026
+    disabled: true
+  - key: fromDate
+    value: "2026"
+    disabled: true
+  - key: categoryId
+    value: "{{categoryId}}"
+    disabled: true
+  - key: type
+    value: expense
+    disabled: true
+  - key: withDescription
+    value: "true"
+    disabled: true
+scripts:
+  - type: afterResponse
+    code: >-
+      const json = pm.response.json();
+
+
+      pm.environment.set("transactionId", json.transactions[0].id);
+
+      console.log("Saved transaction id: " +
+      pm.environment.get("transactionId"));
+    language: text/javascript
+order: 4000

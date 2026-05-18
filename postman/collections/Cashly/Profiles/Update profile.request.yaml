@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/api/profile"
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+        "currency": "EUR", // will use a lookup table for the symbol
+        "budget": 200, 
+        "budgetPeriod": "monthly" // monthly, yearly, weekly
+    }
+order: 2000

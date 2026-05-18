@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/api/transactions/import"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: file
+      src: []
+      description: This is either an xlsx, csv or json file to import.
+    - type: text
+      key: type
+      value: xlsx
+order: 1000

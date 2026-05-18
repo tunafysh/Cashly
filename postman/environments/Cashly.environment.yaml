@@ -1,0 +1,11 @@
+name: Cashly
+values:
+  - key: categoryId
+    value: ''
+    enabled: true
+  - key: transactionId
+    value: ''
+    enabled: true
+  - key: base_url
+    value: ''
+    enabled: true

@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{base_url}}/api/transactions/export"
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "file": "json", // can be json, csv or xlsx
+        "colors": "00FF00:000000:FF0000" // syntax: primary:muted:destructive
+    }
+order: 1000

@@ -1,0 +1,26 @@
+$kind: http-request
+description: Retrieves all categories belonging to the authenticated user. Sends
+  a `GET` request to `/api/categories` with no request body. The response
+  returns an array of category objects, each containing the category `id`,
+  `userId`, `name`, and `color`.
+url: "{{base_url}}/api/categories"
+method: GET
+auth:
+  type: jwt
+  credentials:
+    algorithm: HS256
+    isSecretBase64Encoded: false
+    payload: "{}"
+    addTokenTo: header
+    headerPrefix: Bearer
+    queryParamKey: token
+    header: "{}"
+scripts:
+  - type: afterResponse
+    code: |-
+      const json = pm.response.json();
+
+      pm.environment.set("categoryId", json.category[0].id);
+      console.log("Saved category id: " + pm.environment.get("categoryId"));
+    language: text/javascript
+order: 2000

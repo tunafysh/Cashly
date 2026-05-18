@@ -1,0 +1,28 @@
+$kind: collection
+name: Cashly
+description: >-
+  ### What's this?
+
+
+  this is the postman collection of the APIs and other stuff for Cashly, my
+  finance management application for uni.
+
+
+  ### How do i use this?
+
+
+  To use said APIs you have to be logged in either by SSO or normal way w/
+  username, email and password in [here](https://usecashly.vercel.app/login).
+  You can do this in a browser **WITH** Postman Interceptor to get the necessary
+  cookies. This is the recommended way to get the cookies but of course you can
+  do the manual way by going to DevTools, whatever tickles your fancy.
+
+
+  ### Small preparation
+
+
+  You NEED to create a new environment because i made the variables like the
+  categoryId automatically in the create transaction because for convenience
+  reasons. So on the top right please create a new environment and select said
+  environment or in the second tab in the left sidebar, again it all boils down
+  to preference.
