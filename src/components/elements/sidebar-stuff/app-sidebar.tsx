@@ -21,6 +21,7 @@ import {
   TrendingUpIcon,
   BadgeCentIcon,
   Settings2Icon,
+  UnplugIcon,
 } from "lucide-react";
 import { Skeleton } from "../../ui/skeleton";
 import { Suspense } from "react";
@@ -50,6 +51,12 @@ const data = {
       url: "/app/budget",
       icon: <TrendingUpIcon className="size-4" />,
       description: "Budget planning",
+    },
+    {
+      title: "MCP Tokens",
+      url: "/app/mcp-tokens",
+      icon: <UnplugIcon className="size-4" />,
+      description: "Manage MCP tokens",
     },
   ],
   navSecondary: [
