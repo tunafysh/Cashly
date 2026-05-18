@@ -43,9 +43,10 @@ export function BudgetModifier() {
   function onClick(adjustment: number) {
     const currentGoal = goal ?? 0
     const newGoal = Math.max(0, currentGoal + adjustment)
-    setGoal(newGoal)
-    setInputValue(newGoal.toString())
-    handleSaveBudget(newGoal)
+    const rounded = Math.round(newGoal * 100) / 100
+    setGoal(rounded)
+    setInputValue(rounded.toString())
+    handleSaveBudget(rounded)
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -78,7 +79,7 @@ export function BudgetModifier() {
   }
 
   function handleInputBlur() {
-    const num = parseInt(inputValue, 10)
+    const num = parseFloat(inputValue)
     if (isNaN(num)) {
       setInputValue(goal?.toString() || "")
       setIsEditing(false)
@@ -89,9 +90,10 @@ export function BudgetModifier() {
       setInputValue("")
       handleSaveBudget(null)
     } else {
-      setGoal(num)
-      setInputValue(num.toString())
-      handleSaveBudget(num)
+      const rounded = Math.round(num * 100) / 100
+      setGoal(rounded)
+      setInputValue(rounded.toString())
+      handleSaveBudget(rounded)
     }
     setIsEditing(false)
   }
@@ -151,11 +153,12 @@ export function BudgetModifier() {
             <Input
               autoFocus
               type="number"
+              step="0.01"
               value={inputValue}
               onChange={handleInputChange}
               onBlur={handleInputBlur}
               onKeyDown={handleKeyDown}
-              className="w-24 text-center text-4xl font-bold"
+              className="w-32 text-center text-3xl font-bold"
               min="0"
               disabled={isLoading}
             />
@@ -164,8 +167,15 @@ export function BudgetModifier() {
               onClick={() => !isLoading && setIsEditing(true)}
               className={isLoading ? "cursor-not-allowed text-center" : "cursor-pointer text-center"}
             >
-              <div className="text-5xl font-bold tracking-tighter">
-                {goal === null || goal === 0 ? "—" : goal}
+              <div className="flex items-baseline justify-center gap-1">
+                <div className="text-5xl font-bold tracking-tighter">
+                  {goal === null || goal === 0 ? "—" : Math.floor(goal!)}
+                </div>
+                {goal && goal > Math.floor(goal) && (
+                  <div className="text-sm font-semibold text-muted-foreground">
+                    {String((goal * 100) % 100).padStart(2, "0")}
+                  </div>
+                )}
               </div>
               <div className="text-xs text-muted-foreground uppercase">
                 {isLoading ? "Saving..." : "Click to edit"}
