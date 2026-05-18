@@ -28,7 +28,7 @@ export default async function AppRootLayout({
     console.error("Failed to load profile:", error);
   }
 
-  const title =
+  let title =
     pathname
       .split("/")
       .filter(Boolean) // removes empty parts
@@ -36,6 +36,11 @@ export default async function AppRootLayout({
       ?.replace(/-/g, " ") // optional: "user-settings" → "user settings"
       .replace(/\b\w/g, (c) => c.toUpperCase()) ?? // capitalize
     "Home";
+
+    if (title.split(" ")[0].toLowerCase() === "Mcp") {
+      title = "MCP Tokens";
+    }
+
 
   return (
     <Providers profile={profile} session={session}>
