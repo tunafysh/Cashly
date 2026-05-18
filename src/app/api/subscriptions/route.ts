@@ -34,13 +34,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { name, amount, type, nextBillingAt } = await req.json();
+  const { name, amount, type } = await req.json();
 
-  if (!name || !amount || !type || !nextBillingAt) {
+  if (!name || !amount || !type ) {
     return NextResponse.json(
       { error: "Missing required fields" },
       { status: 400 },
     );
+  }
+
+  const nextBillingAt = new Date();
+  if (type === "monthly") {
+    nextBillingAt.setMonth(nextBillingAt.getMonth() + 1);
+  } else if (type === "yearly") {
+    nextBillingAt.setFullYear(nextBillingAt.getFullYear() + 1);
   }
 
   const subscription = await createSubscription({
@@ -48,7 +55,7 @@ export async function POST(req: NextRequest) {
     name,
     amount,
     type,
-    nextBillingAt: new Date(nextBillingAt),
+    nextBillingAt: nextBillingAt,
   });
 
   return NextResponse.json({ subscription });
