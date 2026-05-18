@@ -33,7 +33,7 @@ import {
   useReactTable,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-import { Loader2, Trash2, Plus, X, RotateCw } from "lucide-react";
+import { Loader2, Trash2, Plus, X, Pencil } from "lucide-react";
 import { useEffect, useState, useMemo, useTransition } from "react";
 import {
   Dialog,
@@ -63,22 +63,6 @@ async function deleteSubscription(id: string) {
     });
     if (!response.ok) {
       throw new Error("Failed to delete subscription");
-    }
-    return true;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
-async function renewSubscription(id: string) {
-  try {
-    const response = await fetch(`/api/subscriptions/renew`, {
-      method: "POST",
-      body: JSON.stringify({ id: id }),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to renew subscription");
     }
     return true;
   } catch (err) {
@@ -149,48 +133,50 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
   );
 }
 
-interface RenewButtonProps {
-  id: string;
-  onRenew: () => void;
+interface EditButtonProps {
+  subscription: Subscription;
+  onEdit: () => void;
 }
 
-function RenewButton({ id, onRenew }: RenewButtonProps) {
-  const [renewing, setRenewing] = useState(false);
+function EditButton({ subscription, onEdit }: EditButtonProps) {
+  const [open, setOpen] = useState(false);
 
-  const handleRenew = async () => {
-    try {
-      setRenewing(true);
-      await renewSubscription(id);
-      onRenew();
-    } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Failed to renew subscription",
-      );
-      setRenewing(false);
-    }
+  const handleEditSuccess = () => {
+    setOpen(false);
+    onEdit();
   };
 
   return (
-    <Button
-      size="sm"
-      variant="ghost"
-      className="hover:bg-primary/10 hover:text-primary"
-      onClick={handleRenew}
-      disabled={renewing}
-    >
-      {renewing ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        <RotateCw className="w-4 h-4" />
-      )}
-    </Button>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="hover:bg-primary/10 hover:text-primary"
+        >
+          <Pencil className="h-4 w-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogPortal>
+        <DialogOverlay />
+        <DialogContent className="sm:max-w-106.25">
+          <DialogHeader>
+            <DialogTitle>Edit Subscription</DialogTitle>
+          </DialogHeader>
+          <SubscriptionForm
+            subscription={subscription}
+            onSuccess={handleEditSuccess}
+          />
+        </DialogContent>
+      </DialogPortal>
+    </Dialog>
   );
 }
 
 const subscriptionColumns = (
   currency: string,
   onDelete: (id: string) => void,
-  onRenew: () => void,
+  onEdit: () => void,
 ): ColumnDef<Subscription>[] => [
   {
     accessorKey: "name",
@@ -247,30 +233,32 @@ const subscriptionColumns = (
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const id: string = row.original.id;
+      const subscription = row.original;
       return (
         <div className="flex gap-1">
-          <RenewButton id={id} onRenew={onRenew} />
-          <DeleteButton id={id} onDelete={onDelete} />
+          <EditButton subscription={subscription} onEdit={onEdit} />
+          <DeleteButton id={subscription.id} onDelete={onDelete} />
         </div>
       );
     },
   },
 ];
 
-interface CreateSubscriptionFormProps {
+interface SubscriptionFormProps {
   onSuccess: () => void;
+  subscription?: Subscription;
 }
 
-function CreateSubscriptionForm({
+function SubscriptionForm({
   onSuccess,
-}: CreateSubscriptionFormProps) {
+  subscription,
+}: SubscriptionFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: "",
-    amount: "",
-    type: "monthly" as "monthly" | "yearly",
+    name: subscription?.name || "",
+    amount: subscription?.amount?.toString() || "",
+    type: (subscription?.type as "monthly" | "yearly") || ("monthly" as "monthly" | "yearly"),
   });
 
   const handleSubmit = async (e: React.SubmitEvent) => {
@@ -287,10 +275,12 @@ function CreateSubscriptionForm({
         throw new Error("Please enter a valid amount");
       }
 
+      const isEditing = !!subscription;
       const response = await fetch("/api/subscriptions", {
-        method: "POST",
+        method: isEditing ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          ...(isEditing && { id: subscription.id }),
           name: formData.name,
           amount: parseFloat(formData.amount),
           type: formData.type,
@@ -298,10 +288,12 @@ function CreateSubscriptionForm({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create subscription");
+        throw new Error(isEditing ? "Failed to update subscription" : "Failed to create subscription");
       }
 
-      setFormData({ name: "", amount: "", type: "monthly" });
+      if (!isEditing) {
+        setFormData({ name: "", amount: "", type: "monthly" });
+      }
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -367,10 +359,10 @@ function CreateSubscriptionForm({
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
+              {subscription ? "Updating..." : "Creating..."}
             </>
           ) : (
-            "Create Subscription"
+            subscription ? "Update Subscription" : "Create Subscription"
           )}
         </Button>
       </DialogFooter>
@@ -431,7 +423,7 @@ export default function SubscriptionsTable() {
     setSubscriptions((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const handleRenew = () => {
+  const handleEdit = () => {
     fetchSubscriptions();
   };
 
@@ -451,7 +443,7 @@ export default function SubscriptionsTable() {
   const columns = subscriptionColumns(
     profile?.currency || "USD",
     handleDelete,
-    handleRenew
+    handleEdit
   );
   const table = useReactTable({
     data: filteredSubscriptions,
@@ -483,7 +475,7 @@ export default function SubscriptionsTable() {
                 <DialogHeader>
                   <DialogTitle>Create Subscription</DialogTitle>
                 </DialogHeader>
-                <CreateSubscriptionForm
+                <SubscriptionForm
                   onSuccess={handleCreateSuccess}
                 />
               </DialogContent>
