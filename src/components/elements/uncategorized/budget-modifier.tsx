@@ -23,17 +23,17 @@ const BUDGET_VARIANTS = [
 
 export function BudgetModifier() {
   const { profile, updateProfile } = useProfile()
-  const [goal, setGoal] = React.useState(() => Number(profile?.budget) || 350)
+  const [goal, setGoal] = React.useState<number | null>(() => profile?.budget ? Number(profile.budget) : null)
   const [isEditing, setIsEditing] = React.useState(false)
-  const [inputValue, setInputValue] = React.useState(goal.toString())
+  const [inputValue, setInputValue] = React.useState(goal?.toString() || "")
   const [variant, setVariant] = React.useState(profile?.budgetPeriod || "monthly")
   const [isLoading, setIsLoading] = React.useState(false)
 
   React.useEffect(() => {
-    if (profile?.budget) {
-      const budgetNum = Number(profile.budget)
+    if (profile?.budget !== undefined) {
+      const budgetNum = profile.budget ? Number(profile.budget) : null
       setGoal(budgetNum)
-      setInputValue(budgetNum.toString())
+      setInputValue(budgetNum?.toString() || "")
     }
     if (profile?.budgetPeriod) {
       setVariant(profile.budgetPeriod)
@@ -41,7 +41,8 @@ export function BudgetModifier() {
   }, [profile?.budget, profile?.budgetPeriod])
 
   function onClick(adjustment: number) {
-    const newGoal = Math.max(200, Math.min(400, goal + adjustment))
+    const currentGoal = goal ?? 0
+    const newGoal = Math.max(0, currentGoal + adjustment)
     setGoal(newGoal)
     setInputValue(newGoal.toString())
     handleSaveBudget(newGoal)
@@ -51,10 +52,11 @@ export function BudgetModifier() {
     setInputValue(e.target.value)
   }
 
-  function handleSaveBudget(budgetValue: number) {
+  function handleSaveBudget(budgetValue: number | null) {
     if (isLoading || !updateProfile) return
     setIsLoading(true)
-    updateProfile({ budget: budgetValue })
+    const valueToSave = budgetValue !== null ? budgetValue : null
+    updateProfile({ budget: valueToSave })
       .catch((error) => {
         console.error("Failed to update budget:", error)
       })
@@ -77,11 +79,19 @@ export function BudgetModifier() {
 
   function handleInputBlur() {
     const num = parseInt(inputValue, 10)
-    if (!isNaN(num) && num >= 200 && num <= 400) {
-      setGoal(num)
-      handleSaveBudget(num)
+    if (isNaN(num)) {
+      setInputValue(goal?.toString() || "")
+      setIsEditing(false)
+      return
+    }
+    if (num < 0) {
+      setGoal(null)
+      setInputValue("")
+      handleSaveBudget(null)
     } else {
-      setInputValue(goal.toString())
+      setGoal(num)
+      setInputValue(num.toString())
+      handleSaveBudget(num)
     }
     setIsEditing(false)
   }
@@ -90,7 +100,7 @@ export function BudgetModifier() {
     if (e.key === "Enter") {
       handleInputBlur()
     } else if (e.key === "Escape") {
-      setInputValue(goal.toString())
+      setInputValue(goal?.toString() || "0")
       setIsEditing(false)
     }
   }
@@ -131,7 +141,7 @@ export function BudgetModifier() {
             size="icon"
             className="h-10 w-10 shrink-0 rounded-full"
             onClick={() => onClick(-10)}
-            disabled={goal <= 200 || isLoading}
+            disabled={(goal ?? 0) <= 0 || isLoading}
           >
             <Minus className="h-4 w-4" />
             <span className="sr-only">Decrease</span>
@@ -146,8 +156,7 @@ export function BudgetModifier() {
               onBlur={handleInputBlur}
               onKeyDown={handleKeyDown}
               className="w-24 text-center text-4xl font-bold"
-              min="200"
-              max="400"
+              min="0"
               disabled={isLoading}
             />
           ) : (
@@ -156,7 +165,7 @@ export function BudgetModifier() {
               className={isLoading ? "cursor-not-allowed text-center" : "cursor-pointer text-center"}
             >
               <div className="text-5xl font-bold tracking-tighter">
-                {goal}
+                {goal === null || goal === 0 ? "—" : goal}
               </div>
               <div className="text-xs text-muted-foreground uppercase">
                 {isLoading ? "Saving..." : "Click to edit"}
@@ -169,7 +178,7 @@ export function BudgetModifier() {
             size="icon"
             className="h-10 w-10 shrink-0 rounded-full"
             onClick={() => onClick(10)}
-            disabled={goal >= 400 || isLoading}
+            disabled={isLoading}
           >
             <Plus className="h-4 w-4" />
             <span className="sr-only">Increase</span>
