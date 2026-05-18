@@ -147,13 +147,11 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     const mcpServer = createMcpServer();
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined, // Stateless: no session management
+      enableJsonResponse: true, // Use JSON responses instead of SSE for stateless mode
     });
 
     // Connect server to transport
     await mcpServer.connect(transport);
-
-    // Get raw request body for transport
-    const body = await req.json();
 
     // Use transport's built-in request handler
     // This handles all JSON-RPC routing automatically
@@ -177,43 +175,21 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
 
 /**
  * GET handler for SSE (Server-Sent Events) streaming.
- * Required by MCP Streamable HTTP transport for bi-directional communication.
+ * Not needed for stateless JSON responses - returns 405 Method Not Allowed.
+ * For session-based streaming, implement session management via sessionIdGenerator.
  */
-export async function GET(req: NextRequest): Promise<Response> {
-  // Authenticate request
-  const userId = await authenticateRequest(req);
-  if (!userId) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  // Set user context for tools
-  global.mcpCurrentUserId = userId;
-
-  try {
-    // Create a fresh server and transport for this SSE stream
-    const mcpServer = createMcpServer();
-    const transport = new WebStandardStreamableHTTPServerTransport({
-      sessionIdGenerator: undefined, // Stateless: no session management
-    });
-
-    // Connect server to transport
-    await mcpServer.connect(transport);
-
-    // Use transport's built-in request handler for SSE
-    const response = await transport.handleRequest(req as unknown as Request);
-
-    return response;
-  } catch (error) {
-    console.error("MCP GET (SSE) error:", error);
-    return new Response(
-      JSON.stringify({
-        jsonrpc: "2.0",
-        error: { code: -32603, message: "Internal server error" },
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  } finally {
-    // Clean up user context
-    global.mcpCurrentUserId = null;
-  }
+export async function GET(_req: NextRequest): Promise<Response> {
+  return new Response(
+    JSON.stringify({
+      jsonrpc: "2.0",
+      error: { code: -32601, message: "Method not allowed. Use POST for JSON-RPC requests." },
+    }),
+    { 
+      status: 405,
+      headers: { 
+        "Content-Type": "application/json",
+        "Allow": "POST",
+      } 
+    }
+  );
 }
