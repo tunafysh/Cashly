@@ -28,7 +28,7 @@ export function NavMain({
             <Button
               asChild
               size="sm"
-              className="w-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:bg-primary/80"
+              className="w-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:bg-primary/80 mt-8"
             >
               <a href="/app/dashboard" className="flex items-center gap-2">
                 <CirclePlusIcon className="size-4" />
