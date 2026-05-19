@@ -388,6 +388,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse | Response>
 
 export async function OPTIONS(): Promise<Response> {
   // CORS preflight is intentionally unauthenticated; actual MCP methods are authenticated in handleMcpRequest.
+  // MCP-Protocol-Version, MCP-Session-Id, and Last-Event-ID are required by Streamable HTTP clients (protocol negotiation/session/SSE resume).
   return new Response(
     null,
     {
