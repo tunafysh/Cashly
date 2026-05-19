@@ -387,25 +387,84 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
   global.mcpCurrentUserId = userId;
 
   try {
-    // Create a fresh server for this request
-    const mcpServer = createMcpServer();
+    console.log("[MCP] ========== NEW REQUEST ==========");
+    
+    // Log request details
+    const bodyText = await req.text();
+    let method = "unknown";
+    try {
+      const body = JSON.parse(bodyText);
+      method = body.method || "unknown";
+      console.log(`[MCP] Method: ${method}`);
+      console.log(`[MCP] ID: ${body.id}`);
+      console.log(`[MCP] Params: ${JSON.stringify(body.params)}`);
+    } catch (e) {
+      console.log("[MCP] Could not parse body");
+    }
 
-    // Create transport - let it handle request parsing
+    // Create server
+    console.log("[MCP] Creating McpServer...");
+    const mcpServer = createMcpServer();
+    console.log("[MCP] McpServer created");
+
+    // Create transport
+    console.log("[MCP] Creating WebStandardStreamableHTTPServerTransport...");
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });
+    console.log("[MCP] Transport created");
 
-    // Connect server to transport - this sets up all the message handlers
+    // Connect server to transport
+    console.log("[MCP] Connecting server to transport...");
     await mcpServer.connect(transport);
+    console.log("[MCP] Server connected to transport");
 
-    // Pass the request directly to the transport
-    // It will parse the JSON-RPC message and route it appropriately
-    const response = await transport.handleRequest(req as unknown as Request);
+    // Create new request with body
+    console.log("[MCP] Creating new Request object...");
+    const newReq = new Request(req.url, {
+      method: req.method,
+      headers: req.headers,
+      body: bodyText,
+    });
+
+    // Handle request
+    console.log(`[MCP] Calling transport.handleRequest() for method: ${method}...`);
+    const response = await transport.handleRequest(newReq as any);
+    
+    // Try to inspect response
+    try {
+      const cloned = response.clone();
+      const responseText = await cloned.text();
+      const parsed = JSON.parse(responseText);
+      
+      if (method === "tools/list") {
+        const toolCount = parsed.result?.tools?.length || 0;
+        console.log(`[MCP] tools/list response contains ${toolCount} tools`);
+        if (toolCount > 0) {
+          console.log(`[MCP] Tools: ${parsed.result.tools.map((t: any) => t.name).join(", ")}`);
+        }
+      } else if (parsed.result) {
+        console.log(`[MCP] Response result type: ${typeof parsed.result}`);
+      }
+      
+      if (parsed.error) {
+        console.log(`[MCP] Response error: ${JSON.stringify(parsed.error)}`);
+      }
+    } catch (inspectErr) {
+      console.log("[MCP] Could not inspect response body");
+    }
+
+    console.log(`[MCP] Responding to ${method} with status 200`);
+    console.log("[MCP] ========== END REQUEST ==========");
 
     return response as unknown as NextResponse;
   } catch (error) {
+    console.error("[MCP] !!!!! REQUEST ERROR !!!!!");
     console.error("[MCP] Error:", error);
+    console.error("[MCP] Stack:", error instanceof Error ? error.stack : "no stack");
+    console.log("[MCP] ========== END REQUEST (ERROR) ==========");
+    
     return new NextResponse(
       JSON.stringify({
         jsonrpc: "2.0",
