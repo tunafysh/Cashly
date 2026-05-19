@@ -7,6 +7,7 @@ import * as z from "zod/v4";
 import type { CallToolResult } from "@modelcontextprotocol/server";
 import {
   createTransaction,
+  deleteTransaction,
   getSummary,
   getUserTransactions,
 } from "@/db/queries/transactions";
@@ -14,10 +15,18 @@ import { Category, Subscription, Transaction } from "@/lib/types";
 import {
   createCategory,
   createCategoryWithoutColor,
+  deleteCategory,
+  getCategoryById,
   getCategoryByName,
   getUserCategories,
+  updateCategory,
 } from "@/db/queries/categories";
-import { createSubscription, getUserSubscriptions } from "@/db/queries/subscriptions";
+import {
+  createSubscription,
+  deleteSubscription,
+  getUserSubscriptions,
+  updateSubscription,
+} from "@/db/queries/subscriptions";
 import { sub } from "date-fns/sub";
 import { getBudget, setBudget } from "@/db/queries/profiles";
 
@@ -52,16 +61,19 @@ function createMcpServer(): McpServer {
           .describe("Number of transactions to skip"),
       }),
     },
-    async (args: { limit?: number; offset?: number }): Promise<CallToolResult> => {
+    async (args: {
+      limit?: number;
+      offset?: number;
+    }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
 
       const transactions = (
-        await getUserTransactions(
-          global.mcpCurrentUserId,
-          { limit: args.limit, offset: args.offset },
-        )
+        await getUserTransactions(global.mcpCurrentUserId, {
+          limit: args.limit,
+          offset: args.offset,
+        })
       ).map((data) => ({
         ...data,
         amount: parseFloat(data.amount.toString()),
@@ -82,7 +94,10 @@ function createMcpServer(): McpServer {
         amount: z.number().describe("Transaction amount"),
         type: z.enum(["income", "expense"]).describe("Transaction type"),
         description: z.string().optional().describe("Transaction description"),
-        createdAt: z.string().optional().describe("Transaction date (ISO format)"),
+        createdAt: z
+          .string()
+          .optional()
+          .describe("Transaction date (ISO format)"),
         categoryName: z.string().describe("Category name"),
       }),
     },
@@ -117,6 +132,37 @@ function createMcpServer(): McpServer {
       return {
         content: [],
         structuredContent: { transaction },
+      };
+    },
+  );
+
+  server.registerTool(
+    "delete_transaction",
+    {
+      description: "Delete a transaction specified by id.",
+      inputSchema: z.object({
+        id: z
+          .string()
+          .describe(
+            "Id of the specified transaction. you can get this by running the get_transactions tool.",
+          ),
+      }),
+    },
+    async (args: { id: string }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const deletedTransaction = await deleteTransaction(
+        global.mcpCurrentUserId,
+        args.id,
+      );
+      return {
+        content: [],
+        structuredContent: {
+          message: "Transaction deleted.",
+          deletedTransaction,
+        },
       };
     },
   );
@@ -171,6 +217,89 @@ function createMcpServer(): McpServer {
       return {
         content: [],
         structuredContent: { category },
+      };
+    },
+  );
+
+  server.registerTool(
+    "update_category",
+    {
+      description: "Updates a category's information like the name and color",
+      inputSchema: z.object({
+        id: z.string().describe("The id of the category to modify/update."),
+        name: z
+          .string()
+          .optional()
+          .describe("The modified name of the category. (optional)"),
+        color: z
+          .string()
+          .optional()
+          .describe(
+            "The modified color of the category. (optional, HEX value)",
+          ),
+      }),
+    },
+    async (args: {
+      id: string;
+      name?: string;
+      color?: string;
+    }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      let originalCategory = await getCategoryById(
+        global.mcpCurrentUserId,
+        args.id,
+      );
+
+      if (!originalCategory) {
+        throw new Error("Category does not exist.");
+      }
+
+      let data = {
+        name: args.name ? args.name : originalCategory?.name,
+        color: args.color ? args.color : originalCategory?.color,
+      };
+
+      const updatedCategory = updateCategory(
+        global.mcpCurrentUserId,
+        args.id,
+        data.name,
+        data.color,
+      );
+
+      return {
+        content: [],
+        structuredContent: {
+          message: "Category updated.",
+          updatedCategory,
+        },
+      };
+    },
+  );
+
+  server.registerTool(
+    "delete_category",
+    {
+      description: "Deletes a specified category using said category's id.",
+      inputSchema: z.object({
+        id: z.string().describe("The id of the category to delete."),
+      }),
+    },
+    async (args: { id: string }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const deletedCategory = deleteCategory(global.mcpCurrentUserId, args.id);
+
+      return {
+        content: [],
+        structuredContent: {
+          message: "Category deleted.",
+          deletedCategory,
+        },
       };
     },
   );
@@ -237,13 +366,98 @@ function createMcpServer(): McpServer {
         content: [],
         structuredContent: { subscription },
       };
-    }
+    },
+  );
+
+  server.registerTool(
+    "update_subscription",
+    {
+      description: "Update a subscription specified by id.",
+      inputSchema: z.object({
+        id: z.string().describe("The id of the subscription to modify"),
+        name: z
+          .string()
+          .optional()
+          .describe("The name of the subscription to modify"),
+        amount: z
+          .number()
+          .optional()
+          .describe("The amount of money of the subscription to modify"),
+        type: z
+          .enum(["monthly", "yearly"])
+          .optional()
+          .describe(
+            "The type of the subscription to modify (monthly or yearly)",
+          ),
+      }),
+    },
+    async (args: {
+      id: string;
+      name?: string;
+      amount?: number;
+      type?: "monthly" | "yearly";
+    }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const data = {
+        name: args.name,
+        amount: args.amount,
+        type: args.type,
+      };
+
+      const updatedSubscription = await updateSubscription(
+        global.mcpCurrentUserId,
+        args.id,
+        data,
+      );
+
+      return {
+        content: [],
+        structuredContent: {
+          message: "Subscription updated.",
+          updatedSubscription,
+        },
+      };
+    },
+  );
+
+  server.registerTool(
+    "delete_subscription",
+    {
+      description: "Delete a subscription specified by an id.",
+      inputSchema: z.object({
+        id: z
+          .string()
+          .describe("The id of the specified subscription to delete."),
+      }),
+    },
+    async (args: { id: string }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const deletedSubscription = deleteSubscription(
+        args.id,
+        global.mcpCurrentUserId,
+      );
+
+      return {
+        content: [],
+        structuredContent: {
+          message: "Subscription deleted.",
+          deletedSubscription,
+        },
+      };
+    },
   );
 
   server.registerTool(
     "get_budget",
     {
-      description: "Get current budget information (amount and period)",
+      description:
+        "Get current budget information (amount and period). If budget is null it means it's not enabled. ",
       inputSchema: z.object({}),
     },
     async (): Promise<CallToolResult> => {
@@ -257,7 +471,7 @@ function createMcpServer(): McpServer {
         content: [],
         structuredContent: budget || {},
       };
-    }
+    },
   );
 
   server.registerTool(
@@ -265,25 +479,35 @@ function createMcpServer(): McpServer {
     {
       description: "Set current budget information (amount and period)",
       inputSchema: z.object({
-        amount: z.number().describe("New budget amount"),
-        period: z.enum(["yearly", "monthly"]).describe("Budget period, (yearly or monthly)"),
+        amount: z
+          .number()
+          .nullable()
+          .describe("New budget amount, null to disable budget entirely."),
+        period: z
+          .enum(["yearly", "monthly"])
+          .nullable()
+          .describe("Budget period, (yearly or monthly)."),
       }),
     },
     async (args: {
-      amount: number;
-      period: "yearly" | "monthly";
+      amount: number | null;
+      period: "yearly" | "monthly" | null;
     }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
-        throw new Error("User context not available"); 
+        throw new Error("User context not available");
       }
 
-      const response = await setBudget(global.mcpCurrentUserId, args.amount, args.period);
+      const response = await setBudget(
+        global.mcpCurrentUserId,
+        args.amount ?? undefined,
+        args.period ?? "monthly",
+      );
 
       return {
         content: [],
         structuredContent: { response },
-      };  
-    }
+      };
+    },
   );
 
   server.registerTool(
@@ -341,7 +565,9 @@ async function authenticateRequest(req: NextRequest): Promise<string | null> {
  * Shared MCP request handler for Streamable HTTP.
  * Supports GET/POST/DELETE by delegating method handling to the MCP transport.
  */
-async function handleMcpRequest(req: NextRequest): Promise<NextResponse | Response> {
+async function handleMcpRequest(
+  req: NextRequest,
+): Promise<NextResponse | Response> {
   // Authenticate request
   const userId = await authenticateRequest(req);
   if (!userId) {
@@ -358,7 +584,9 @@ async function handleMcpRequest(req: NextRequest): Promise<NextResponse | Respon
     });
 
     await mcpServer.connect(transport);
-    return (await transport.handleRequest(req as unknown as Request)) as unknown as NextResponse;
+    return (await transport.handleRequest(
+      req as unknown as Request,
+    )) as unknown as NextResponse;
   } catch (error) {
     console.error("[MCP] Request error:", error);
     return new NextResponse(
@@ -385,23 +613,22 @@ export async function GET(req: NextRequest): Promise<NextResponse | Response> {
   return handleMcpRequest(req);
 }
 
-export async function DELETE(req: NextRequest): Promise<NextResponse | Response> {
+export async function DELETE(
+  req: NextRequest,
+): Promise<NextResponse | Response> {
   return handleMcpRequest(req);
 }
 
 export async function OPTIONS(): Promise<Response> {
   // CORS preflight is intentionally unauthenticated; actual MCP methods are authenticated in handleMcpRequest.
   // MCP-Protocol-Version, MCP-Session-Id, and Last-Event-ID are required by Streamable HTTP clients (protocol negotiation/session/SSE resume).
-  return new Response(
-    null,
-    {
-      status: 204,
-      headers: {
-        Allow: "GET, POST, DELETE, OPTIONS",
-        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Authorization, Content-Type, Accept, MCP-Protocol-Version, MCP-Session-Id, Last-Event-ID",
-      },
+  return new Response(null, {
+    status: 204,
+    headers: {
+      Allow: "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers":
+        "Authorization, Content-Type, Accept, MCP-Protocol-Version, MCP-Session-Id, Last-Event-ID",
     },
-  );
+  });
 }

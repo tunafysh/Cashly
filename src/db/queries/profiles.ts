@@ -55,7 +55,9 @@ export type UserProfile = {
   budgetPeriod: string;
 };
 
-export async function getBudget(userId: string): Promise<{ budget: number | null; budgetPeriod: string } | null> {
+export async function getBudget(
+  userId: string,
+): Promise<{ budget: number | null; budgetPeriod: string } | null> {
   const profile = await getUserProfile(userId);
   if (!profile) {
     return null;
@@ -66,7 +68,11 @@ export async function getBudget(userId: string): Promise<{ budget: number | null
   };
 }
 
-export async function setBudget(userId: string, budget: number | undefined, budgetPeriod: string) {
+export async function setBudget(
+  userId: string,
+  budget: number | undefined,
+  budgetPeriod: string,
+) {
   await updateUserProfile(userId, {
     budget,
     budgetPeriod,

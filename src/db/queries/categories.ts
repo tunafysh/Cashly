@@ -39,6 +39,16 @@ export async function getCategoryByName(userId: string, name: string) {
   return result.length > 0 ? result[0] : null;
 }
 
+export async function getCategoryById(userId: string, id: string) {
+  const result = await db
+    .select()
+    .from(categories)
+    .where(and(eq(categories.userId, userId), eq(categories.id, id)))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+}
+
 export async function createCategory({
   userId,
   name,

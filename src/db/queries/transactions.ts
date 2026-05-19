@@ -170,7 +170,11 @@ export async function deleteTransaction(userId: string, transactionId: string) {
     .returning();
 }
 
-export async function getSummary(userId: string, fromDate?: Date, toDate?: Date) {
+export async function getSummary(
+  userId: string,
+  fromDate?: Date,
+  toDate?: Date,
+) {
   const conditions = [eq(transactions.userId, userId)];
 
   if (fromDate) {
@@ -188,9 +192,8 @@ export async function getSummary(userId: string, fromDate?: Date, toDate?: Date)
   const transaction = await db
     .select()
     .from(transactions)
-    .where(and(...conditions))
+    .where(and(...conditions));
 
-  
   const result = transaction.reduce(
     (acc, tx) => {
       if (tx.type === "income") {
