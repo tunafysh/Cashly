@@ -314,17 +314,11 @@ function createMcpServer(): McpServer {
  * Returns null if authentication fails.
  */
 async function authenticateRequest(req: NextRequest): Promise<string | null> {
-  // Try token-based auth first (Authorization header, x-api-key, or query param)
+  // Try token-based auth first (Authorization header or x-api-key)
   const authHeader = req.headers.get("Authorization");
-  const bearerToken =
-    authHeader?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() ?? null;
+  const bearerToken = authHeader?.match(/^Bearer\s+(\S+)$/i)?.[1] ?? null;
   const headerToken = req.headers.get("x-api-key")?.trim() || null;
-  const url = new URL(req.url);
-  const queryToken =
-    url.searchParams.get("token")?.trim() ||
-    url.searchParams.get("access_token")?.trim() ||
-    null;
-  const token = bearerToken || headerToken || queryToken;
+  const token = bearerToken || headerToken;
 
   if (token) {
     const mcpToken = await validateMCPToken(token);
