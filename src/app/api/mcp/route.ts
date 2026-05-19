@@ -1,4 +1,4 @@
-import { McpServer, isInitializeRequest } from "@modelcontextprotocol/server";
+import { McpServer } from "@modelcontextprotocol/server";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/server";
 import { auth } from "@/lib/auth";
 import { validateMCPToken } from "@/db/queries/mcp-tokens";
@@ -314,15 +314,21 @@ function createMcpServer(): McpServer {
  * Returns null if authentication fails.
  */
 async function authenticateRequest(req: NextRequest): Promise<string | null> {
-  // Try Bearer token auth first
+  // Try token-based auth first (Authorization header, x-api-key, or query param)
   const authHeader = req.headers.get("Authorization");
-  if (authHeader?.startsWith("Bearer ")) {
-    const token = authHeader.slice(7);
-    const mcpToken = await validateMCPToken(token);
+  const bearerToken =
+    authHeader?.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() ?? null;
+  const headerToken = req.headers.get("x-api-key")?.trim() || null;
+  const url = new URL(req.url);
+  const queryToken =
+    url.searchParams.get("token")?.trim() ||
+    url.searchParams.get("access_token")?.trim() ||
+    null;
+  const token = bearerToken || headerToken || queryToken;
 
-    if (mcpToken) {
-      return mcpToken.userId;
-    }
+  if (token) {
+    const mcpToken = await validateMCPToken(token);
+    if (mcpToken) return mcpToken.userId;
   }
 
   // Fall back to NextAuth session
