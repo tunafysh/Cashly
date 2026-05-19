@@ -388,6 +388,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse | Response>
 }
 
 export async function OPTIONS(): Promise<Response> {
+  // CORS preflight must not require auth headers/cookies.
   return new Response(
     null,
     {
