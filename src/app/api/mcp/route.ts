@@ -389,6 +389,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse | Response>
 
 export async function OPTIONS(): Promise<Response> {
   return new Response(
+    null,
     {
       status: 204,
       headers: {
