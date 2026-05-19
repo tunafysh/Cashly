@@ -81,7 +81,7 @@ function createMcpServer(): McpServer {
         amount: z.number().describe("Transaction amount"),
         type: z.enum(["income", "expense"]).describe("Transaction type"),
         description: z.string().optional().describe("Transaction description"),
-        createdAt: z.date().optional().describe("Transaction date"),
+        createdAt: z.string().optional().describe("Transaction date (ISO format)"),
         categoryName: z.string().describe("Category name"),
       }),
     },
@@ -89,7 +89,7 @@ function createMcpServer(): McpServer {
       amount: number;
       type: "income" | "expense";
       description?: string;
-      createdAt?: Date;
+      createdAt?: string;
       categoryName: string;
     }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
@@ -110,7 +110,7 @@ function createMcpServer(): McpServer {
         type: args.type,
         categoryId: category.id,
         description: args.description,
-        createdAt: args.createdAt,
+        createdAt: args.createdAt ? new Date(args.createdAt) : undefined,
       });
 
       return {
