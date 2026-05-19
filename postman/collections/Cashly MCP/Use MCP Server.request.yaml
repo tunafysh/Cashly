@@ -1,0 +1,14 @@
+$kind: mcp-request
+name: "Use MCP Server"
+transport: sse
+url: "{{base_url}}/api/mcp"
+message: ""
+auth:
+  type: bearer
+  credentials:
+    token: "{{mcp_token}}"
+settings:
+  strictSSL: false
+  requestTimeout: 0
+  sessionTimeout: 3600000
+order: 1779146063923

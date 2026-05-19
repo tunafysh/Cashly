@@ -281,7 +281,12 @@ function CreateTransactionForm({
         throw new Error("Failed to create transaction");
       }
 
-      setFormData({ amount: "", type: "expense", categoryId: "", description: "" });
+      setFormData({
+        amount: "",
+        type: "expense",
+        categoryId: "",
+        description: "",
+      });
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -331,7 +336,9 @@ function CreateTransactionForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Category (Optional)</label>
+        <label className="block text-sm font-medium mb-1">
+          Category (Optional)
+        </label>
         <Select
           value={formData.categoryId}
           onValueChange={(value) =>
@@ -359,7 +366,9 @@ function CreateTransactionForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-1">Description (Optional)</label>
+        <label className="block text-sm font-medium mb-1">
+          Description (Optional)
+        </label>
         <Input
           type="text"
           placeholder="Add a note..."
@@ -397,7 +406,7 @@ export default function TransactionsTable() {
   const debouncedSearchInput = useDebounce(searchInput, 750);
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "income" | "expense">(
-    "all"
+    "all",
   );
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [dateRangeStart, setDateRangeStart] = useState<string>("");
@@ -427,7 +436,7 @@ export default function TransactionsTable() {
           if (dateRangeEnd) params.append("toDate", dateRangeEnd);
 
           const response = await fetch(
-            `/api/transactions?${params.toString()}`
+            `/api/transactions?${params.toString()}`,
           );
           if (!response.ok) {
             throw new Error("Failed to fetch transactions");
@@ -462,7 +471,7 @@ export default function TransactionsTable() {
 
   useEffect(() => {
     fetchTransactions();
-  }, [typeFilter, categoryFilter, dateRangeStart, dateRangeEnd])
+  }, [typeFilter, categoryFilter, dateRangeStart, dateRangeEnd]);
 
   const handleDelete = (id: string) => {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
@@ -533,11 +542,16 @@ export default function TransactionsTable() {
             />
             {debouncedSearchInput && (
               <p className="text-xs text-muted-foreground mt-1">
-                Searching: {globalFilter || "(no text)"}{dateRangeStart ? ` from ${dateRangeStart}` : ""}{dateRangeEnd ? ` to ${dateRangeEnd}` : ""}
+                Searching: {globalFilter || "(no text)"}
+                {dateRangeStart ? ` from ${dateRangeStart}` : ""}
+                {dateRangeEnd ? ` to ${dateRangeEnd}` : ""}
               </p>
             )}
           </div>
-          <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
+          <Select
+            value={typeFilter}
+            onValueChange={(v: any) => setTypeFilter(v)}
+          >
             <SelectTrigger className="text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -603,7 +617,8 @@ export default function TransactionsTable() {
                 className="gap-1 cursor-pointer"
                 onClick={() => setCategoryFilter("")}
               >
-                Category: {categories.find((c) => c.id === categoryFilter)?.name}
+                Category:{" "}
+                {categories.find((c) => c.id === categoryFilter)?.name}
                 <X className="h-3 w-3" />
               </Badge>
             )}
@@ -649,7 +664,9 @@ export default function TransactionsTable() {
         <Card className="py-12 mx-4 lg:mx-6">
           <div className="flex justify-center items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <p className="text-sm text-muted-foreground">Loading transactions...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading transactions...
+            </p>
           </div>
         </Card>
       ) : error || filteredTransactions.length === 0 ? (

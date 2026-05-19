@@ -9,3 +9,6 @@ values:
   - key: base_url
     value: ''
     enabled: true
+  - key: mcp_token
+    value: ''
+    enabled: true

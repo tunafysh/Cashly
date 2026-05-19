@@ -7,7 +7,6 @@ workspace:
 cloudResources:
   collections:
     ../postman/collections/Cashly: 42941571-1ab5aec8-f1ad-4c0d-bc49-887895eee173
-    ../postman/collections/Cashly MCP: 42941571-40e27fab-9852-47bd-b29d-6f487528c1c3
   environments:
     ../postman/environments/Cashly.environment.yaml: 42941571-1a3d120c-64e7-48da-a781-2f8ac9195467
 

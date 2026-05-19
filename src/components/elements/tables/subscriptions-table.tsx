@@ -182,9 +182,7 @@ const subscriptionColumns = (
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <span className="text-sm font-medium">
-        {row.getValue("name")}
-      </span>
+      <span className="text-sm font-medium">{row.getValue("name")}</span>
     ),
   },
   {
@@ -219,12 +217,20 @@ const subscriptionColumns = (
       const date = new Date(row.getValue("nextBillingAt"));
       const today = new Date();
       const isUpcoming = date > today;
-      
+
       return (
-        <span className={`text-sm ${
-          isUpcoming ? "text-muted-foreground" : "text-orange-600 dark:text-orange-400 font-semibold"
-        }`}>
-          {date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+        <span
+          className={`text-sm ${
+            isUpcoming
+              ? "text-muted-foreground"
+              : "text-orange-600 dark:text-orange-400 font-semibold"
+          }`}
+        >
+          {date.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          })}
         </span>
       );
     },
@@ -249,16 +255,15 @@ interface SubscriptionFormProps {
   subscription?: Subscription;
 }
 
-function SubscriptionForm({
-  onSuccess,
-  subscription,
-}: SubscriptionFormProps) {
+function SubscriptionForm({ onSuccess, subscription }: SubscriptionFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: subscription?.name || "",
     amount: subscription?.amount?.toString() || "",
-    type: (subscription?.type as "monthly" | "yearly") || ("monthly" as "monthly" | "yearly"),
+    type:
+      (subscription?.type as "monthly" | "yearly") ||
+      ("monthly" as "monthly" | "yearly"),
   });
 
   const handleSubmit = async (e: React.SubmitEvent) => {
@@ -288,7 +293,11 @@ function SubscriptionForm({
       });
 
       if (!response.ok) {
-        throw new Error(isEditing ? "Failed to update subscription" : "Failed to create subscription");
+        throw new Error(
+          isEditing
+            ? "Failed to update subscription"
+            : "Failed to create subscription",
+        );
       }
 
       if (!isEditing) {
@@ -361,8 +370,10 @@ function SubscriptionForm({
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               {subscription ? "Updating..." : "Creating..."}
             </>
+          ) : subscription ? (
+            "Update Subscription"
           ) : (
-            subscription ? "Update Subscription" : "Create Subscription"
+            "Create Subscription"
           )}
         </Button>
       </DialogFooter>
@@ -379,7 +390,7 @@ export default function SubscriptionsTable() {
   const debouncedSearchInput = useDebounce(searchInput, 750);
   const [globalFilter, setGlobalFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "monthly" | "yearly">(
-    "all"
+    "all",
   );
   const [isPending, startTransition] = useTransition();
   const { profile } = useProfile();
@@ -399,7 +410,7 @@ export default function SubscriptionsTable() {
           if (typeFilter !== "all") params.append("type", typeFilter);
 
           const response = await fetch(
-            `/api/subscriptions?${params.toString()}`
+            `/api/subscriptions?${params.toString()}`,
           );
           if (!response.ok) {
             throw new Error("Failed to fetch subscriptions");
@@ -443,7 +454,7 @@ export default function SubscriptionsTable() {
   const columns = subscriptionColumns(
     profile?.currency || "USD",
     handleDelete,
-    handleEdit
+    handleEdit,
   );
   const table = useReactTable({
     data: filteredSubscriptions,
@@ -475,9 +486,7 @@ export default function SubscriptionsTable() {
                 <DialogHeader>
                   <DialogTitle>Create Subscription</DialogTitle>
                 </DialogHeader>
-                <SubscriptionForm
-                  onSuccess={handleCreateSuccess}
-                />
+                <SubscriptionForm onSuccess={handleCreateSuccess} />
               </DialogContent>
             </DialogPortal>
           </Dialog>
@@ -498,7 +507,10 @@ export default function SubscriptionsTable() {
               </p>
             )}
           </div>
-          <Select value={typeFilter} onValueChange={(v: any) => setTypeFilter(v)}>
+          <Select
+            value={typeFilter}
+            onValueChange={(v: any) => setTypeFilter(v)}
+          >
             <SelectTrigger className="text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -542,7 +554,9 @@ export default function SubscriptionsTable() {
         <Card className="py-12 mx-4 lg:mx-6">
           <div className="flex justify-center items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
-            <p className="text-sm text-muted-foreground">Loading subscriptions...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading subscriptions...
+            </p>
           </div>
         </Card>
       ) : error || filteredSubscriptions.length === 0 ? (

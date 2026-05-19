@@ -37,10 +37,9 @@ export default async function AppRootLayout({
       .replace(/\b\w/g, (c) => c.toUpperCase()) ?? // capitalize
     "Home";
 
-    if (title.split(" ")[0].toLowerCase() === "Mcp") {
-      title = "MCP Tokens";
-    }
-
+  if (title.split(" ")[0].toLowerCase() === "Mcp") {
+    title = "MCP Tokens";
+  }
 
   return (
     <Providers profile={profile} session={session}>

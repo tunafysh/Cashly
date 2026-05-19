@@ -131,14 +131,14 @@ export async function renewDueSubscriptionsNow(type: "monthly" | "yearly") {
 
     // create transaction here based on subscription details
     createTransaction({
-        createdAt: next,
-        amount: parseFloat(s.amount),
-        type: "expense",
-        description: `Subscription renewal: ${s.name}`,
-        userId: s.userId,
-        subscriptionId: s.id,
-        categoryId: null, // no fts it's uncategorized.
-      })
+      createdAt: next,
+      amount: parseFloat(s.amount),
+      type: "expense",
+      description: `Subscription renewal: ${s.name}`,
+      userId: s.userId,
+      subscriptionId: s.id,
+      categoryId: null, // no fts it's uncategorized.
+    });
 
     const [updated] = await db
       .update(subscriptions)

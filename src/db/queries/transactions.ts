@@ -68,10 +68,13 @@ export type Filters = {
   type?: "income" | "expense";
   subscriptionId?: string;
   search?: string;
+  offset?: number;
+  limit?: number;
 };
 
 export async function getUserTransactions(userId: string, filters?: Filters) {
   const conditions = [eq(transactions.userId, userId)];
+  const amount = [];
 
   console.log(filters);
   console.log(filters?.fromDate instanceof Date);
@@ -115,9 +118,19 @@ export async function getUserTransactions(userId: string, filters?: Filters) {
     conditions.push(eq(transactions.subscriptionId, filters.subscriptionId));
   }
 
-  return await baseTransactionQuery()
+  const query = baseTransactionQuery()
     .where(and(...conditions))
     .orderBy(desc(transactions.createdAt));
+
+  if (filters?.limit !== undefined) {
+    query.limit(filters.limit);
+  }
+
+  if (filters?.offset !== undefined) {
+    query.offset(filters.offset);
+  }
+
+  return await query;
 }
 
 export async function createTransaction(
@@ -155,4 +168,44 @@ export async function deleteTransaction(userId: string, transactionId: string) {
       and(eq(transactions.id, transactionId), eq(transactions.userId, userId)),
     )
     .returning();
+}
+
+export async function getSummary(userId: string, fromDate?: Date, toDate?: Date) {
+  const conditions = [eq(transactions.userId, userId)];
+
+  if (fromDate) {
+    conditions.push(gte(transactions.createdAt, fromDate));
+  }
+
+  if (toDate) {
+    const endOfDay = new Date(toDate);
+    endOfDay.setUTCDate(endOfDay.getUTCDate() + 1);
+    endOfDay.setUTCHours(0, 0, 0, 0);
+    conditions.push(lte(transactions.createdAt, endOfDay));
+  }
+
+  // get income, expenses and balance
+  const transaction = await db
+    .select()
+    .from(transactions)
+    .where(and(...conditions))
+
+  
+  const result = transaction.reduce(
+    (acc, tx) => {
+      if (tx.type === "income") {
+        acc.income += parseFloat(tx.amount);
+      } else if (tx.type === "expense") {
+        acc.expenses += parseFloat(tx.amount);
+      }
+      return acc;
+    },
+    { income: 0, expenses: 0 },
+  );
+
+  const income = result.income;
+  const expenses = result.expenses;
+  const balance = income - expenses;
+
+  return { income, expenses, balance };
 }

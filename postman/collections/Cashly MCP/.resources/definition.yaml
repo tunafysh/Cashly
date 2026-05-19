@@ -1,8 +1,6 @@
 $kind: collection
 name: Cashly MCP
-variables:
-  MCPToken: ""
 auth:
-  type: bearer
-  credentials:
-    token: "{{MCPToken}}"
+  - id: 5f687fe7-54a4-4727-9ace-43c525e73dd8
+    type: noauth
+    name: No Auth

@@ -15,7 +15,7 @@ export function parseNaturalLanguageSearch(input: string): ParsedDateRange {
   try {
     // Common patterns - match "from X to/until Y" or "from X" or "to/until Y"
     const fromToPattern = /from\s+(.+?)(?:\s+(?:to|until)\s+(.+?))?$/i;
-    
+
     let fromMatch = fromToPattern.exec(input);
     let fromText = "";
     let toText = "";
@@ -23,15 +23,15 @@ export function parseNaturalLanguageSearch(input: string): ParsedDateRange {
     if (fromMatch) {
       fromText = fromMatch[1];
       toText = fromMatch[2] || "";
-      
+
       let parsedAny = false;
-      
+
       const fromDate = chrono.parseDate(fromText);
       if (fromDate) {
         result.fromDate = fromDate.toISOString().split("T")[0];
         parsedAny = true;
       }
-      
+
       if (toText) {
         const toDate = chrono.parseDate(toText);
         if (toDate) {
@@ -39,7 +39,7 @@ export function parseNaturalLanguageSearch(input: string): ParsedDateRange {
           parsedAny = true;
         }
       }
-      
+
       // If fromDate is set but toDate is not, default toDate to the same day as fromDate
       // unless "until now" or similar was explicitly mentioned
       if (result.fromDate && !result.toDate) {
@@ -48,7 +48,7 @@ export function parseNaturalLanguageSearch(input: string): ParsedDateRange {
           result.toDate = result.fromDate;
         }
       }
-      
+
       // Remove the pattern from search if we successfully parsed at least one date
       if (parsedAny) {
         result.search = input.replace(fromMatch[0], "").trim();

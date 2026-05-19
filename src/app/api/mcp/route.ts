@@ -5,6 +5,21 @@ import { validateMCPToken } from "@/db/queries/mcp-tokens";
 import { NextRequest, NextResponse } from "next/server";
 import * as z from "zod/v4";
 import type { CallToolResult } from "@modelcontextprotocol/server";
+import {
+  createTransaction,
+  getSummary,
+  getUserTransactions,
+} from "@/db/queries/transactions";
+import { Category, Subscription, Transaction } from "@/lib/types";
+import {
+  createCategory,
+  createCategoryWithoutColor,
+  getCategoryByName,
+  getUserCategories,
+} from "@/db/queries/categories";
+import { createSubscription, getUserSubscriptions } from "@/db/queries/subscriptions";
+import { sub } from "date-fns/sub";
+import { getBudget, setBudget } from "@/db/queries/profiles";
 
 // Auth context for tools (stored temporarily during request)
 declare global {
@@ -27,25 +42,89 @@ function createMcpServer(): McpServer {
     {
       description: "Fetch user transactions",
       inputSchema: z.object({
-        limit: z.number().optional().describe("Maximum number of transactions to return"),
-        offset: z.number().optional().describe("Number of transactions to skip"),
+        limit: z
+          .number()
+          .optional()
+          .describe("Maximum number of transactions to return"),
+        offset: z
+          .number()
+          .optional()
+          .describe("Number of transactions to skip"),
       }),
     },
-    async ({ limit = 10, offset = 0 }): Promise<CallToolResult> => {
+    async ({
+      limit = undefined,
+      offset = undefined,
+    }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
-      // TODO: Implement database query with:
-      // const transactions = await getTransactionsByUserId(global.mcpCurrentUserId, limit, offset);
+
+      const transactions: Transaction[] = await getUserTransactions(
+        global.mcpCurrentUserId,
+        { limit: limit, offset: offset },
+      );
+
       return {
         content: [
           {
             type: "text",
-            text: `Fetching ${limit} transactions for user ${global.mcpCurrentUserId} (offset: ${offset})`,
+            text: JSON.stringify(transactions, null, 2),
           },
         ],
       };
-    }
+    },
+  );
+
+  server.registerTool(
+    "create_transaction",
+    {
+      description: "Create a new transaction",
+      inputSchema: z.object({
+        amount: z.number().describe("Transaction amount"),
+        type: z.enum(["income", "expense"]).describe("Transaction type"),
+        description: z.string().optional().describe("Transaction description"),
+        createdAt: z.date().optional().describe("Transaction date"),
+        categoryName: z.string().describe("Category name"),
+      }),
+    },
+    async ({
+      amount,
+      type,
+      description,
+      createdAt,
+      categoryName,
+    }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const category = await getCategoryByName(
+        global.mcpCurrentUserId,
+        categoryName,
+      );
+      if (!category) {
+        throw new Error(`Category "${categoryName}" not found for user`);
+      }
+
+      const transaction = await createTransaction({
+        userId: global.mcpCurrentUserId,
+        amount,
+        type,
+        categoryId: category.id,
+        description,
+        createdAt,
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(transaction, null, 2),
+          },
+        ],
+      };
+    },
   );
 
   server.registerTool(
@@ -58,13 +137,145 @@ function createMcpServer(): McpServer {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
-      // TODO: Implement database query with:
-      // const categories = await getCategoriesByUserId(global.mcpCurrentUserId);
+
+      const categories: Category[] = await getUserCategories(
+        global.mcpCurrentUserId,
+      );
+
       return {
         content: [
           {
             type: "text",
-            text: `Fetching categories for user ${global.mcpCurrentUserId}`,
+            text: JSON.stringify(categories, null, 2),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    "create_category",
+    {
+      description: "Create a new expense category",
+      inputSchema: z.object({
+        name: z.string().describe("Category name"),
+        color: z.string().optional().describe("Category color (hex code)"),
+      }),
+    },
+    async ({ name, color }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const category = color
+        ? await createCategory({
+            userId: global.mcpCurrentUserId,
+            name,
+            color: color,
+          })
+        : await createCategoryWithoutColor({
+            userId: global.mcpCurrentUserId,
+            name,
+          });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(category, null, 2),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    "get_subscriptions",
+    {
+      description: "Fetch all active subscriptions",
+      inputSchema: z.object({}),
+    },
+    async (): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const subscriptions: Subscription[] = (
+        await getUserSubscriptions(global.mcpCurrentUserId)
+      ).map((data) => ({
+        ...data,
+        amount: parseFloat(data.amount.toString()),
+      }));
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(subscriptions, null, 2),
+          },
+        ],
+      };
+    },
+  );
+
+  server.registerTool(
+    "create_subscription",
+    {
+      description: "Create a new subscription",
+      inputSchema: z.object({
+        name: z.string().describe("Subscription name"),
+        amount: z.number().describe("Subscription amount"),
+        type: z.enum(["monthly", "yearly"]).describe("Subscription type"),
+      }),
+    },
+    async ({ name, amount, type }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const now = new Date();
+      const nextBillingAt =
+        type === "monthly"
+          ? sub(now, { months: -1 })
+          : sub(now, { years: -1 });
+
+      const subscription = await createSubscription({
+        userId: global.mcpCurrentUserId,
+        name,
+        amount,
+        type,
+        nextBillingAt,
+      });
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(subscription, null, 2),
+          },
+        ],
+      };
+    }
+  )
+
+  server.registerTool(
+    "get_budget",
+    {
+      description: "Get current budget information (amount and period)",
+      inputSchema: z.object({}),
+    },
+    async (): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available");
+      }
+
+      const budget = await getBudget(global.mcpCurrentUserId);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(budget, null, 2),
           },
         ],
       };
@@ -72,27 +283,56 @@ function createMcpServer(): McpServer {
   );
 
   server.registerTool(
-    "get_balance",
+    "set_budget",
     {
-      description: "Get current account balance",
+      description: "Set current budget information (amount and period)",
+      inputSchema: z.object({
+        amount: z.number().describe("New budget amount"),
+        period: z.enum(["yearly", "monthly"]).describe("Budget period, (yearly or monthly)"),
+      }),
+    },
+    async ({ amount, period }): Promise<CallToolResult> => {
+      if (!global.mcpCurrentUserId) {
+        throw new Error("User context not available"); 
+      }
+
+      const response = await setBudget(global.mcpCurrentUserId, amount, period);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(response, null, 2),
+          },
+        ],
+      };  
+    }
+  );
+
+
+
+  server.registerTool(
+    "get_summary",
+    {
+      description: "Get current account summary (balance, income, expenses)",
       inputSchema: z.object({}),
     },
     async (): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
-      // TODO: Implement database query with:
-      // const profile = await getProfileByUserId(global.mcpCurrentUserId);
-      // return profile.balance
+
+      const response = await getSummary(global.mcpCurrentUserId);
+
       return {
         content: [
           {
             type: "text",
-            text: `Fetching balance for user ${global.mcpCurrentUserId}`,
+            text: JSON.stringify(response, null, 2),
           },
         ],
       };
-    }
+    },
   );
 
   return server;
@@ -126,7 +366,7 @@ async function authenticateRequest(req: NextRequest): Promise<string | null> {
 /**
  * MCP HTTP endpoint using Streamable HTTP transport (Web Standard).
  * This follows the official MCP SDK documentation for Next.js.
- * 
+ *
  * The transport automatically handles:
  * - JSON-RPC request/response routing
  * - SSE streaming for long-running operations
@@ -165,7 +405,7 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
         jsonrpc: "2.0",
         error: { code: -32603, message: "Internal server error" },
       }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      { status: 500, headers: { "Content-Type": "application/json" } },
     );
   } finally {
     // Clean up user context
@@ -182,14 +422,17 @@ export async function GET(_req: NextRequest): Promise<Response> {
   return new Response(
     JSON.stringify({
       jsonrpc: "2.0",
-      error: { code: -32601, message: "Method not allowed. Use POST for JSON-RPC requests." },
+      error: {
+        code: -32601,
+        message: "Method not allowed. Use POST for JSON-RPC requests.",
+      },
     }),
-    { 
+    {
       status: 405,
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
-        "Allow": "POST",
-      } 
-    }
+        Allow: "POST",
+      },
+    },
   );
 }

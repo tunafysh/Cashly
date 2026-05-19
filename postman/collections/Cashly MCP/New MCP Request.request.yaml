@@ -1,4 +1,0 @@
-$kind: mcp-request
-transport: sse
-url: '{{base_url}}'
-message: '{"method":"tools/list","params":{}}'

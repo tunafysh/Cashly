@@ -3,8 +3,22 @@ import { useEffect, useState } from "react";
 import { useMCPTokens } from "@/hooks/use-mcp-tokens";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { Trash2, Plus, Copy, Check, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
@@ -14,7 +28,8 @@ interface MCPTokensManagerProps {
 }
 
 export function MCPTokensManager({ onTokenCreated }: MCPTokensManagerProps) {
-  const { tokens, loading, error, fetchTokens, createToken, deleteToken } = useMCPTokens();
+  const { tokens, loading, error, fetchTokens, createToken, deleteToken } =
+    useMCPTokens();
   const [isCreating, setIsCreating] = useState(false);
   const [tokenName, setTokenName] = useState("");
   const [expiresInDays, setExpiresInDays] = useState<string>("");
@@ -110,8 +125,12 @@ export function MCPTokensManager({ onTokenCreated }: MCPTokensManagerProps) {
 
           {showNewToken && newTokenValue && (
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-sm font-medium text-green-900 mb-2">Token created successfully!</p>
-              <p className="text-sm text-green-800 mb-3">Save this token. You won't be able to see it again.</p>
+              <p className="text-sm font-medium text-green-900 mb-2">
+                Token created successfully!
+              </p>
+              <p className="text-sm text-green-800 mb-3">
+                Save this token. You won't be able to see it again.
+              </p>
               <div className="flex items-center gap-2 p-2 bg-white border border-green-200 rounded font-mono text-xs">
                 <span className="flex-1 truncate">{newTokenValue}</span>
                 <Button
@@ -192,12 +211,18 @@ export function MCPTokensManager({ onTokenCreated }: MCPTokensManagerProps) {
                           {token.token}
                         </span>
                       </p>
-                      <p>Created: {format(new Date(token.createdAt), "MMM d, yyyy")}</p>
+                      <p>
+                        Created:{" "}
+                        {format(new Date(token.createdAt), "MMM d, yyyy")}
+                      </p>
                       {token.expiresAt && (
                         <p>
-                          Expires: {format(new Date(token.expiresAt), "MMM d, yyyy")}{" "}
+                          Expires:{" "}
+                          {format(new Date(token.expiresAt), "MMM d, yyyy")}{" "}
                           {new Date(token.expiresAt) < new Date() && (
-                            <span className="text-red-600 font-medium">(Expired)</span>
+                            <span className="text-red-600 font-medium">
+                              (Expired)
+                            </span>
                           )}
                         </p>
                       )}
@@ -215,8 +240,8 @@ export function MCPTokensManager({ onTokenCreated }: MCPTokensManagerProps) {
                       <AlertDialogContent>
                         <AlertDialogTitle>Delete Token</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to delete "{token.name}"? This action cannot be
-                          undone.
+                          Are you sure you want to delete "{token.name}"? This
+                          action cannot be undone.
                         </AlertDialogDescription>
                         <div className="flex gap-3 justify-end">
                           <AlertDialogCancel>Cancel</AlertDialogCancel>

@@ -54,7 +54,10 @@ export function DateRangePicker({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="justify-start text-left font-normal text-sm w-full">
+        <Button
+          variant="outline"
+          className="justify-start text-left font-normal text-sm w-full"
+        >
           <CalendarIcon className="mr-2 h-4 w-4" />
           <span className="truncate">{displayText}</span>
         </Button>

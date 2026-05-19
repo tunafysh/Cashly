@@ -2,8 +2,8 @@ import { BudgetModifier } from "@/components/elements/uncategorized/budget-modif
 
 export default function Budget() {
   return (
-  <div className="p-6 md:p-4">
+    <div className="p-6 md:p-4">
       <BudgetModifier />
-  </div>
+    </div>
   );
 }

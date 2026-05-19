@@ -11,8 +11,8 @@ export async function validateMCPToken(token: string) {
         eq(mcpTokens.token, token),
         eq(mcpTokens.isActive, true),
         // Token is valid if expiresAt is null OR expiresAt is in the future
-        or(isNull(mcpTokens.expiresAt), gt(mcpTokens.expiresAt, new Date()))
-      )
+        or(isNull(mcpTokens.expiresAt), gt(mcpTokens.expiresAt, new Date())),
+      ),
     )
     .limit(1);
 
@@ -31,7 +31,7 @@ export async function createMCPToken(
   userId: string,
   name: string,
   token: string,
-  expiresAt?: Date
+  expiresAt?: Date,
 ) {
   return await db
     .insert(mcpTokens)

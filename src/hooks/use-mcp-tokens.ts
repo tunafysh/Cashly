@@ -1,4 +1,3 @@
-
 import { useCallback, useState } from "react";
 
 export interface MCPToken {
@@ -15,7 +14,10 @@ interface UseMCPTokensReturn {
   loading: boolean;
   error: string | null;
   fetchTokens: () => Promise<void>;
-  createToken: (name: string, expiresInDays?: number) => Promise<MCPToken | null>;
+  createToken: (
+    name: string,
+    expiresInDays?: number,
+  ) => Promise<MCPToken | null>;
   deleteToken: (id: string) => Promise<boolean>;
 }
 
@@ -38,7 +40,7 @@ export function useMCPTokens(): UseMCPTokensReturn {
           ...t,
           createdAt: new Date(t.createdAt),
           expiresAt: t.expiresAt ? new Date(t.expiresAt) : null,
-        }))
+        })),
       );
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
@@ -82,36 +84,33 @@ export function useMCPTokens(): UseMCPTokensReturn {
         setLoading(false);
       }
     },
-    [fetchTokens]
+    [fetchTokens],
   );
 
-  const deleteToken = useCallback(
-    async (id: string): Promise<boolean> => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(`/api/mcp/tokens?id=${id}`, {
-          method: "DELETE",
-        });
+  const deleteToken = useCallback(async (id: string): Promise<boolean> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/mcp/tokens?id=${id}`, {
+        method: "DELETE",
+      });
 
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.error || "Failed to delete token");
-        }
-
-        // Remove from local state
-        setTokens((prev) => prev.filter((t) => t.id !== id));
-        return true;
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        setError(message);
-        return false;
-      } finally {
-        setLoading(false);
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete token");
       }
-    },
-    []
-  );
+
+      // Remove from local state
+      setTokens((prev) => prev.filter((t) => t.id !== id));
+      return true;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unknown error";
+      setError(message);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return {
     tokens,

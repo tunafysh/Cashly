@@ -22,10 +22,9 @@ export type Category = {
 
 export type Subscription = {
   id: string;
-  userId: string;
   name: string;
   amount: number;
   type: "monthly" | "yearly";
   createdAt: Date;
   nextBillingAt: Date;
-}
+};

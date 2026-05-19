@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     console.error("GET /api/mcp/tokens error:", error);
     return NextResponse.json(
       { error: "Failed to fetch tokens" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -88,14 +88,14 @@ export async function POST(req: NextRequest) {
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return NextResponse.json(
         { error: "Token name is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (name.length > 100) {
       return NextResponse.json(
         { error: "Token name must be less than 100 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -105,14 +105,14 @@ export async function POST(req: NextRequest) {
       if (!Number.isInteger(expiresInDays) || expiresInDays <= 0) {
         return NextResponse.json(
           { error: "expiresInDays must be a positive integer" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       if (expiresInDays > 365 * 10) {
         return NextResponse.json(
           { error: "Token expiration cannot exceed 10 years" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -126,13 +126,13 @@ export async function POST(req: NextRequest) {
       session.user.id,
       name,
       token,
-      expiresAt
+      expiresAt,
     );
 
     if (!result[0]) {
       return NextResponse.json(
         { error: "Failed to create token" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -150,13 +150,13 @@ export async function POST(req: NextRequest) {
         warning:
           "Save this token somewhere safe. You won't be able to see it again!",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("POST /api/mcp/tokens error:", error);
     return NextResponse.json(
       { error: "Failed to create token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -188,7 +188,7 @@ export async function DELETE(req: NextRequest) {
     if (!tokenExists) {
       return NextResponse.json(
         { error: "Token not found or does not belong to you" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -203,7 +203,7 @@ export async function DELETE(req: NextRequest) {
     console.error("DELETE /api/mcp/tokens error:", error);
     return NextResponse.json(
       { error: "Failed to delete token" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
