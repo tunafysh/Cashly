@@ -393,6 +393,11 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     // Create a fresh server for this request
     const mcpServer = createMcpServer();
 
+    // For tools/list, add extra debugging
+    if (body.method === "tools/list") {
+      console.log("[MCP] TOOLS/LIST REQUEST RECEIVED");
+    }
+
     // Create transport
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
@@ -411,6 +416,11 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
 
     // Handle the request
     const response = await transport.handleRequest(newReq as any);
+
+    if (body.method === "tools/list") {
+      const responseText = await response.clone().text();
+      console.log("[MCP] TOOLS/LIST RESPONSE:", responseText);
+    }
 
     console.log("[MCP] Responding to method:", body.method);
     return response as unknown as NextResponse;
