@@ -383,23 +383,39 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
   global.mcpCurrentUserId = userId;
 
   try {
-    // Create a fresh server and transport for this request
+    // Read body once for debugging
+    const bodyText = await req.text();
+    const body = JSON.parse(bodyText);
+    
+    console.log("[MCP] Request method:", body.method);
+    console.log("[MCP] User ID:", userId);
+
+    // Create a fresh server for this request
     const mcpServer = createMcpServer();
+
+    // Create transport
     const transport = new WebStandardStreamableHTTPServerTransport({
-      sessionIdGenerator: undefined, // Stateless: no session management
-      enableJsonResponse: true, // Use JSON responses instead of SSE for stateless mode
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true,
     });
 
     // Connect server to transport
     await mcpServer.connect(transport);
 
-    // Use transport's built-in request handler
-    // This handles all JSON-RPC routing automatically
-    const response = await transport.handleRequest(req as unknown as Request);
+    // Create a new Request from the body we read
+    const newReq = new Request(req.url, {
+      method: req.method,
+      headers: req.headers,
+      body: bodyText,
+    });
 
+    // Handle the request
+    const response = await transport.handleRequest(newReq as any);
+
+    console.log("[MCP] Responding to method:", body.method);
     return response as unknown as NextResponse;
   } catch (error) {
-    console.error("MCP route error:", error);
+    console.error("[MCP] Error:", error);
     return new NextResponse(
       JSON.stringify({
         jsonrpc: "2.0",
@@ -408,7 +424,6 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
       { status: 500, headers: { "Content-Type": "application/json" } },
     );
   } finally {
-    // Clean up user context
     global.mcpCurrentUserId = null;
   }
 }
