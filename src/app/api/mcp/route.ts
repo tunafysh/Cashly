@@ -383,46 +383,22 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
   global.mcpCurrentUserId = userId;
 
   try {
-    // Read body once for debugging
-    const bodyText = await req.text();
-    const body = JSON.parse(bodyText);
-    
-    console.log("[MCP] Request method:", body.method);
-    console.log("[MCP] User ID:", userId);
-
     // Create a fresh server for this request
     const mcpServer = createMcpServer();
 
-    // For tools/list, add extra debugging
-    if (body.method === "tools/list") {
-      console.log("[MCP] TOOLS/LIST REQUEST RECEIVED");
-    }
-
-    // Create transport
+    // Create transport - let it handle request parsing
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });
 
-    // Connect server to transport
+    // Connect server to transport - this sets up all the message handlers
     await mcpServer.connect(transport);
 
-    // Create a new Request from the body we read
-    const newReq = new Request(req.url, {
-      method: req.method,
-      headers: req.headers,
-      body: bodyText,
-    });
+    // Pass the request directly to the transport
+    // It will parse the JSON-RPC message and route it appropriately
+    const response = await transport.handleRequest(req as unknown as Request);
 
-    // Handle the request
-    const response = await transport.handleRequest(newReq as any);
-
-    if (body.method === "tools/list") {
-      const responseText = await response.clone().text();
-      console.log("[MCP] TOOLS/LIST RESPONSE:", responseText);
-    }
-
-    console.log("[MCP] Responding to method:", body.method);
     return response as unknown as NextResponse;
   } catch (error) {
     console.error("[MCP] Error:", error);
