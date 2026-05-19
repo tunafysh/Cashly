@@ -335,15 +335,10 @@ async function authenticateRequest(req: NextRequest): Promise<string | null> {
 }
 
 /**
- * MCP HTTP endpoint using Streamable HTTP transport (Web Standard).
- * This follows the official MCP SDK documentation for Next.js.
- *
- * The transport automatically handles:
- * - JSON-RPC request/response routing
- * - SSE streaming for long-running operations
- * - Method dispatch (initialize, tools/list, tools/call, etc.)
+ * Shared MCP request handler for Streamable HTTP.
+ * Supports GET/POST/DELETE by delegating method handling to the MCP transport.
  */
-export async function POST(req: NextRequest): Promise<NextResponse | Response> {
+async function handleMcpRequest(req: NextRequest): Promise<NextResponse | Response> {
   // Authenticate request
   const userId = await authenticateRequest(req);
   if (!userId) {
@@ -354,84 +349,15 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
   global.mcpCurrentUserId = userId;
 
   try {
-    console.log("[MCP] ========== NEW REQUEST ==========");
-    
-    // Log request details
-    const bodyText = await req.text();
-    let method = "unknown";
-    try {
-      const body = JSON.parse(bodyText);
-      method = body.method || "unknown";
-      console.log(`[MCP] Method: ${method}`);
-      console.log(`[MCP] ID: ${body.id}`);
-      console.log(`[MCP] Params: ${JSON.stringify(body.params)}`);
-    } catch (e) {
-      console.log("[MCP] Could not parse body");
-    }
-
-    // Create server
-    console.log("[MCP] Creating McpServer...");
     const mcpServer = createMcpServer();
-    console.log("[MCP] McpServer created");
-
-    // Create transport
-    console.log("[MCP] Creating WebStandardStreamableHTTPServerTransport...");
     const transport = new WebStandardStreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });
-    console.log("[MCP] Transport created");
 
-    // Connect server to transport
-    console.log("[MCP] Connecting server to transport...");
     await mcpServer.connect(transport);
-    console.log("[MCP] Server connected to transport");
-
-    // Create new request with body
-    console.log("[MCP] Creating new Request object...");
-    const newReq = new Request(req.url, {
-      method: req.method,
-      headers: req.headers,
-      body: bodyText,
-    });
-
-    // Handle request
-    console.log(`[MCP] Calling transport.handleRequest() for method: ${method}...`);
-    const response = await transport.handleRequest(newReq as any);
-    
-    // Try to inspect response
-    try {
-      const cloned = response.clone();
-      const responseText = await cloned.text();
-      const parsed = JSON.parse(responseText);
-      
-      if (method === "tools/list") {
-        const toolCount = parsed.result?.tools?.length || 0;
-        console.log(`[MCP] tools/list response contains ${toolCount} tools`);
-        if (toolCount > 0) {
-          console.log(`[MCP] Tools: ${parsed.result.tools.map((t: any) => t.name).join(", ")}`);
-        }
-      } else if (parsed.result) {
-        console.log(`[MCP] Response result type: ${typeof parsed.result}`);
-      }
-      
-      if (parsed.error) {
-        console.log(`[MCP] Response error: ${JSON.stringify(parsed.error)}`);
-      }
-    } catch (inspectErr) {
-      console.log("[MCP] Could not inspect response body");
-    }
-
-    console.log(`[MCP] Responding to ${method} with status 200`);
-    console.log("[MCP] ========== END REQUEST ==========");
-
-    return response as unknown as NextResponse;
+    return (await transport.handleRequest(req as unknown as Request)) as unknown as NextResponse;
   } catch (error) {
-    console.error("[MCP] !!!!! REQUEST ERROR !!!!!");
-    console.error("[MCP] Error:", error);
-    console.error("[MCP] Stack:", error instanceof Error ? error.stack : "no stack");
-    console.log("[MCP] ========== END REQUEST (ERROR) ==========");
-    
+    console.error("[MCP] Request error:", error);
     return new NextResponse(
       JSON.stringify({
         jsonrpc: "2.0",
@@ -445,24 +371,33 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
 }
 
 /**
- * GET handler for SSE (Server-Sent Events) streaming.
- * Not needed for stateless JSON responses - returns 405 Method Not Allowed.
- * For session-based streaming, implement session management via sessionIdGenerator.
+ * MCP Streamable HTTP handlers.
+ * The transport internally dispatches each supported method.
  */
-export async function GET(_req: NextRequest): Promise<Response> {
+export async function POST(req: NextRequest): Promise<NextResponse | Response> {
+  return handleMcpRequest(req);
+}
+
+export async function GET(req: NextRequest): Promise<NextResponse | Response> {
+  return handleMcpRequest(req);
+}
+
+export async function DELETE(req: NextRequest): Promise<NextResponse | Response> {
+  return handleMcpRequest(req);
+}
+
+export async function OPTIONS(): Promise<Response> {
+  // CORS preflight is intentionally unauthenticated; actual MCP methods are authenticated in handleMcpRequest.
+  // MCP-Protocol-Version, MCP-Session-Id, and Last-Event-ID are required by Streamable HTTP clients (protocol negotiation/session/SSE resume).
   return new Response(
-    JSON.stringify({
-      jsonrpc: "2.0",
-      error: {
-        code: -32601,
-        message: "Method not allowed. Use POST for JSON-RPC requests.",
-      },
-    }),
+    null,
     {
-      status: 405,
+      status: 204,
       headers: {
-        "Content-Type": "application/json",
-        Allow: "POST",
+        Allow: "GET, POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers":
+          "Authorization, Content-Type, Accept, MCP-Protocol-Version, MCP-Session-Id, Last-Event-ID",
       },
     },
   );
