@@ -52,17 +52,14 @@ function createMcpServer(): McpServer {
           .describe("Number of transactions to skip"),
       }),
     },
-    async ({
-      limit = undefined,
-      offset = undefined,
-    }): Promise<CallToolResult> => {
+    async (args: { limit?: number; offset?: number }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
 
       const transactions: Transaction[] = await getUserTransactions(
         global.mcpCurrentUserId,
-        { limit: limit, offset: offset },
+        { limit: args.limit, offset: args.offset },
       );
 
       return {
@@ -88,12 +85,12 @@ function createMcpServer(): McpServer {
         categoryName: z.string().describe("Category name"),
       }),
     },
-    async ({
-      amount,
-      type,
-      description,
-      createdAt,
-      categoryName,
+    async (args: {
+      amount: number;
+      type: "income" | "expense";
+      description?: string;
+      createdAt?: Date;
+      categoryName: string;
     }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
@@ -101,19 +98,19 @@ function createMcpServer(): McpServer {
 
       const category = await getCategoryByName(
         global.mcpCurrentUserId,
-        categoryName,
+        args.categoryName,
       );
       if (!category) {
-        throw new Error(`Category "${categoryName}" not found for user`);
+        throw new Error(`Category "${args.categoryName}" not found for user`);
       }
 
       const transaction = await createTransaction({
         userId: global.mcpCurrentUserId,
-        amount,
-        type,
+        amount: args.amount,
+        type: args.type,
         categoryId: category.id,
-        description,
-        createdAt,
+        description: args.description,
+        createdAt: args.createdAt,
       });
 
       return {
@@ -162,20 +159,20 @@ function createMcpServer(): McpServer {
         color: z.string().optional().describe("Category color (hex code)"),
       }),
     },
-    async ({ name, color }): Promise<CallToolResult> => {
+    async (args: { name: string; color?: string }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
 
-      const category = color
+      const category = args.color
         ? await createCategory({
             userId: global.mcpCurrentUserId,
-            name,
-            color: color,
+            name: args.name,
+            color: args.color,
           })
         : await createCategoryWithoutColor({
             userId: global.mcpCurrentUserId,
-            name,
+            name: args.name,
           });
 
       return {
@@ -228,22 +225,26 @@ function createMcpServer(): McpServer {
         type: z.enum(["monthly", "yearly"]).describe("Subscription type"),
       }),
     },
-    async ({ name, amount, type }): Promise<CallToolResult> => {
+    async (args: {
+      name: string;
+      amount: number;
+      type: "monthly" | "yearly";
+    }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available");
       }
 
       const now = new Date();
       const nextBillingAt =
-        type === "monthly"
+        args.type === "monthly"
           ? sub(now, { months: -1 })
           : sub(now, { years: -1 });
 
       const subscription = await createSubscription({
         userId: global.mcpCurrentUserId,
-        name,
-        amount,
-        type,
+        name: args.name,
+        amount: args.amount,
+        type: args.type,
         nextBillingAt,
       });
 
@@ -256,7 +257,7 @@ function createMcpServer(): McpServer {
         ],
       };
     }
-  )
+  );
 
   server.registerTool(
     "get_budget",
@@ -291,12 +292,15 @@ function createMcpServer(): McpServer {
         period: z.enum(["yearly", "monthly"]).describe("Budget period, (yearly or monthly)"),
       }),
     },
-    async ({ amount, period }): Promise<CallToolResult> => {
+    async (args: {
+      amount: number;
+      period: "yearly" | "monthly";
+    }): Promise<CallToolResult> => {
       if (!global.mcpCurrentUserId) {
         throw new Error("User context not available"); 
       }
 
-      const response = await setBudget(global.mcpCurrentUserId, amount, period);
+      const response = await setBudget(global.mcpCurrentUserId, args.amount, args.period);
 
       return {
         content: [
@@ -398,22 +402,6 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     // Pass the request directly to the transport
     // It will parse the JSON-RPC message and route it appropriately
     const response = await transport.handleRequest(req as unknown as Request);
-
-    // Clone response to inspect it for debugging
-    const clonedResponse = response.clone();
-    const responseBody = await clonedResponse.text();
-    
-    try {
-      const parsed = JSON.parse(responseBody);
-      if (parsed.result?.tools) {
-        console.log(`[MCP] tools/list returning ${parsed.result.tools.length} tools`);
-      }
-      if (parsed.method === "tools/list") {
-        console.log("[MCP] tools/list response:", JSON.stringify(parsed.result, null, 2));
-      }
-    } catch (e) {
-      // Not JSON or other parse error, ignore
-    }
 
     return response as unknown as NextResponse;
   } catch (error) {
