@@ -399,6 +399,22 @@ export async function POST(req: NextRequest): Promise<NextResponse | Response> {
     // It will parse the JSON-RPC message and route it appropriately
     const response = await transport.handleRequest(req as unknown as Request);
 
+    // Clone response to inspect it for debugging
+    const clonedResponse = response.clone();
+    const responseBody = await clonedResponse.text();
+    
+    try {
+      const parsed = JSON.parse(responseBody);
+      if (parsed.result?.tools) {
+        console.log(`[MCP] tools/list returning ${parsed.result.tools.length} tools`);
+      }
+      if (parsed.method === "tools/list") {
+        console.log("[MCP] tools/list response:", JSON.stringify(parsed.result, null, 2));
+      }
+    } catch (e) {
+      // Not JSON or other parse error, ignore
+    }
+
     return response as unknown as NextResponse;
   } catch (error) {
     console.error("[MCP] Error:", error);
