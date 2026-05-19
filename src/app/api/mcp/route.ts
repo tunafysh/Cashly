@@ -351,7 +351,6 @@ async function handleMcpRequest(req: NextRequest): Promise<NextResponse | Respon
   try {
     const mcpServer = createMcpServer();
     const transport = new WebStandardStreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
       enableJsonResponse: true,
     });
 
@@ -388,7 +387,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse | Response>
 }
 
 export async function OPTIONS(): Promise<Response> {
-  // CORS preflight must not require auth headers/cookies.
+  // CORS preflight is intentionally unauthenticated; actual MCP methods are authenticated in handleMcpRequest.
   return new Response(
     null,
     {
