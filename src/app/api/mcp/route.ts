@@ -57,18 +57,19 @@ function createMcpServer(): McpServer {
         throw new Error("User context not available");
       }
 
-      const transactions: Transaction[] = await getUserTransactions(
-        global.mcpCurrentUserId,
-        { limit: args.limit, offset: args.offset },
-      );
+      const transactions = (
+        await getUserTransactions(
+          global.mcpCurrentUserId,
+          { limit: args.limit, offset: args.offset },
+        )
+      ).map((data) => ({
+        ...data,
+        amount: parseFloat(data.amount.toString()),
+      }));
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(transactions, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { transactions },
       };
     },
   );
@@ -114,12 +115,8 @@ function createMcpServer(): McpServer {
       });
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(transaction, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { transaction },
       };
     },
   );
@@ -140,12 +137,8 @@ function createMcpServer(): McpServer {
       );
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(categories, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { categories },
       };
     },
   );
@@ -176,12 +169,8 @@ function createMcpServer(): McpServer {
           });
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(category, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { category },
       };
     },
   );
@@ -205,12 +194,8 @@ function createMcpServer(): McpServer {
       }));
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(subscriptions, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { subscriptions },
       };
     },
   );
@@ -249,12 +234,8 @@ function createMcpServer(): McpServer {
       });
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(subscription, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { subscription },
       };
     }
   );
@@ -273,12 +254,8 @@ function createMcpServer(): McpServer {
       const budget = await getBudget(global.mcpCurrentUserId);
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(budget, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: budget || {},
       };
     }
   );
@@ -303,17 +280,11 @@ function createMcpServer(): McpServer {
       const response = await setBudget(global.mcpCurrentUserId, args.amount, args.period);
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(response, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: { response },
       };  
     }
   );
-
-
 
   server.registerTool(
     "get_summary",
@@ -329,12 +300,8 @@ function createMcpServer(): McpServer {
       const response = await getSummary(global.mcpCurrentUserId);
 
       return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify(response, null, 2),
-          },
-        ],
+        content: [],
+        structuredContent: response ? { summary: response } : {},
       };
     },
   );
