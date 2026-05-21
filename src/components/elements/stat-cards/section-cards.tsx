@@ -30,7 +30,8 @@ function SectionCard({
   fromDate,
   toDate,
   currency,
-}: {
+  formatter,
+}: {   
   title: string;
   value: number;
   label: string;
@@ -40,14 +41,14 @@ function SectionCard({
   fromDate?: Date;
   toDate?: Date;
   currency?: string;
-  format: "currency" | "number";
+  formatter: "currency" | "number";
 }) {
   return (
     <Card className="@container/card">
       <CardHeader>
         <CardDescription>{title}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {formatCurrency(value, currency || "USD")}
+          {formatter === "currency" ? formatCurrency(value, currency || "USD") : value}
         </CardTitle>
         <CardAction>
           <Badge variant="outline">
@@ -131,7 +132,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
-        format="currency"
+        formatter="currency"
       />
       <SectionCard
         title="Total Expenses"
@@ -143,7 +144,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
-        format="currency"
+        formatter="currency"
       />
       <SectionCard
         title="Total Income"
@@ -155,7 +156,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
-        format="currency"
+        formatter="currency"
       />
       <SectionCard
         title="Transaction Count"
@@ -167,7 +168,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
-        format="number"
+        formatter="number"
       />
     </div>
   );
