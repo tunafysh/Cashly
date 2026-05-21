@@ -37,8 +37,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const name = (await req.json()).name;
-    const color = (await req.json()).color ?? null;
+    const { name, color }: { name: string, color: string | null } = await req.json();
 
     const category = color ?
      await createCategory({
