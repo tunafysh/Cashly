@@ -3,9 +3,16 @@ import Navbar from "@/components/elements/sections/navbar";
 import Features from "@/components/elements/sections/features";
 import Contact from "@/components/elements/sections/contact";
 import Footer from "@/components/elements/sections/footer";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-//** Page for testing out components locally cuz i don't have the auth keys and stuff. */
-export default function Workbench() {
+export default async function Home() {
+  const session = await auth();
+
+  if (session?.user?.id) {
+    redirect("/app");
+  }
+
   return (
     <>
       <div className="lg:px-28 md:px-12 sm:px-0">

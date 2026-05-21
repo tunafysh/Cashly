@@ -9,6 +9,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { CirclePlusIcon } from "lucide-react";
+import { QuickAddDialog } from "../forms/quick-create-form";
 
 export function NavMain({
   items,
@@ -25,16 +26,16 @@ export function NavMain({
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <Button
-              asChild
-              size="sm"
-              className="w-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:bg-primary/80 mt-8"
-            >
-              <a href="/app/dashboard" className="flex items-center gap-2">
-                <CirclePlusIcon className="size-4" />
-                <span>Quick Create</span>
-              </a>
-            </Button>
+            <QuickAddDialog onSuccess={() => {}}>
+              <Button
+                asChild
+                size="sm"
+                className="w-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:bg-primary/80 mt-8"
+              >
+                  <CirclePlusIcon className="size-4" />
+                  <span>Quick add</span>
+              </Button>
+            </QuickAddDialog>
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu className="gap-1">

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   createCategory,
+  createCategoryWithoutColor,
   deleteCategory,
   getUserCategories,
   updateCategory,
@@ -36,14 +37,19 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, color } = await req.json();
+    const name = (await req.json()).name;
+    const color = (await req.json()).color ?? null;
 
-    const category = await createCategory({
+    const category = color ?
+     await createCategory({
       userId: session.user.id,
       name,
       color,
-    });
-
+    }) : await createCategoryWithoutColor({
+      userId: session.user.id,
+      name
+    })
+    
     return NextResponse.json({ category });
   } catch (error) {
     console.error("Error creating category:", error);
