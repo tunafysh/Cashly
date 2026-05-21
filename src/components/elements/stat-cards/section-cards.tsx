@@ -17,6 +17,7 @@ type SummaryData = {
   balance: number;
   income: number;
   expenses: number;
+  transactionCount: number;
 };
 
 function SectionCard({
@@ -39,6 +40,7 @@ function SectionCard({
   fromDate?: Date;
   toDate?: Date;
   currency?: string;
+  format: "currency" | "number";
 }) {
   return (
     <Card className="@container/card">
@@ -79,6 +81,7 @@ export function SectionCards({
     balance: 0,
     income: 0,
     expenses: 0,
+    transactionCount: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -128,6 +131,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
+        format="currency"
       />
       <SectionCard
         title="Total Expenses"
@@ -139,6 +143,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
+        format="currency"
       />
       <SectionCard
         title="Total Income"
@@ -150,10 +155,11 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
+        format="currency"
       />
       <SectionCard
         title="Transaction Count"
-        value={0}
+        value={data.transactionCount}
         label="Filter active transactions"
         loading={loading}
         trend="active"
@@ -161,6 +167,7 @@ export function SectionCards({
         fromDate={fromDate}
         toDate={toDate}
         currency={currency}
+        format="number"
       />
     </div>
   );

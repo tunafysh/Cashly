@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
       balance,
       income,
       expenses: Math.abs(expenses),
+      transactionCount: transactions.length,
     });
   } catch (err) {
     console.error("Error in summary:", err);
@@ -60,12 +61,13 @@ export async function POST(req: NextRequest) {
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const balance = income + expenses;
+    const balance = income - expenses;
 
     return NextResponse.json({
       balance,
       income,
       expenses: Math.abs(expenses),
+      transactionCount: transactions.length,
     });
   } catch (err) {
     console.error("Error in summary:", err);
