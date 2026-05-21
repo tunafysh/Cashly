@@ -22,6 +22,7 @@ import {
   BadgeCentIcon,
   Settings2Icon,
   UnplugIcon,
+  TagsIcon,
 } from "lucide-react";
 import { Skeleton } from "../../ui/skeleton";
 import { Suspense } from "react";
@@ -39,6 +40,12 @@ const data = {
       url: "/app/transactions",
       icon: <WalletIcon className="size-4" />,
       description: "View all transactions",
+    },
+    {
+      title: "Categories",
+      url: "/app/categories",
+      icon: <TagsIcon className="size-4" />,
+      description: "Manage categories",
     },
     {
       title: "Subscriptions",
