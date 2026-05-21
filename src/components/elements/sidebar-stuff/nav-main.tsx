@@ -32,8 +32,10 @@ export function NavMain({
                 size="sm"
                 className="w-full bg-primary text-primary-foreground transition-all duration-200 hover:bg-primary/90 active:bg-primary/80 mt-8"
               >
+                <div className="flex items-center justify-center gap-2">
                   <CirclePlusIcon className="size-4" />
                   <span>Quick add</span>
+                </div>
               </Button>
             </QuickAddDialog>
           </SidebarMenuItem>
