@@ -3,15 +3,8 @@ import { ChartAreaInteractive } from "@/components/elements/stat-cards/chart-are
 import { SectionCards } from "@/components/elements/stat-cards/section-cards";
 import { useState } from "react";
 import TransactionOverview from "@/components/elements/tables/transaction-overview-table";
-import { formatCurrency } from "@/lib/utils";
 import { useProfile } from "@/lib/profile-context";
 import BudgetCard from "@/components/elements/stat-cards/budget-card";
-import { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Dashboard - Cashly",
-  description: "View your financial overview and insights on the Cashly dashboard."
-}
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{
@@ -26,31 +19,25 @@ export default function Dashboard() {
   };
 
   return (
-    <>
-      <div className="flex flex-1 flex-col">
-        <div className="@container/main flex flex-1 flex-col gap-2">
-          <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-            <SectionCards
-              fromDate={dateRange.fromDate}
-              toDate={dateRange.toDate}
-              currency={profile?.currency}
-            />
-            {profile?.budget != null || profile?.budget != undefined ? (
-              profile?.budget !== 0 ? (
-                <BudgetCard />
-              ) : (
-                <></>
-              )
-            ) : (
-              <></>
-            )}
-            <div className="px-4 lg:px-6">
-              <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
-            </div>
-            <TransactionOverview currency={profile?.currency} />
-          </div>
-        </div>
+    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
+      <SectionCards
+        fromDate={dateRange.fromDate}
+        toDate={dateRange.toDate}
+        currency={profile?.currency}
+      />
+      {profile?.budget != null || profile?.budget != undefined ? (
+        profile?.budget !== 0 ? (
+          <BudgetCard />
+        ) : (
+          <></>
+        )
+      ) : (
+        <></>
+      )}
+      <div className="px-4 lg:px-6">
+        <ChartAreaInteractive onDateRangeChange={handleDateRangeChange} />
       </div>
-    </>
+      <TransactionOverview currency={profile?.currency} />
+    </div>
   );
 }

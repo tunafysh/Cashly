@@ -37,18 +37,20 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { name, color }: { name: string, color: string | null } = await req.json();
+    const { name, color }: { name: string; color: string | null } =
+      await req.json();
 
-    const category = color ?
-     await createCategory({
-      userId: session.user.id,
-      name,
-      color,
-    }) : await createCategoryWithoutColor({
-      userId: session.user.id,
-      name
-    })
-    
+    const category = color
+      ? await createCategory({
+          userId: session.user.id,
+          name,
+          color,
+        })
+      : await createCategoryWithoutColor({
+          userId: session.user.id,
+          name,
+        });
+
     return NextResponse.json({ category });
   } catch (error) {
     console.error("Error creating category:", error);

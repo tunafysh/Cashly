@@ -19,7 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Cashly",
-  description: "A personal finance management app built with Next.js and PostgreSQL.",
+  description:
+    "A personal finance management app built with Next.js and PostgreSQL.",
 };
 
 export default function RootLayout({

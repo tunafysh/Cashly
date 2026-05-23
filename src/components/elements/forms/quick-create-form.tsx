@@ -48,9 +48,7 @@ export function QuickAddDialog({ onSuccess, children }: QuickAddDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogPortal>
         <DialogOverlay />
         <DialogContent className="sm:max-w-md">
@@ -157,12 +155,16 @@ function QuickAddCategoryForm({ onSuccess }: QuickAddCategoryFormProps) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">Color (Optional)</label>
+        <label className="block text-sm font-medium mb-2">
+          Color (Optional)
+        </label>
         <div className="flex items-center gap-3">
           <input
             type="color"
             value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, color: e.target.value })
+            }
             disabled={loading}
             className="h-10 w-14 rounded-md cursor-pointer border"
           />
@@ -449,9 +451,7 @@ function QuickAddSubscriptionFormTabbed({
           step="0.01"
           placeholder="0.00"
           value={formData.amount}
-          onChange={(e) =>
-            setFormData({ ...formData, amount: e.target.value })
-          }
+          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
           disabled={loading}
         />
       </div>

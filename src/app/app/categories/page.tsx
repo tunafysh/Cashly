@@ -3,8 +3,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Categories - Cashly",
-  description: "View and manage your expense categories in Cashly."
-}
+  description: "View and manage your expense categories in Cashly.",
+};
 
 export default function Categories() {
   return (

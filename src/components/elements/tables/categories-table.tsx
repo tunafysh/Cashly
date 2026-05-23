@@ -77,9 +77,7 @@ function DeleteButton({ id, onDelete }: DeleteButtonProps) {
       onDelete(id);
       toast.success("Category deleted successfully");
     } catch (err) {
-      alert(
-        err instanceof Error ? err.message : "Failed to delete category",
-      );
+      alert(err instanceof Error ? err.message : "Failed to delete category");
       setDeleting(false);
     }
   };
@@ -155,10 +153,7 @@ function EditButton({ category, onEdit }: EditButtonProps) {
           <DialogHeader>
             <DialogTitle>Edit Category</DialogTitle>
           </DialogHeader>
-          <CategoryForm
-            category={category}
-            onSuccess={handleEditSuccess}
-          />
+          <CategoryForm category={category} onSuccess={handleEditSuccess} />
         </DialogContent>
       </DialogPortal>
     </Dialog>
@@ -241,16 +236,18 @@ function CategoryForm({ onSuccess, category }: CategoryFormProps) {
 
       if (!response.ok) {
         throw new Error(
-          isEditing
-            ? "Failed to update category"
-            : "Failed to create category",
+          isEditing ? "Failed to update category" : "Failed to create category",
         );
       }
 
       if (!isEditing) {
         setFormData({ name: "", color: "#3b82f6" });
       }
-      toast.success(isEditing ? "Category updated successfully" : "Category created successfully");
+      toast.success(
+        isEditing
+          ? "Category updated successfully"
+          : "Category created successfully",
+      );
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -285,14 +282,18 @@ function CategoryForm({ onSuccess, category }: CategoryFormProps) {
           <input
             type="color"
             value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, color: e.target.value })
+            }
             disabled={loading}
             className="w-12 h-10 rounded cursor-pointer"
           />
           <Input
             type="text"
             value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, color: e.target.value })
+            }
             disabled={loading}
             placeholder="#000000"
             className="flex-1"

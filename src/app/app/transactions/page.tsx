@@ -3,8 +3,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Transactions - Cashly",
-  description: "View and manage your transactions in Cashly."
-}
+  description: "View and manage your transactions in Cashly.",
+};
 
 export default function Transactions() {
   return (

@@ -3,8 +3,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "MCP Tokens - Cashly",
-  description: "Manage your MCP tokens in Cashly."
-}
+  description: "Manage your MCP tokens in Cashly.",
+};
 
 export default function McpTokens() {
   return (

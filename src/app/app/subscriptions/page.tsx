@@ -4,8 +4,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Subscriptions - Cashly",
-  description: "View and manage your subscriptions in Cashly."
-}
+  description: "View and manage your subscriptions in Cashly.",
+};
 
 export default function Subscriptions() {
   return (

@@ -31,7 +31,7 @@ function SectionCard({
   toDate,
   currency,
   formatter,
-}: {   
+}: {
   title: string;
   value: number;
   label: string;
@@ -48,7 +48,9 @@ function SectionCard({
       <CardHeader>
         <CardDescription>{title}</CardDescription>
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-          {formatter === "currency" ? formatCurrency(value, currency || "USD") : value}
+          {formatter === "currency"
+            ? formatCurrency(value, currency || "USD")
+            : value}
         </CardTitle>
         <CardAction>
           <Badge variant="outline">

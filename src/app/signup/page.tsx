@@ -3,8 +3,9 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Signup - Cashly",
-  description: "Create a new Cashly account to start managing your finances effectively."
-}
+  description:
+    "Create a new Cashly account to start managing your finances effectively.",
+};
 
 export default function SignupPage() {
   return (

@@ -27,7 +27,6 @@ async function getTitle() {
   return title;
 }
 
-
 export default async function AppRootLayout({
   children,
 }: React.PropsWithChildren) {
