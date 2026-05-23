@@ -27,7 +27,7 @@ export default function Settings() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-4 p-4 md:p-6">
-        <div className="w-full grid grid-cols-2 gap-3 md:grid-cols-1 grid-rows-1 md:grid-rows-2">
+        <div className="w-full grid grid-cols-2 gap-3 sm:grid-cols-1 grid-rows-1 sm:grid-rows-2">
           <ImportCard />
           <ExportCard />
         </div>
