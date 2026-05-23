@@ -101,7 +101,7 @@ export default function ExportPanel() {
   }
 
   return (
-    <Card className="w-full max-w-2xl overflow-hidden">
+    <Card className="w-full overflow-hidden">
       <CardHeader className="space-y-1">
         <CardTitle>Export Transactions</CardTitle>
         <CardDescription>

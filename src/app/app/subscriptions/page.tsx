@@ -1,5 +1,11 @@
 import SubscriptionsTable from "@/components/elements/tables/subscriptions-table";
 import { QuickCreateSubscriptionForm } from "@/components/elements/forms/quick-create-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Subscriptions - Cashly",
+  description: "View and manage your subscriptions in Cashly."
+}
 
 export default function Subscriptions() {
   return (

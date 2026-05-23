@@ -16,6 +16,12 @@ import {
   ItemDescription,
   ItemTitle,
 } from "@/components/ui/item";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Settings - Cashly",
+  description: "Manage your application settings and preferences in Cashly."
+}
 
 export default function Settings() {
   return (

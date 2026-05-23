@@ -37,7 +37,7 @@ export default function ImportPanel() {
   }
 
   return (
-    <Card className="w-full max-w-2xl border-dashed">
+    <Card className="w-full border-dashed">
       <CardHeader>
         <CardTitle>Import transactions</CardTitle>
       </CardHeader>

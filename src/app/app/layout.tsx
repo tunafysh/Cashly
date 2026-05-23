@@ -5,12 +5,32 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getUserProfile, UserProfile } from "@/db/queries/profiles";
 import Providers from "@/components/elements/uncategorized/providers";
+import { Metadata } from "next";
+
+async function getTitle() {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "/";
+
+  let title =
+    pathname
+      .split("/")
+      .filter(Boolean) // removes empty parts
+      .pop() // last segment
+      ?.replace(/-/g, " ") // optional: "user-settings" → "user settings"
+      .replace(/\b\w/g, (c) => c.toUpperCase()) ?? // capitalize
+    "Home";
+
+  if (title.split(" ")[0].toLowerCase() === "Mcp") {
+    title = "MCP Tokens";
+  }
+
+  return title;
+}
+
 
 export default async function AppRootLayout({
   children,
 }: React.PropsWithChildren) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") || "/";
   const session = await auth();
 
   let profile: UserProfile | undefined;
@@ -28,24 +48,11 @@ export default async function AppRootLayout({
     console.error("Failed to load profile:", error);
   }
 
-  let title =
-    pathname
-      .split("/")
-      .filter(Boolean) // removes empty parts
-      .pop() // last segment
-      ?.replace(/-/g, " ") // optional: "user-settings" → "user settings"
-      .replace(/\b\w/g, (c) => c.toUpperCase()) ?? // capitalize
-    "Home";
-
-  if (title.split(" ")[0].toLowerCase() === "Mcp") {
-    title = "MCP Tokens";
-  }
-
   return (
     <Providers profile={profile} session={session}>
       <AppSidebar variant="inset" />
       <SidebarInset>
-        <SiteHeader title={`${title}`} />
+        <SiteHeader title={`${await getTitle()}`} />
         {children}
       </SidebarInset>
     </Providers>

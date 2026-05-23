@@ -6,6 +6,12 @@ import TransactionOverview from "@/components/elements/tables/transaction-overvi
 import { formatCurrency } from "@/lib/utils";
 import { useProfile } from "@/lib/profile-context";
 import BudgetCard from "@/components/elements/stat-cards/budget-card";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Dashboard - Cashly",
+  description: "View your financial overview and insights on the Cashly dashboard."
+}
 
 export default function Dashboard() {
   const [dateRange, setDateRange] = useState<{

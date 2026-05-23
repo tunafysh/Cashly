@@ -1,4 +1,10 @@
 import { LoginForm } from "@/components/elements/forms/login-form";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Login - Cashly",
+  description: "Access your Cashly account by logging in with your credentials."
+}
 
 export default function LoginPage() {
   return (
