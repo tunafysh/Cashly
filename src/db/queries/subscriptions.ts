@@ -93,9 +93,9 @@ export async function renewSubscriptions(
   const current = new Date(sub.nextBillingAt);
   const next = new Date(current);
   if (type === "monthly") {
-    next.setMonth(next.getMonth() + 1);
+    next.setMonth(next.getMonth());
   } else {
-    next.setFullYear(next.getFullYear() + 1);
+    next.setFullYear(next.getFullYear());
   }
 
   const [updated] = await db
@@ -131,7 +131,7 @@ export async function renewDueSubscriptionsNow(type: "monthly" | "yearly") {
 
     // create transaction here based on subscription details
     createTransaction({
-      createdAt: next,
+      createdAt: current,
       amount: parseFloat(s.amount),
       type: "expense",
       description: `Subscription renewal: ${s.name}`,
