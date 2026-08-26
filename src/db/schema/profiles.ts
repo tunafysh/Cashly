@@ -1,6 +1,5 @@
 import { pgTable, uuid, text, numeric } from "drizzle-orm/pg-core";
 import { users } from "./users";
-import { Currency } from "lucide-react";
 
 export const profiles = pgTable("profiles", {
   id: uuid("id")
