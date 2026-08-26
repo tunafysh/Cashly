@@ -76,7 +76,7 @@ export function BudgetModifier() {
       });
   }
 
-  function handleSaveVariant(newVariant: string) {
+  function handleSaveVariant(newVariant: "monthly" | "yearly") {
     if (isLoading || !updateProfile) return;
     setIsLoading(true);
     updateProfile({ budgetPeriod: newVariant })
@@ -117,7 +117,7 @@ export function BudgetModifier() {
     }
   }
 
-  function handleVariantChange(newVariant: string) {
+  function handleVariantChange(newVariant: "monthly" | "yearly") {
     setVariant(newVariant);
     handleSaveVariant(newVariant);
   }

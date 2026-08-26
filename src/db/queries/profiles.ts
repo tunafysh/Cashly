@@ -19,7 +19,7 @@ export type RawUserProfile = {
   id: string;
   currency: string;
   budget: string | null;
-  budgetPeriod: string;
+  budgetPeriod: "monthly" | "yearly";
 };
 
 export async function getUserProfile(
