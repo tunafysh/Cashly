@@ -20,6 +20,8 @@ async function loginWithCredentials(
 
   let user = await getUserByEmail(credentials.email);
 
+  console.log("DB USER:", user);
+
   if (!user) {
     throw new Error("User not found");
   }
@@ -69,6 +71,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
 
     async signIn({ user, account }) {
+      console.log("AUTH USER:", user, "ACCOUNT:", account);
       if (user && user.id) {
         await ensureProfileExists(user.id);
       } else {
