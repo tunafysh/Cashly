@@ -69,17 +69,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session;
     },
+  },
+  events: {
+    async createUser({ user }) {
+    if (user.id) {
+      await ensureProfileExists(user.id);
+    }
+  },
 
-    async signIn({ user, account }) {
-      console.log("AUTH USER:", user, "ACCOUNT:", account);
-      if (user && user.id) {
-        await ensureProfileExists(user.id);
-      } else {
-        console.warn("User object does not contain an id:", user);
-      }
-
-      return true;
-    },
   },
   providers: [
     Credentials({
