@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cashly-config
-stringData:
+data:
   PGHOST: postgres
   PGUSER: cashly_user
   PGDATABASE: cashly

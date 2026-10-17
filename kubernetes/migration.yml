@@ -8,6 +8,7 @@ spec:
     spec:
       containers:
       - name: cashly
-        image: cashly:latest
+        image: localhost/cashly:latest
+        imagePullPolicy: IfNotPresent
         command: ["pnpm", "run", "db:migrate"]
       restartPolicy: Never

@@ -5,6 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: cashly-ingress
 spec:
+  ingressClassName: caddy
   rules:
   - host: localhost
     http:
