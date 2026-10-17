@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pg-config
+stringData:
+  POSTGRES_DB: cashly
+  POSTGRES_USER: cashly_user

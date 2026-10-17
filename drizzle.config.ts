@@ -1,3 +1,4 @@
+
 import dotenv from "dotenv";
 import { defineConfig } from "drizzle-kit";
 
@@ -5,34 +6,42 @@ dotenv.config({
   path: ".env.local",
 });
 
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(`Missing environment variable: ${name}`);
-  }
-  return value;
-}
+const hasDatabaseCredentials =
+  !!process.env.PGUSER &&
+  !!process.env.PGHOST &&
+  !!process.env.PGDATABASE;
 
-const url = new URL("postgresql://");
-
-url.username = requireEnv("PGUSER");
-url.password = process.env.PGPASSWORD || ""; // password can be optional
-url.hostname = requireEnv("PGHOST");
-url.pathname = `/${requireEnv("PGDATABASE")}`;
-
-url.searchParams.set("sslmode", process.env.PGSSLMODE ?? "require");
-url.searchParams.set(
-  "channel_binding",
-  process.env.PGCHANNELBINDING ?? "require",
-);
-
-const connectionString = url.toString();
-
-export default defineConfig({
+const config = {
   schema: "./src/db/schema",
   out: "./drizzle",
-  dialect: "postgresql",
-  dbCredentials: {
-    url: connectionString,
-  },
-});
+  dialect: "postgresql" as const,
+};
+
+export default defineConfig(
+  hasDatabaseCredentials
+    ? {
+        ...config,
+        dbCredentials: {
+          url: (() => {
+            const url = new URL("postgresql://");
+
+            url.username = process.env.PGUSER!;
+            url.password = process.env.PGPASSWORD || "";
+            url.hostname = process.env.PGHOST!;
+            url.pathname = `/${process.env.PGDATABASE!}`;
+
+            url.searchParams.set(
+              "sslmode",
+              process.env.PGSSLMODE ?? "require",
+            );
+            url.searchParams.set(
+              "channel_binding",
+              process.env.PGCHANNELBINDING ?? "require",
+            );
+
+            return url.toString();
+          })(),
+        },
+      }
+    : config,
+);

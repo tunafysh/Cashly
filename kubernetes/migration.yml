@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: database-migration
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      containers:
+      - name: cashly
+        image: cashly:latest
+        command: ["pnpm", "run", "db:migrate"]
+      restartPolicy: Never
